@@ -109,7 +109,7 @@ input[type=text]{font:inherit;width:100%;padding:12px;border-radius:12px;border:
   <div class="bar"><i id="pbar"></i></div>
 </header>
 <main id="app"></main>
-<div id="vid" hidden><div class="vt"><b id="vTit"></b><button class="sec" id="vX">✕ Cerrar</button></div><div class="vb"><i id="vBar"></i></div><div class="stage" id="vStage"></div><div class="stp" id="vStp"></div><div class="cap" id="vCap"></div><div class="ctl"><button class="sec" id="vPrev">⏮</button><button id="vPlay">⏸ Pausa</button><button class="sec" id="vNext">⏭</button><select id="vRate"><option value="0.85">0.85×</option><option value="0.95" selected>0.95×</option><option value="1.05">1.05×</option><option value="1.2">1.2×</option></select></div></div>
+<div id="vid" hidden><div class="vt"><b id="vTit"></b><button class="sec" id="vX">✕ Cerrar</button></div><div class="vb"><i id="vBar"></i></div><div class="stage" id="vStage"></div><div class="stp" id="vStp"></div><div class="stp" id="vVozInfo" style="padding:0 14px"></div><div class="cap" id="vCap"></div><div class="ctl"><button class="sec" id="vPrev">⏮</button><button id="vPlay">⏸ Pausa</button><button class="sec" id="vNext">⏭</button><select id="vVoz" aria-label="Voz"></select><select id="vRate"><option value="0.85">0.85×</option><option value="0.95" selected>0.95×</option><option value="1.05">1.05×</option><option value="1.2">1.2×</option></select></div></div>
 <script>
 const KEY="curso-patron-v1";
 let ST={done:{},prac:{},exam:0,name:""};
@@ -415,7 +415,14 @@ function clipsDe(mods){const out=[];for(const m of mods){out.push({mod:m.t,img:n
   m.steps.forEach((st,si)=>{let t=limpia(st.h)+". "+limpia(st.p);if(st.frases)t+=" Por ejemplo: "+st.frases.map(f=>limpia(f)).join(". Otra: ");if(st.tipx)t+=" "+limpia(st.tipx);out.push({mod:m.t,img:st.img||null,lines:frases(t),step:`${m.t} · paso ${si+1} de ${m.steps.length}`})});}
   return out}
 const NB=/paulina|juan|ang[eé]lica|diego|jorge|m[oó]nica|marisol|carlos|francisca|esperanza|sabina|dalia/i;
-function mejorVoz(){let vs=[];try{vs=speechSynthesis.getVoices().filter(v=>/^es/i.test(v.lang))}catch(e){}let pref=null;try{pref=localStorage.getItem("planos-voz-name")}catch(e){}
+function vocesES(){let vs=[];try{vs=speechSynthesis.getVoices().filter(v=>/^es/i.test(v.lang))}catch(e){}return vs}
+function vocesListas(){return new Promise(res=>{if(vocesES().length||!window.speechSynthesis){res();return}let t=0;const f=()=>{if(vocesES().length||++t>12){res();return}setTimeout(f,150)};try{speechSynthesis.onvoiceschanged=()=>res()}catch(e){}f()})}
+try{speechSynthesis.getVoices();speechSynthesis.addEventListener&&speechSynthesis.addEventListener("voiceschanged",()=>{})}catch(e){}
+function llenaVoz(){const sel=$("vVoz"),vs=vocesES(),m=mejorVoz();let pref="";try{pref=localStorage.getItem("planos-voz-name")||""}catch(e){}
+  sel.innerHTML='<option value="">Voz: automática</option>'+vs.map(v=>`<option value="${esc(v.name)}">${esc(v.name)} (${esc(v.lang)})</option>`).join("");sel.value=vs.some(v=>v.name===pref)?pref:"";
+  const bueno=vs.some(v=>/premium|enhanced|mejorada|natural|neural/i.test(v.name));
+  $("vVozInfo").innerHTML=vs.length?`🗣️ Hablando con: <b>${esc(m?m.name:"voz por defecto")}</b>`+(bueno?"":"<br>⚠️ No veo voces <b>Mejoradas</b> en tu teléfono. Descárgalas en Ajustes → Accesibilidad → Lectura y voz → Contenido hablado → Voces → Español (México); luego cierra Safari por completo y vuelve a entrar."):"⚠️ El teléfono no mostró voces en español. Cierra Safari por completo y vuelve a entrar.";}
+function mejorVoz(){let vs=vocesES();let pref=null;try{pref=localStorage.getItem("planos-voz-name")}catch(e){}
   if(pref){const v=vs.find(x=>x.name===pref);if(v)return v}
   const sc=v=>(/premium|enhanced|mejorada|natural|neural/i.test(v.name)?100:0)+(/es[-_]MX/i.test(v.lang)?50:/es[-_]419/i.test(v.lang)?40:/es[-_]US/i.test(v.lang)?35:0)+(NB.test(v.name)?10:0)-(/compact|eloquence|grandma|grandpa|rocko|shelley|sandy|reed|flo|eddy/i.test(v.name)?60:0);
   return vs.slice().sort((a,b)=>sc(b)-sc(a))[0]||null}
@@ -437,7 +444,8 @@ function vSpeak(){
   const next=()=>{if(my!==V.tok)return;V.k++;vSpeak()};u.onend=next;u.onerror=next;
   try{speechSynthesis.speak(u)}catch(e){next()}
 }
-function vStart(clips){
+async function vStart(clips){
+  await vocesListas();llenaVoz();
   V.clips=clips;V.i=0;V.k=0;V.paused=false;V.on=true;$("vid").hidden=false;document.body.style.overflow="hidden";
   try{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
   $("vPlay").textContent="⏸ Pausa";vShow();vSpeak();
@@ -445,6 +453,7 @@ function vStart(clips){
 function vStop(){V.on=false;V.tok++;try{speechSynthesis.cancel()}catch(e){}$("vid").hidden=true;document.body.style.overflow=""}
 function vEnd(){V.on=false;$("vCap").innerHTML="🎬 Fin del video. ¡Ahora haz tu mini examen y la práctica en la app!";$("vBar").style.width="100%";$("vPlay").textContent="↺ Ver de nuevo"}
 $("vX").onclick=vStop;
+$("vVoz").onchange=()=>{try{localStorage.setItem("planos-voz-name",$("vVoz").value)}catch(e){}llenaVoz();if(V.on&&!V.paused){V.tok++;vSpeak()}};
 $("vPlay").onclick=()=>{if(!V.on&&V.i>=V.clips.length-1&&$("vPlay").textContent.startsWith("↺")){vStart(V.clips);return}
   if(V.paused){V.paused=false;$("vPlay").textContent="⏸ Pausa";vSpeak()}else{V.paused=true;V.tok++;try{speechSynthesis.cancel()}catch(e){}$("vPlay").textContent="▶️ Seguir"}};
 $("vNext").onclick=()=>{V.tok++;try{speechSynthesis.cancel()}catch(e){}V.i=Math.min(V.clips.length-1,V.i+1);V.k=0;V.on=true;vShow();if(!V.paused)vSpeak()};
