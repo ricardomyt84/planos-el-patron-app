@@ -143,3 +143,67 @@ NEWCH.dorado=(g,s)=>{const w=s*1.5,im=(typeof IMG!=='undefined')?IMG.head:null;
   if(im){const h=w*im.height/im.width,t=document.createElement('canvas');t.width=Math.ceil(w);t.height=Math.ceil(h);const tg=t.getContext('2d');tg.drawImage(im,0,0,w,h);tg.globalCompositeOperation='source-atop';const gr=tg.createLinearGradient(0,0,w,h);gr.addColorStop(0,'rgba(255,236,120,.62)');gr.addColorStop(.5,'rgba(255,190,0,.5)');gr.addColorStop(1,'rgba(214,150,0,.6)');tg.fillStyle=gr;tg.fillRect(0,0,w,h);g.drawImage(t,-w/2,-h*0.62,w,h)}
   const R=s*.34;g.fillStyle='#ffd43b';g.strokeStyle='#8a5a00';g.lineWidth=R*.05;g.beginPath();g.moveTo(-R*.8,-R*1.34);g.lineTo(-R*.8,-R*1.9);g.lineTo(-R*.4,-R*1.55);g.lineTo(0,-R*2.0);g.lineTo(R*.4,-R*1.55);g.lineTo(R*.8,-R*1.9);g.lineTo(R*.8,-R*1.34);g.closePath();g.fill();g.stroke();
   g.fillStyle='#e03131';for(const x of[-.8,0,.8]){g.beginPath();g.arc(R*x,-R*1.78,R*.09,0,Math.PI*2);g.fill()}g.fillStyle='rgba(255,255,255,.8)';for(const[x,y]of[[-.5,-.9],[.55,-.7],[.1,-.3]]){g.beginPath();g.arc(R*x,R*y,R*.06,0,Math.PI*2);g.fill()}};
+/* 👨‍👧‍👦 LA FAMILIA CHON: Julián Chon (el guapechón), Clon Chon (el bebé) y Luchi Lon (el grandulón) */
+(function(){
+const T=Math.PI*2;
+const eyeC=(g,R,x,col,ry)=>{g.fillStyle='#fff';g.beginPath();g.ellipse(x,-R*.04,R*.2,R*(ry||.22),0,0,T);g.fill();g.strokeStyle='rgba(0,0,0,.3)';g.lineWidth=R*.025;g.stroke();g.fillStyle=col;g.beginPath();g.arc(x+R*.02,-R*.02,R*.12,0,T);g.fill();g.fillStyle='#111';g.beginPath();g.arc(x+R*.02,-R*.02,R*.06,0,T);g.fill();g.fillStyle='#fff';g.beginPath();g.arc(x-R*.02,-R*.08,R*.045,0,T);g.fill()};
+const spark=(g,x,y,r,col)=>{g.fillStyle=col||'#fff';g.beginPath();g.moveTo(x,y-r);g.quadraticCurveTo(x+r*.18,y-r*.18,x+r,y);g.quadraticCurveTo(x+r*.18,y+r*.18,x,y+r);g.quadraticCurveTo(x-r*.18,y+r*.18,x-r,y);g.quadraticCurveTo(x-r*.18,y-r*.18,x,y-r);g.fill()};
+const faceB=(g,R,skin,sy)=>{const gr=g.createRadialGradient(-R*.3,-R*.35,R*.1,0,0,R*1.1);gr.addColorStop(0,'#fff3e4');gr.addColorStop(.35,skin);gr.addColorStop(1,'#d9a67a');g.fillStyle=gr;g.save();g.scale(1,sy||1);g.beginPath();g.arc(0,0,R,0,T);g.fill();g.strokeStyle='rgba(0,0,0,.28)';g.lineWidth=R*.05;g.stroke();g.restore()};
+const cheekB=(g,R,y,a)=>{g.fillStyle=`rgba(236,110,110,${a||.35})`;g.beginPath();g.arc(-R*.62,y,R*.2,0,T);g.arc(R*.62,y,R*.2,0,T);g.fill()};
+const brw=(g,x1,y1,x2,y2,w,col)=>{g.strokeStyle=col;g.lineWidth=w;g.lineCap='round';g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke()};
+/* 😎 JULIÁN CHON, EL GUAPECHÓN: pelo castaño rojizo de lado, ceja levantada, sonrisa de galán y brillito en el diente */
+NEWCH.julian=(g,s)=>{const R=s*.34;
+  faceB(g,R,'#f4d2b2');
+  // pelo: castaño rojizo, copete peinado hacia un lado
+  g.fillStyle='#8c4a22';g.beginPath();g.arc(0,-R*.1,R*1.08,Math.PI*.96,Math.PI*2.04);g.lineTo(R*.98,-R*.18);g.quadraticCurveTo(R*.55,-R*.62,-R*.05,-R*.5);g.quadraticCurveTo(-R*.62,-R*.46,-R*1.0,-R*.1);g.closePath();g.fill();
+  g.fillStyle='#a85d2e';g.beginPath();g.moveTo(-R*.95,-R*.6);g.quadraticCurveTo(-R*.2,-R*1.35,R*.95,-R*.65);g.quadraticCurveTo(R*.2,-R*.8,-R*.95,-R*.6);g.fill();
+  g.fillStyle='rgba(255,255,255,.2)';g.beginPath();g.ellipse(-R*.3,-R*.95,R*.38,R*.07,-.25,0,T);g.fill();
+  eyeC(g,R,-R*.38,'#6b3a1c');eyeC(g,R,R*.38,'#6b3a1c');
+  brw(g,-R*.66,-R*.36,-R*.18,-R*.3,R*.09,'#6e3a18');brw(g,R*.16,-R*.38,R*.66,-R*.5,R*.09,'#6e3a18'); // ceja izquierda normal, derecha levantada
+  cheekB(g,R,R*.3,.38);
+  g.fillStyle='#d9a07c';g.beginPath();g.ellipse(0,R*.16,R*.07,R*.05,0,0,T);g.fill();
+  // sonrisa ladeada de galán
+  g.fillStyle='#7a2a2a';g.beginPath();g.moveTo(-R*.46,R*.4);g.quadraticCurveTo(-R*.05,R*.95,R*.52,R*.34);g.quadraticCurveTo(R*.05,R*.56,-R*.46,R*.4);g.fill();
+  g.fillStyle='#fff';g.beginPath();g.moveTo(-R*.4,R*.43);g.quadraticCurveTo(0,R*.6,R*.46,R*.37);g.quadraticCurveTo(R*.04,R*.7,-R*.4,R*.43);g.fill();
+  spark(g,R*.34,R*.52,R*.2,'#fff');spark(g,R*.78,-R*.05,R*.12,'#ffe066');
+  // pulsera de estrellitas: "el guapechón"
+  g.fillStyle='#ffe066';g.font=`bold ${R*.3}px Arial Black,Arial`;g.textAlign='center';g.strokeStyle='#c92a2a';g.lineWidth=R*.07;g.strokeText('★',-R*.95,-R*1.0);g.fillText('★',-R*.95,-R*1.0)};
+/* 🍼 CLON CHON, EL BEBÉ: rizos color fresa-miel, moño rojo de lentejuelas, ojotes y mejillas de bebé */
+NEWCH.clon=(g,s)=>{const R=s*.34;
+  // rizos detrás de la cara
+  g.fillStyle='#c97a34';for(let i=0;i<16;i++){const a=Math.PI*.82+i*(Math.PI*1.36/15),rr=R*(1.0+.12*Math.sin(i*2.3));g.beginPath();g.arc(Math.cos(a)*rr*1.02,Math.sin(a)*rr*1.0-R*.04,R*.3,0,T);g.fill()}
+  for(const sx of[-1,1])for(let k=0;k<3;k++){g.beginPath();g.arc(sx*R*(.98+.06*(k%2)),R*(.05+k*.3),R*.27,0,T);g.fill()}
+  faceB(g,R,'#f8dcc2',.98);
+  // fleco rizado
+  g.fillStyle='#d98d3f';for(let i=0;i<9;i++){const x=-R*.82+i*R*.205,y=-R*.62+Math.abs(i-4)*R*.05;g.beginPath();g.arc(x,y,R*.22,0,T);g.fill()}
+  g.fillStyle='rgba(255,236,190,.5)';g.beginPath();g.arc(-R*.45,-R*.78,R*.1,0,T);g.arc(R*.15,-R*.82,R*.09,0,T);g.fill();
+  // moño rojo de lentejuelas
+  g.save();g.translate(R*.08,-R*1.12);g.fillStyle='#d6212a';g.strokeStyle='#8c0f16';g.lineWidth=R*.05;
+  for(const sx of[-1,1]){g.beginPath();g.moveTo(0,0);g.quadraticCurveTo(sx*R*.6,-R*.55,sx*R*.95,-R*.12);g.quadraticCurveTo(sx*R*.7,R*.42,0,R*.06);g.closePath();g.fill();g.stroke()}
+  g.beginPath();g.arc(0,R*.02,R*.18,0,T);g.fill();g.stroke();
+  g.fillStyle='rgba(255,255,255,.75)';for(const[x,y]of[[-.55,-.1],[-.75,-.02],[.55,-.12],[.72,-.02],[-.4,.1],[.4,.08]]){g.beginPath();g.arc(R*x,R*y,R*.045,0,T);g.fill()}g.restore();
+  // ojotes de bebé con pestañas
+  eyeC(g,R,-R*.36,'#7a4a22',.27);eyeC(g,R,R*.36,'#7a4a22',.27);
+  g.strokeStyle='#5a3418';g.lineWidth=R*.05;g.lineCap='round';for(const sx of[-1,1]){g.beginPath();g.moveTo(sx*R*.56,-R*.18);g.lineTo(sx*R*.7,-R*.26);g.moveTo(sx*R*.5,-R*.24);g.lineTo(sx*R*.6,-R*.36);g.stroke()}
+  brw(g,-R*.6,-R*.4,-R*.18,-R*.44,R*.06,'#a8642a');brw(g,R*.18,-R*.44,R*.6,-R*.4,R*.06,'#a8642a');
+  cheekB(g,R,R*.3,.5);
+  g.fillStyle='#e0a98a';g.beginPath();g.ellipse(0,R*.14,R*.06,R*.045,0,0,T);g.fill();
+  g.fillStyle='#8a2a30';g.beginPath();g.moveTo(-R*.34,R*.4);g.quadraticCurveTo(0,R*.88,R*.34,R*.4);g.quadraticCurveTo(0,R*.5,-R*.34,R*.4);g.fill();g.fillStyle='#fff';g.beginPath();g.moveTo(-R*.3,R*.42);g.quadraticCurveTo(0,R*.52,R*.3,R*.42);g.quadraticCurveTo(0,R*.5,-R*.3,R*.42);g.fill();g.fillStyle='#ff8fa3';g.beginPath();g.ellipse(0,R*.66,R*.14,R*.08,0,0,T);g.fill();
+  g.font=`${R*.55}px serif`;g.textAlign='center';g.fillText('🍼',R*1.05,R*.95)};
+/* 🚚 LUCHI LON, EL GRANDULÓN: cara larga, pelo ondulado rubio oscuro y la camioneta roja de su playera */
+NEWCH.luchi=(g,s)=>{const R=s*.34;
+  faceB(g,R,'#f2d0ac',1.14);
+  // pelo ondulado, largo hacia atrás y hacia los lados
+  g.fillStyle='#b98f4c';g.beginPath();g.arc(0,-R*.08,R*1.12,Math.PI*.93,Math.PI*2.07);g.lineTo(R*1.12,R*.22);g.quadraticCurveTo(R*.9,-R*.1,R*.7,-R*.55);g.quadraticCurveTo(R*.2,-R*.35,-R*.3,-R*.62);g.quadraticCurveTo(-R*.8,-R*.3,-R*1.0,R*.22);g.closePath();g.fill();
+  g.fillStyle='#d1a85e';for(let i=0;i<6;i++){const x=-R*.85+i*R*.34;g.beginPath();g.ellipse(x,-R*1.0+Math.abs(i-2.5)*R*.06,R*.26,R*.18,.5*Math.sin(i),0,T);g.fill()}
+  g.fillStyle='rgba(255,246,214,.45)';g.beginPath();g.ellipse(-R*.2,-R*1.0,R*.4,R*.07,-.15,0,T);g.fill();
+  eyeC(g,R,-R*.38,'#4a78a8',.2);eyeC(g,R,R*.38,'#4a78a8',.2);
+  brw(g,-R*.66,-R*.34,-R*.18,-R*.34,R*.085,'#8a6a32');brw(g,R*.18,-R*.34,R*.66,-R*.34,R*.085,'#8a6a32');
+  cheekB(g,R,R*.36,.3);
+  g.fillStyle='#d6a07c';g.beginPath();g.ellipse(0,R*.2,R*.07,R*.05,0,0,T);g.fill();
+  g.strokeStyle='#8a2a2a';g.lineWidth=R*.08;g.lineCap='round';g.beginPath();g.arc(0,R*.42,R*.34,.2*Math.PI,.8*Math.PI);g.stroke();
+  // la camioneta roja con arbolito de su playera
+  g.save();g.translate(R*1.0,R*1.0);g.fillStyle='#fff';g.beginPath();g.arc(0,0,R*.46,0,T);g.fill();g.strokeStyle='#d6212a';g.lineWidth=R*.06;g.stroke();
+  g.fillStyle='#d6212a';g.fillRect(-R*.32,-R*.02,R*.64,R*.2);g.fillRect(-R*.06,-R*.2,R*.26,R*.2);g.fillStyle='#2f9e44';g.beginPath();g.moveTo(-R*.2,-R*.02);g.lineTo(-R*.12,-R*.26);g.lineTo(-R*.04,-R*.02);g.fill();
+  g.fillStyle='#222';g.beginPath();g.arc(-R*.18,R*.2,R*.07,0,T);g.arc(R*.18,R*.2,R*.07,0,T);g.fill();g.restore()};
+})();
