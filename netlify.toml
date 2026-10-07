@@ -1,6 +1,6 @@
-# App estática: no se compila nada, se publica la carpeta planos.
+# App estática: no se compila nada, se publica la carpeta docs.
 [build]
-  publish = "planos"
+  publish = "docs"
   command = "echo sin compilacion"
 
 [[headers]]
