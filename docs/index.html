@@ -630,6 +630,7 @@ async function startConv(){
   closeSheets();go("plano");CV.on=true;CV.busy=false;document.body.classList.add("cv");$("fabAg").classList.add("live");$("convBar").hidden=false;
   try{if(navigator.wakeLock)CV.wl=await navigator.wakeLock.request("screen")}catch(e){}
   try{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+  try{if(window.VN)VN.unlock()}catch(e){}audioMode("playback");CV.mudo="";CV.mudos=0;
   cvIdle();cvState("hab","");
   await cvSay(sel&&S.shapes.find(x=>x.id===sel)?"Te escucho. Dime qué hacemos con este cuarto.":"Te escucho. Dime qué dibujamos.");
   if(CV.on){const p=CV.promote;CV.promote=null;cvListen(p)}
@@ -648,7 +649,7 @@ function bargeOn(){return !!(SR&&CV.on&&($("vAud").checked||!IOS))}
 function recText(e){let t="",f=false;for(let i=0;i<e.results.length;i++){t+=e.results[i][0].transcript;if(e.results[i].isFinal)f=true}return{t,f}}
 /* Escucha. Si el agente notó 1.2 s de silencio (2.6 s si la frase quedó a medias) ya contesta: no espera a que el teléfono corte solo. */
 function cvListen(pre){
-  if(!CV.on||CV.busy)return;cvState("esc","");
+  if(!CV.on||CV.busy)return;cvState("esc",CV.mudo||"");audioMode("auto");
   try{
     const r=pre||new SR();if(!pre){r.lang="es-MX";r.interimResults=true;r.continuous=false}
     CV.rec=r;let last=(pre&&pre._t)||"",fin="";
@@ -689,38 +690,47 @@ async function cvHandle(t,opc){
 }
 /* Habla con la voz del teléfono. Si la voz elegida no suena (pasa en iPhone con voces duplicadas), prueba la voz por defecto. */
 function hablarDisp(txt,rate,done){
-  let terminado=false;const fin=()=>{if(terminado)return;terminado=true;clearTimeout(wd);clearTimeout(g);done()};
+  let terminado=false,empezo=false;const fin=()=>{if(terminado)return;terminado=true;clearTimeout(wd);clearTimeout(g);done(!empezo)};
   let wd=null,intento=0;
-  const g=setTimeout(fin,8000+txt.length*130);
+  const g=setTimeout(fin,3500+txt.length*110);
   const intentar=()=>{
     if(terminado)return;
     let v=null;if(intento===0&&!window.__vozFalla)v=mejorVoz();
-    const u=new SpeechSynthesisUtterance(txt);u.lang="es-MX";if(v){u.voice=v;u.lang=v.lang}u.rate=rate||0.95;u.pitch=1;
-    let empezo=false;u.onstart=()=>{empezo=true;clearTimeout(wd)};u.onend=fin;u.onerror=ev=>{if(ev&&(ev.error==="canceled"||ev.error==="interrupted"))return;if(!empezo&&intento===0){window.__vozFalla=true;intento=1;intentar()}else fin()};
+    const u=new SpeechSynthesisUtterance(txt);u.lang="es-MX";if(v){u.voice=v;u.lang=v.lang}u.rate=rate||0.95;u.pitch=1;u.volume=1;
+    u.onstart=()=>{empezo=true;clearTimeout(wd)};u.onend=fin;u.onerror=ev=>{if(ev&&(ev.error==="canceled"||ev.error==="interrupted"))return;if(!empezo&&intento===0){window.__vozFalla=true;intento=1;intentar()}else fin()};
     clearTimeout(wd);wd=setTimeout(()=>{if(empezo||terminado)return;try{speechSynthesis.cancel()}catch(e){}
-      if(intento===0){window.__vozFalla=true;intento=1;intentar()}else fin()},2500);
+      if(intento===0){window.__vozFalla=true;intento=1;intentar()}else fin()},1800);
     try{speechSynthesis.speak(u)}catch(e){fin()}};
   intentar();
 }
+/* Sesión de audio de iOS: "playback" suena aunque el interruptor lateral esté en silencio; "auto" deja usar el micrófono */
+function audioMode(m){try{if(navigator.audioSession)navigator.audioSession.type=m}catch(e){}}
 function cvSay(txt,solo,o){
   return new Promise(res=>{
-    if(!window.speechSynthesis||!txt){res();return}
-    if(!solo)cvState("hab");
+    if(!txt){res();return}
+    if(!solo){cvState("hab","💬 "+String(txt).replace(/[*_#`]/g,""));audioMode("playback")}
     try{speechSynthesis.cancel()}catch(e){}
     const partes=(String(txt).replace(/[*_#`]/g,"").match(/[^.!?\n]+[.!?]*/g)||[String(txt)]).map(x=>x.trim()).filter(Boolean);
     let i=0,fin=false,barge=null,promoted=false;
     const cierra=()=>{if(fin)return;fin=true;try{if(barge&&!promoted){barge.onend=null;barge.abort()}}catch(e){}CV.cancel=null;CV.speaking=false;res()};
-    CV.cancel=()=>{try{speechSynthesis.cancel()}catch(e){}cierra()};CV.speaking=!solo;
+    CV.cancel=()=>{try{speechSynthesis.cancel()}catch(e){}try{if(window.VN)VN.stop()}catch(e){}cierra()};CV.speaking=!solo;
+    const natural=!solo&&window.VN&&VN.pref&&!VN.disabled&&VN.sesionOk();if(natural)partes.forEach(p=>{try{VN.prefetch(p,parseFloat($("vRate").value)||0.95)}catch(e){}});
     if(!solo&&bargeOn()){ /* interrumpir hablando: ignora lo que es eco del propio agente (palabras que él mismo está diciendo) */
       const mine=new Set(wordsOf(txt));
       try{barge=new SR();barge.lang="es-MX";barge.interimResults=true;barge.continuous=false;
         barge.onresult=e=>{if(fin)return;const t=recText(e).t,w=wordsOf(t),nov=w.filter(x=>!mine.has(x));
           const para=/(^|\s)(espera|esp[eé]rate|alto|detente|c[aá]llate|momento|oye|perd[oó]n|no no)(\s|$)/i.test(fold(t))&&!mine.has(fold(t).split(" ")[0]);
-          if((nov.length>=2&&nov.length>=w.length*.5)||(para&&nov.length>=1)){try{speechSynthesis.cancel()}catch(x){}barge._t=t;barge.onresult=null;CV.promote=barge;promoted=true;$("cvTxt").textContent=t;cierra()}};
+          if((nov.length>=2&&nov.length>=w.length*.5)||(para&&nov.length>=1)){try{speechSynthesis.cancel()}catch(x){}try{if(window.VN)VN.stop()}catch(x){}barge._t=t;barge.onresult=null;CV.promote=barge;promoted=true;$("cvTxt").textContent=t;cierra()}};
         barge.onerror=()=>{};barge.start()}catch(e){barge=null}}
-    const dice=()=>{
+    const dice=async()=>{
       if(fin)return;if(i>=partes.length){cierra();return}
-      hablarDisp(partes[i++],parseFloat($("vRate").value)||0.95,dice)};
+      const p=partes[i++],rate=parseFloat($("vRate").value)||0.95;
+      if(natural&&!VN.disabled){let ok=false;try{ok=await VN.say(p,rate)}catch(e){}if(fin)return;if(ok){CV.mudo="";dice();return}}
+      if(!window.speechSynthesis){cierra();return}
+      hablarDisp(p,rate,mudo=>{if(fin)return;
+        if(mudo){CV.mudos=(CV.mudos||0)+1;if(!solo){CV.mudo="🔇 No se oye: sube el volumen y apaga el modo silencio (botón lateral del iPhone). Te lo dejo escrito: "+String(txt).replace(/[*_#`]/g,"");toast("🔇 No se escucha: revisa volumen y el botón lateral de silencio")}cierra();return}
+        CV.mudos=0;CV.mudo="";dice()})};
+    if(!window.speechSynthesis&&!natural){res();return}
     dice();
   });
 }
