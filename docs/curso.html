@@ -706,13 +706,13 @@ document.addEventListener("click",e=>{
   if(e.target.closest("#vStage")&&!e.target.closest("button,a")&&V.sc.length){vSideToggle()}
 });
 $("vX").onclick=vStop;
-function vEstadoVoz(){const el=$("vNatInfo");if(!el)return;if(!window.VN||!VN.pref){el.textContent="📱 Usando la voz del teléfono";return}el.textContent=VN.estado&&VN.estado!=="ok"?VN.mensaje(VN.estado)+" · uso la voz del teléfono":VN.estado==="ok"?"✅ Voz natural activa":""}
+function vEstadoVoz(){const el=$("vNatInfo");if(!el)return;el.textContent=window.VN?VN.diagnostico():"";el.style.color=/✅/.test(el.textContent)?"#4ade80":"#ffd978"}
 $("vNat").value=(window.VN&&VN.pref)?VN.voz:"off";
 $("vNat").onchange=()=>{const v=$("vNat").value;if(v==="off")VN.pref=false;else{VN.pref=true;VN.voz=v;VN.disabled=false}vEstadoVoz();if(V.on&&!V.paused&&!V.wait){V.tok++;vSpeak()}};
 $("vTest").onclick=async()=>{try{speechSynthesis.cancel()}catch(e){}if(window.VN){VN.stop();VN.unlock()}
   if(window.VN&&VN.pref){const r=await VN.probar();vEstadoVoz();if(r.ok)return}
   try{const u=new SpeechSynthesisUtterance("Hola. Esta es la voz con la que te voy a explicar el curso.");const v=mejorVoz();if(v){u.voice=v;u.lang=v.lang}else u.lang="es-MX";u.rate=parseFloat($("vRate").value)||0.8;speechSynthesis.speak(u)}catch(e){}};
-$("vCfg").onclick=()=>{$("vOpts").hidden=!$("vOpts").hidden;vSideShow()};
+$("vCfg").onclick=()=>{$("vOpts").hidden=!$("vOpts").hidden;if(!$("vOpts").hidden)vEstadoVoz();vSideShow()};
 $("vOptsX").onclick=()=>{$("vOpts").hidden=true};
 let SUB=false;try{SUB=localStorage.getItem("curso-sub")==="1"}catch(e){}
 function aplicaSub(){$("vCap").classList.toggle("off",!SUB)}aplicaSub();

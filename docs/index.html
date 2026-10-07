@@ -613,7 +613,7 @@ $("vRateT").textContent=$("vRate").value+"×";
 $("vSel").onchange=()=>{try{localStorage.setItem(VK,$("vSel").value)}catch(e){}};
 $("vRate").oninput=()=>{$("vRateT").textContent=$("vRate").value+"×";try{localStorage.setItem("planos-voz-rate",$("vRate").value)}catch(e){}};
 $("vAud").onchange=()=>{try{localStorage.setItem("planos-aud",$("vAud").checked?"1":"0")}catch(e){}};
-function vnPaint(){const el=$("vnInfo");if(!el||!window.VN)return;el.textContent=!VN.pref?"📱 Usando la voz del teléfono":(VN.estado?VN.mensaje(VN.estado):"🎙️ Voz natural lista; se confirma al probarla")}
+function vnPaint(){const el=$("vnInfo");if(!el||!window.VN)return;el.textContent=VN.diagnostico();el.style.color=/✅/.test(el.textContent)?"#4ade80":"#ffd978"}
 if(window.VN){$("vnSel").value=VN.pref?VN.voz:"off";vnPaint()}
 $("vnSel").onchange=()=>{const v=$("vnSel").value;if(v==="off")VN.pref=false;else{VN.pref=true;VN.voz=v;VN.disabled=false}vnPaint()};
 $("vTest").onclick=async()=>{try{speechSynthesis.cancel()}catch(e){};if(window.VN){VN.stop();VN.unlock()}
@@ -691,7 +691,7 @@ function cvSay(txt,solo){
 $("fabAg").onclick=()=>{if(CV.on)stopConv();else startConv()};
 $("fabTxt").onclick=()=>openAgent();
 $("cvStop").onclick=stopConv;
-$("cvCfg").onclick=()=>{llenaVoces();openSheet("sheetAg")};
+$("cvCfg").onclick=()=>{llenaVoces();vnPaint();openSheet("sheetAg")};
 /* ---------- portada de inicio ---------- */
 function homeShow(){
   if(TOUR&&TOUR.on)return;
