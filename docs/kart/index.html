@@ -594,7 +594,7 @@ function startRace(){
   raceT=0;countT=3.2;state='count';finishedAt=0;results=[];melI=0;musicT=AC?AC.currentTime+0.1:0;setMusic(TRK.song);tilt.sum=0;tilt.n=0;
   cam.x=player.x;cam.y=player.y;cam.a=player.a;if(P2){cam2.x=player2.x;cam2.y=player2.y;cam2.a=player2.a}
   showScreen(null);$('pad').classList.add('on');$('top').classList.add('on');$('pad').classList.toggle('p2',P2);
-  const tl=!P2&&ctlMode>0&&tilt.has;$('pad').classList.toggle('tilt',tl);$('tiltBar').classList.toggle('on',tl);
+  const tl=!P2&&ctlMode>0&&tilt.has;$('pad').classList.toggle('tilt',tl);$('tiltBar').classList.toggle('on',tl);if(!P2&&ctlMode>0&&!tilt.has&&typeof say==='function')setTimeout(()=>{if(!tilt.has&&(state==='count'||state==='race'))say(tilt.denied?'📱 Sensor sin permiso: usa las flechas, o Ajustes → Control para permitirlo':'📱 Esperando el sensor de movimiento… mientras, usa las flechas',3800)},2200);
   if(window.V4)V4.raceStart();
 }
 function showScreen(id){for(const s of document.querySelectorAll('.scr'))s.classList.toggle('on',s.id===id)}
@@ -960,19 +960,21 @@ async function showRec(i){curTrack=i;const tabs=$('recTabs');tabs.innerHTML='';T
     body.innerHTML=rows.length?'<table>'+rows.map((x,n)=>`<tr><td>${['🥇','🥈','🥉'][n]||(n+1)+'°'}</td><td>${esc(x.name)}</td><td>${fmt(x.time_ms/1000)}</td></tr>`).join('')+'</table>':'Aún nadie corre aquí. ¡Sé el primero! 🏁'}
   catch(e){const b=lsGet('kart_best',{})[TRACKS[i].id];body.innerHTML='😕 Sin conexión. '+(b?'Tu mejor tiempo: <b>'+fmt(b/1000)+'</b>':'')}}
 /* ---------- inclinar el iPhone como volante ---------- */
-const tilt={listening:false,has:false,raw:0,off:0,steer:0,s:0,sum:0,n:0};let ctlMode=lsGet('kart_ctl',0);
+const tilt={listening:false,has:false,raw:0,off:0,steer:0,s:0,sum:0,n:0};let ctlMode=lsGet('kart_ctl',null);if(ctlMode===null)ctlMode=(('ontouchstart' in window)&&typeof DeviceMotionEvent!=='undefined')?1:0;
 const IOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 function onMotion(e){const a=e.accelerationIncludingGravity;if(!a||a.x==null||a.y==null)return;let dx=a.x,dy=a.y;if(!IOS){dx=-dx;dy=-dy}
   let A=(screen.orientation&&typeof screen.orientation.angle==='number')?screen.orientation.angle:(window.orientation||0);A=((A%360)+360)%360;
   let sx,up;if(A===90){sx=-dy;up=dx}else if(A===270){sx=dy;up=-dx}else if(A===180){sx=-dx;up=-dy}else{sx=dx;up=dy}
-  if(Math.hypot(sx,up)<4)return;tilt.has=true;tilt.raw=Math.atan2(sx,-up)*180/Math.PI;
+  if(Math.hypot(sx,up)<4)return;tilt.raw=Math.atan2(sx,-up)*180/Math.PI;if(!tilt.has){tilt.has=true;tilt.off=tilt.raw;tilt.s=0;syncTiltUI();if(typeof say==='function'&&(state==='count'||state==='race'))say('📱 Sensor listo: inclina el iPhone para girar',2600)}
   let d=tilt.raw-tilt.off;d=Math.abs(d)<1.5?0:d-Math.sign(d)*1.5;let t=clamp(d/SET.tilt*1.15,-1,1);t=Math.sign(t)*Math.pow(Math.abs(t),.85);if(ctlMode===2)t=-t;tilt.s+=(t-tilt.s)*0.5;tilt.steer=tilt.s}
+function syncTiltUI(){const tl=!P2&&ctlMode>0&&tilt.has&&(state==='count'||state==='race');$('pad').classList.toggle('tilt',tl);$('tiltBar').classList.toggle('on',tl)}
 async function enableTilt(){try{if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){const r=await DeviceMotionEvent.requestPermission();if(r!=='granted')return false}
   if(!tilt.listening){addEventListener('devicemotion',onMotion);tilt.listening=true}return true}catch(e){return false}}
 const CTL_TXT=['🎮 Control: botones','📱 Control: inclinar','📱 Inclinar (al revés)'];
 $('bCtl').textContent=CTL_TXT[ctlMode];
-$('bCtl').onclick=async()=>{audioUnlock();const n=(ctlMode+1)%3;if(n>0&&!tilt.listening){const ok=await enableTilt();if(!ok){alert('No pude activar el sensor de movimiento. Toca "Permitir" cuando el iPhone lo pregunte.');return}}ctlMode=n;lsSet('kart_ctl',n);$('bCtl').textContent=CTL_TXT[n];$('hintTitle').textContent=n?'Sostén el iPhone de lado y gíralo como volante 🛞. Si gira al revés, cambia a "al revés". Mantenlo quieto durante la cuenta regresiva.':'3 pistas · 3 vueltas · 4 rivales. Gira tu iPhone de lado para jugar mejor.'};
-if(ctlMode>0)enableTilt();
+$('bCtl').onclick=async()=>{audioUnlock();tilt.denied=false;const n=(ctlMode+1)%3;if(n>0&&!tilt.listening){const ok=await enableTilt();if(!ok){alert('No pude activar el sensor de movimiento. Toca "Permitir" cuando el iPhone lo pregunte.');return}}ctlMode=n;lsSet('kart_ctl',n);$('bCtl').textContent=CTL_TXT[n];$('hintTitle').textContent=n?'Sostén el iPhone de lado y gíralo como volante 🛞. Si gira al revés, cambia a "al revés". Mantenlo quieto durante la cuenta regresiva.':'3 pistas · 3 vueltas · 4 rivales. Gira tu iPhone de lado para jugar mejor.'};
+/* En iPhone el permiso del sensor solo se puede pedir al tocar la pantalla: se pide en el primer toque de cada visita */
+{const h=async()=>{if(ctlMode>0&&!tilt.listening&&!tilt.denied){const ok=await enableTilt();if(!ok)tilt.denied=true}};document.addEventListener('click',h,true);document.addEventListener('touchend',h,true)}
 const TIPS=['💡 El ladrillo siempre llega tarde.','💡 La renta no se cobra sola… ¡pero las monedas sí!','💡 El plomero dice que todo es una fuga.','💡 Cemento fresco = cero velocidad.','💡 El albañil prometió terminar mañana.','💡 Si ves un recibo de renta volando, ¡agáchate!','💡 Los tacos del albañil dan turbo grande.','💡 En la obra negra todo es negro… hasta el futuro.'];
 let tipI=0;function nextTip(){const e=$('tip');if(e)e.textContent=TIPS[tipI++%TIPS.length]}nextTip();setInterval(nextTip,4200);
 function bindHold(id,on,off){const el=$(id);const set=v=>{el.classList.toggle('down',v);v?on():off()};el.addEventListener('pointerdown',e=>{e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}set(true)});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,()=>set(false)))}
