@@ -309,7 +309,7 @@ body.pres .stage #cv{height:calc(100dvh - 110px)}
     <div class="status" id="vnInfo" style="color:var(--mut)"></div>
     <label class="status">Voz<select id="vSel"></select></label>
     <label class="status">Velocidad <span id="vRateT"></span><input type="range" id="vRate" min="0.7" max="1.2" step="0.05" value="0.95"></label>
-    <label class="status"><input type="checkbox" id="vAud" style="width:auto"> 🎧 Uso audífonos (puedo interrumpirlo hablando)</label>
+    <label class="status"><input type="checkbox" id="vAud" style="width:auto"> 🎧 Interrumpirlo con la voz (actívalo si usas audífonos; en Android ya viene activo). Siempre puedes tocar la barra para callarlo</label>
     <div class="row"><button class="sec" id="vTest">▶️ Probar voz</button></div>
     <div class="status" style="color:var(--mut)">💡 Para una voz mucho más natural: Ajustes del iPhone → Accesibilidad → Lectura y voz → Contenido hablado → Voces → Español (México) → descarga una voz <b>Mejorada</b> o <b>Premium</b>. Luego elígela aquí.</div>
     <label class="status"><input type="checkbox" id="agConv" style="width:auto"> 🔁 Modo conversación (escucha sola después de contestar)</label>
@@ -584,7 +584,7 @@ $("bAg2").onclick=agEnviar;
 $("bMic2").onclick=()=>{if(rec){rec.stop();return}try{speechSynthesis.cancel()}catch(e){}escuchar()};
 $("bUndo2").onclick=()=>{$("bUndo").click();$("agOut2").textContent=$("agOut").textContent};
 /* ---------- conversación continua (manos libres) ---------- */
-const CV={on:false,busy:false,rec:null,idle:null,wl:null,carry:"",cancel:null};
+const CV={on:false,busy:false,rec:null,idle:null,wl:null,carry:"",cancel:null,pen:false,promote:null,speaking:false};
 const VK="planos-voz-uri";
 const NB=/paulina|juan|ang[eé]lica|diego|jorge|m[oó]nica|marisol|carlos|francisca|esperanza|sabina|dalia|alvaro|elvira/i;
 const VCAL=["Básica","Estándar","Mejorada","Premium"];
@@ -621,7 +621,7 @@ $("vnSel").onchange=()=>{const v=$("vnSel").value;if(v==="off")VN.pref=false;els
 $("vTest").onclick=async()=>{try{speechSynthesis.cancel()}catch(e){};if(window.VN){VN.stop();VN.unlock()}
   if(window.VN&&VN.pref){const r=await VN.probar();vnPaint();if(r.ok)return}
   cvSay("Hola, soy el agente de El Patrón. ¿Qué dibujamos hoy?",true)};
-function cvState(st,txt){const m={esc:"Te escucho…",pen:"Pensando…",hab:"Hablando…"};$("cvSt").textContent=m[st]||st;if(txt!==undefined)$("cvTxt").textContent=txt;$("convBar").dataset.st=st}
+function cvState(st,txt){const m={esc:"Te escucho…",pen:"Pensando… (puedes seguir hablando)",hab:"Hablando… (háblame o toca para interrumpir)"};$("cvSt").textContent=m[st]||st;if(txt!==undefined)$("cvTxt").textContent=txt;$("convBar").dataset.st=st}
 function cvIdle(){clearTimeout(CV.idle);CV.idle=setTimeout(()=>{if(CV.on){toast("🎧 Conversación en pausa por inactividad");stopConv()}},180000)}
 async function startConv(){
   if(CV.on)return;
@@ -632,36 +632,60 @@ async function startConv(){
   try{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
   cvIdle();cvState("hab","");
   await cvSay(sel&&S.shapes.find(x=>x.id===sel)?"Te escucho. Dime qué hacemos con este cuarto.":"Te escucho. Dime qué dibujamos.");
-  if(CV.on)cvListen();
+  if(CV.on){const p=CV.promote;CV.promote=null;cvListen(p)}
 }
 function stopConv(){
-  CV.on=false;CV.busy=false;clearTimeout(CV.idle);clearTimeout(CV.silT);try{if(CV.bargeRec){CV.bargeRec.onresult=null;CV.bargeRec.abort()}}catch(e){}CV.bargeRec=null;
+  CV.on=false;CV.busy=false;clearTimeout(CV.idle);clearTimeout(CV.silT);try{carryStop()}catch(e){}CV.promote=null;try{if(CV.bargeRec){CV.bargeRec.onresult=null;CV.bargeRec.abort()}}catch(e){}CV.bargeRec=null;
   try{if(CV.rec){CV.rec.onend=null;CV.rec.abort()}}catch(e){}CV.rec=null;
   try{speechSynthesis.cancel()}catch(e){}if(CV.cancel)CV.cancel();
   try{if(CV.wl)CV.wl.release()}catch(e){}CV.wl=null;
   document.body.classList.remove("cv");$("fabAg").classList.remove("live");$("convBar").hidden=true;
 }
-function cvListen(){
+const IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+const wordsOf=x=>fold(x).replace(/[^a-z0-9ñ ]/g," ").split(/\s+/).filter(w=>w.length>2);
+const ENDERS=/(^|\s)(y|e|o|con|de|del|en|a|al|por|para|que|el|la|los|las|un|una|su|mi|pero|luego|despu[eé]s|m[aá]s|entre|hasta|desde)\s*$/i;
+function bargeOn(){return !!(SR&&CV.on&&($("vAud").checked||!IOS))}
+function recText(e){let t="",f=false;for(let i=0;i<e.results.length;i++){t+=e.results[i][0].transcript;if(e.results[i].isFinal)f=true}return{t,f}}
+/* Escucha. Si el agente notó 1.2 s de silencio (2.6 s si la frase quedó a medias) ya contesta: no espera a que el teléfono corte solo. */
+function cvListen(pre){
   if(!CV.on||CV.busy)return;cvState("esc","");
   try{
-    const r=new SR();r.lang="es-MX";r.interimResults=true;r.continuous=false;CV.rec=r;let last="",fin="";
-    r.onresult=e=>{let t="",f=false;for(let i=e.resultIndex;i<e.results.length;i++){t+=e.results[i][0].transcript;if(e.results[i].isFinal)f=true}last=t;$("cvTxt").textContent=t;cvIdle();if(f)fin=t};
+    const r=pre||new SR();if(!pre){r.lang="es-MX";r.interimResults=true;r.continuous=false}
+    CV.rec=r;let last=(pre&&pre._t)||"",fin="";
+    const arm=()=>{clearTimeout(CV.silT);const t=last.trim();if(t.length<2)return;CV.silT=setTimeout(()=>{if(CV.rec===r&&CV.on&&!CV.busy){try{r.stop()}catch(e){}}},ENDERS.test(t)?2600:1200)};
+    r.onresult=e=>{const x=recText(e);last=x.t;$("cvTxt").textContent=x.t;cvIdle();if(x.f)fin=x.t;arm()};
     r.onerror=ev=>{if(ev.error==="not-allowed"||ev.error==="service-not-allowed"){toast("🎙️ Permite el micrófono en Safari para conversar");stopConv()}};
-    r.onend=()=>{CV.rec=null;if(!CV.on||CV.busy)return;const t=(fin||last).trim();if(t.length>1)cvHandle(t);else setTimeout(cvListen,250)};
-    r.start();
+    r.onend=()=>{clearTimeout(CV.silT);if(CV.rec===r)CV.rec=null;if(!CV.on||CV.busy)return;const t=(fin||last).trim();if(t.length>1)cvHandle(t,{});else setTimeout(cvListen,250)};
+    if(!pre)r.start();else arm();
   }catch(e){setTimeout(cvListen,600)}
 }
-async function cvHandle(t){
-  CV.busy=true;cvIdle();
+/* Mientras el agente piensa, sigue oyéndote: si sigues hablando, lo que digas se atiende enseguida. */
+function carryStart(){CV.carry="";CV.pen=true;
+  const loop=()=>{if(!CV.pen||!CV.on||!SR)return;try{const r=new SR();r.lang="es-MX";r.interimResults=true;r.continuous=false;CV.carryRec=r;let last="";
+    r.onresult=e=>{last=recText(e).t;if(last.trim().length>2)$("cvTxt").textContent="🎙️ "+last};r.onerror=()=>{};
+    r.onend=()=>{if(CV.carryRec===r)CV.carryRec=null;const t=last.trim();if(t.length>2)CV.carry=(CV.carry+" "+t).trim();if(CV.pen)setTimeout(loop,80)};r.start()}catch(e){}};
+  loop()}
+function carryStop(){CV.pen=false;try{if(CV.carryRec){CV.carryRec.onend=null;CV.carryRec.onresult=null;CV.carryRec.abort()}}catch(e){}CV.carryRec=null;const c=CV.carry;CV.carry="";return c}
+async function cvHandle(t,opc){
+  CV.busy=true;cvIdle();opc=opc||{};
   if(/^\s*(termina|terminar|terminamos|adi[oó]s|hasta luego|det[eé]n|detente|c[aá]llate|ya no|salir)\b/i.test(t)){cvState("hab",t);await cvSay("Hasta luego.");stopConv();return}
-  cvState("pen",t);
+  cvState("pen",t);if(bargeOn()||!IOS)carryStart();else CV.pen=false;
+  let msg="",carry="";
   try{
-    const r=await runAgent(t);
-    $("cvTxt").textContent=(r.log.join(" · ")||"Sin cambios");if(r.acc.length)toast("✅ "+(r.log[0]||"Listo"));
-    await cvSay(r.msg||(r.acc.length?"Listo.":"No hice cambios."));
-  }catch(err){$("cvTxt").textContent="⚠️ "+err.message;await cvSay("Tuve un problema. Intenta de nuevo.")}
-  CV.busy=false;
-  if(CV.on){if(CV.carry){const c=CV.carry;CV.carry="";cvHandle(c)}else cvListen()}
+    const r=await runAgent(t,null,0,opc.interrumpido?{interrumpido:true}:null);
+    carry=carryStop();
+    $("cvTxt").textContent=(r.log.filter(l=>!l.startsWith("💬")).join(" · ")||"Sin cambios");if(r.acc.length)toast("✅ "+(r.log[0]||"Listo"));
+    msg=r.msg||(r.acc.length?"Listo.":"No hice cambios.");
+  }catch(err){carryStop();$("cvTxt").textContent="⚠️ "+err.message;msg="Tuve un problema. Intenta de nuevo."}
+  if(!CV.on)return;
+  /* si seguías hablando, no te repito lo anterior: atiendo lo nuevo (salvo que el agente te corte con una duda) */
+  const cortaTe=/^\s*perd[oó]n/i.test(msg);
+  if(carry&&!cortaTe){CV.busy=false;cvHandle(carry,{interrumpido:true});return}
+  await cvSay(msg,false,{pend:carry});
+  CV.busy=false;if(!CV.on)return;
+  if(CV.promote){const p=CV.promote;CV.promote=null;cvListen(p);return}
+  if(carry){cvHandle(carry,{interrumpido:true});return}
+  cvListen();
 }
 /* Habla con la voz del teléfono. Si la voz elegida no suena (pasa en iPhone con voces duplicadas), prueba la voz por defecto. */
 function hablarDisp(txt,rate,done){
@@ -678,25 +702,30 @@ function hablarDisp(txt,rate,done){
     try{speechSynthesis.speak(u)}catch(e){fin()}};
   intentar();
 }
-function cvSay(txt,solo){
+function cvSay(txt,solo,o){
   return new Promise(res=>{
     if(!window.speechSynthesis||!txt){res();return}
     if(!solo)cvState("hab");
     try{speechSynthesis.cancel()}catch(e){}
     const partes=(String(txt).replace(/[*_#`]/g,"").match(/[^.!?\n]+[.!?]*/g)||[String(txt)]).map(x=>x.trim()).filter(Boolean);
-    let i=0,fin=false,barge=null;
-    const cierra=()=>{if(fin)return;fin=true;try{if(barge){barge.onend=null;barge.abort()}}catch(e){}CV.cancel=null;res()};
-    CV.cancel=()=>{try{speechSynthesis.cancel()}catch(e){}cierra()};
-    if(!solo&&$("vAud").checked&&CV.on&&SR){ // con audífonos: se puede interrumpir hablando
-      try{barge=new SR();barge.lang="es-MX";barge.interimResults=true;barge.continuous=false;let t="";
-        barge.onresult=e=>{t="";for(let k=0;k<e.results.length;k++)t+=e.results[k][0].transcript;if(t.trim().length>=3&&!fin){try{speechSynthesis.cancel()}catch(x){}CV.carry="";CV.barging=true;cierra()}};
-        barge.onend=()=>{if(CV.barging){CV.barging=false}};barge.start()}catch(e){barge=null}}
+    let i=0,fin=false,barge=null,promoted=false;
+    const cierra=()=>{if(fin)return;fin=true;try{if(barge&&!promoted){barge.onend=null;barge.abort()}}catch(e){}CV.cancel=null;CV.speaking=false;res()};
+    CV.cancel=()=>{try{speechSynthesis.cancel()}catch(e){}cierra()};CV.speaking=!solo;
+    if(!solo&&bargeOn()){ /* interrumpir hablando: ignora lo que es eco del propio agente (palabras que él mismo está diciendo) */
+      const mine=new Set(wordsOf(txt));
+      try{barge=new SR();barge.lang="es-MX";barge.interimResults=true;barge.continuous=false;
+        barge.onresult=e=>{if(fin)return;const t=recText(e).t,w=wordsOf(t),nov=w.filter(x=>!mine.has(x));
+          const para=/(^|\s)(espera|esp[eé]rate|alto|detente|c[aá]llate|momento|oye|perd[oó]n|no no)(\s|$)/i.test(fold(t))&&!mine.has(fold(t).split(" ")[0]);
+          if((nov.length>=2&&nov.length>=w.length*.5)||(para&&nov.length>=1)){try{speechSynthesis.cancel()}catch(x){}barge._t=t;barge.onresult=null;CV.promote=barge;promoted=true;$("cvTxt").textContent=t;cierra()}};
+        barge.onerror=()=>{};barge.start()}catch(e){barge=null}}
     const dice=()=>{
       if(fin)return;if(i>=partes.length){cierra();return}
       hablarDisp(partes[i++],parseFloat($("vRate").value)||0.95,dice)};
     dice();
   });
 }
+/* tocar la barra también interrumpe (sirve con altavoz en iPhone) */
+$("convBar").addEventListener("click",e=>{if(e.target.closest("button"))return;if(CV.on&&CV.speaking&&CV.cancel){CV.promote=null;CV.cancel()}});
 $("fabAg").onclick=()=>{if(CV.on)stopConv();else startConv()};
 $("fabTxt").onclick=()=>openAgent();
 $("cvStop").onclick=stopConv;
@@ -916,8 +945,8 @@ function rayLen(poly,s,d){
 }
 const SRC={tablero:1,toma_agua:1,calentador:1,registro:1,caja_breakers:1,caja_ac:1,medidor:1,minisplit:1};
 const POINT={foco:1,ventilador:1,contacto:1,apagador:1,coladera:1,tablero:1,toma_agua:1,calentador:1,registro:1,caja_breakers:1,medidor:1,minisplit:1};
-const OBJ={cama:[1.4,1.9,"Cama","camas"],inodoro:[.4,.7,"Inodoro"],lavabo:[.5,.4,"Lavabo"],regadera:[.9,.9,"Regadera"],tina:[1.7,.75,"Tina"],fregadero:[.8,.5,"Fregadero"],meseta:[2,.6,"Meseta"],estufa:[.6,.6,"Estufa"],refrigerador:[.7,.7,"Refri"],lavadora:[.6,.6,"Lavadora"],closet:[1.2,.6,"Closet"],escritorio:[1.2,.6,"Escritorio"],tv:[.9,.1,"TV","tv"],foco:[.25,.25,"Foco","focos"],ventilador:[.9,.9,"Ventilador","ventiladores"],contacto:[.1,.1,"Contacto","contactos"],apagador:[.1,.1,"Apagador","apagadores"],coladera:[.15,.15,"Coladera"],tablero:[.4,.15,"Tablero general"],toma_agua:[.25,.25,"Toma de agua"],calentador:[.4,.4,"Calentador"],registro:[.4,.4,"Registro"],caja_breakers:[.3,.12,"Tablero del cuarto"],caja_ac:[.3,.12,"Caja aire acond."],medidor:[.3,.4,"Medidor"],minisplit:[.9,.25,"Minisplit"],arbol:[1.5,1.5,"Árbol"]};
-function symbol(kind,w,h,k){
+const OBJ={cama:[1.4,1.9,"Cama","camas"],inodoro:[.4,.7,"Inodoro"],lavabo:[.5,.4,"Lavabo"],regadera:[.9,.9,"Regadera"],tina:[1.7,.75,"Tina"],fregadero:[.8,.5,"Fregadero"],meseta:[2,.6,"Meseta"],estufa:[.6,.6,"Estufa"],refrigerador:[.7,.7,"Refri"],lavadora:[.6,.6,"Lavadora"],closet:[1.2,.6,"Closet"],escritorio:[1.2,.6,"Escritorio"],tv:[.9,.1,"TV","tv"],foco:[.25,.25,"Foco","focos"],ventilador:[.9,.9,"Ventilador","ventiladores"],contacto:[.1,.1,"Contacto","contactos"],apagador:[.1,.1,"Apagador","apagadores"],coladera:[.15,.15,"Coladera"],tablero:[.4,.15,"Tablero general"],toma_agua:[.25,.25,"Toma de agua"],calentador:[.4,.4,"Calentador"],registro:[.4,.4,"Registro"],caja_breakers:[.3,.12,"Tablero del cuarto"],caja_ac:[.3,.12,"Caja aire acond."],medidor:[.3,.4,"Medidor"],minisplit:[.9,.25,"Minisplit"],arbol:[1.5,1.5,"Árbol"],sofa:[2,.9,"Sofá"],mesa:[1.2,.8,"Mesa"],silla:[.45,.45,"Silla"],comedor:[1.8,.9,"Comedor"],librero:[.9,.35,"Librero"],comoda:[1.2,.5,"Cómoda"],buro:[.45,.4,"Buró"],barra:[1.8,.5,"Barra"],alacena:[1.2,.35,"Alacena"],cocina_integral:[3,.6,"Cocina integral"],campana:[.9,.5,"Campana"],lavadero:[.7,.6,"Lavadero"],bidet:[.4,.6,"Bidet"],secadora:[.6,.6,"Secadora"],tinaco:[1.2,1.2,"Tinaco"],cisterna:[2,1.5,"Cisterna"],bomba:[.4,.3,"Bomba"],escalera:[1,3,"Escalera"],columna:[.3,.3,"Columna"],chimenea:[1.2,.5,"Chimenea"],extractor:[.3,.3,"Extractor"],jardinera:[1.5,.5,"Jardinera"],fosa_septica:[1.2,1.2,"Fosa séptica"],mueble_tv:[1.5,.45,"Mueble TV"],cancel:[.9,.05,"Cancel de baño"],libre:[1,1,"Elemento"]};
+function symbol(kind,w,h,k,o){
   const sw=1.4*k,st=`fill="none" stroke="#0f766e" stroke-width="${sw}"`,fl=`fill="#0f766e26" stroke="#0f766e" stroke-width="${sw}"`,x=-w/2,y=-h/2;
   const R=(a,b,c,d,r)=>`<rect x="${a}" y="${b}" width="${c}" height="${d}" ${r?`rx="${r}"`:""} ${fl}/>`;
   switch(kind){
@@ -942,17 +971,29 @@ function symbol(kind,w,h,k){
     case"estufa":return R(x,y,w,h)+[[.28,.28],[.72,.28],[.28,.72],[.72,.72]].map(([a,b])=>`<circle cx="${x+w*a}" cy="${y+h*b}" r="${Math.min(w,h)*.14}" ${st}/>`).join("");
     case"cama":return R(x,y,w,h)+R(x+w*.06,y+h*.04,w*.4,h*.16,w*.04)+R(x+w*.54,y+h*.04,w*.4,h*.16,w*.04);
     case"closet":return R(x,y,w,h)+`<path d="M${x} ${y}L${x+w} ${y+h}" ${st}/>`;
+    case"sofa":return R(x,y,w,h,h*.15)+R(x,y,w,h*.28,h*.1)+R(x,y+h*.28,w*.1,h*.72,0)+R(x+w*.9,y+h*.28,w*.1,h*.72,0);
+    case"silla":return R(x,y,w,h,w*.2)+R(x,y,w,h*.22,w*.1);
+    case"mesa":case"comedor":return R(x,y,w,h,Math.min(w,h)*.08);
+    case"escalera":{let s=R(x,y,w,h);const n=Math.max(4,Math.round(h/.28));for(let i=1;i<n;i++)s+=`<path d="M${x} ${y+h*i/n}H${x+w}" ${st}/>`;return s+`<path d="M0 ${y+h*.9}V${y+h*.1}M${-w*.12} ${y+h*.25}L0 ${y+h*.1}L${w*.12} ${y+h*.25}" ${st}/>`}
+    case"columna":return`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#0f766e" stroke="#0f766e" stroke-width="${sw}"/>`;
+    case"tinaco":return`<circle r="${Math.min(w,h)/2}" fill="#2563eb26" stroke="#2563eb" stroke-width="${sw}"/><circle r="${Math.min(w,h)*.3}" fill="none" stroke="#2563eb" stroke-width="${sw}"/>`;
+    case"cisterna":case"fosa_septica":return R(x,y,w,h)+`<path d="M${x} ${y}L${x+w} ${y+h}M${x+w} ${y}L${x} ${y+h}" ${st}/>`;
+    case"cocina_integral":case"alacena":case"barra":case"librero":case"comoda":return R(x,y,w,h)+[1,2,3].map(i=>`<path d="M${x+w*i/4} ${y}V${y+h}" ${st}/>`).join("");
+    case"libre":if(o&&o.forma==="circulo")return`<circle r="${Math.min(w,h)/2}" ${fl}/>`;if(o&&o.forma==="texto")return"";return R(x,y,w,h);
     default:return R(x,y,w,h);
   }
 }
 function drawObj(o,k){
   const def=OBJ[o.kind];if(!def)return"";
   const tr=`matrix(${o.u.x} ${o.u.y} ${o.n.x} ${o.n.y} ${o.cx} ${o.cy})`;
-  let s=`<g transform="${tr}">${symbol(o.kind,o.w,o.h,k)}</g>`;
+  let s=`<g transform="${tr}">${symbol(o.kind,o.w,o.h,k,o)}</g>`;
   if(o.kind==="arbol"&&o.talar){const r=o.w/2*.7;s+=`<path d="M${o.cx-r} ${o.cy-r}L${o.cx+r} ${o.cy+r}M${o.cx+r} ${o.cy-r}L${o.cx-r} ${o.cy+r}" stroke="#dc2626" stroke-width="${2.6*k}" stroke-linecap="round"/>`}
-  if((!POINT[o.kind]||SRC[o.kind])&&(o.w*o.h>0.12||SRC[o.kind]))s+=`<text x="${o.cx}" y="${o.cy+3*k}" font-size="${9*k}" ${o.talar?'fill="#dc2626" font-weight="700"':'fill="#0f766e"'} text-anchor="middle">${def[2]}${o.talar?" · TALAR":""}</text>`;
+  const lab=o.label?esc(o.label):def[2];
+  if(o.kind==="libre"||((!POINT[o.kind]||SRC[o.kind])&&(o.w*o.h>0.12||SRC[o.kind])))s+=`<text x="${o.cx}" y="${o.cy+3*k}" font-size="${(o.forma==="texto"?11:9)*k}" ${o.talar?'fill="#dc2626" font-weight="700"':(o.forma==="texto"?'fill="#b45309" font-weight="700"':'fill="#0f766e"')} text-anchor="middle">${lab}${o.talar?" · TALAR":""}</text>`;
   return s;
 }
+const MODELOS=[[/plegad|acordeon|fuelle/,"plegadiza"],[/corred|desliz/,"corrediza"],[/doble|dos hojas|dos puertas|francesa/,"doble"],[/pivot/,"pivotante"],[/cancel/,"cancel"],[/porton|cochera|enrollable|roll|garage|garaje/,"portón"],[/arco|sin hoja|paso libre|vano libre|nicho/,"arco"],[/fij/,"fija"],[/proyect|basculan/,"proyectante"],[/celos/,"celosía"],[/reja|herrer/,"reja"],[/abatib|batient|normal|sencilla|comun/,"abatible"]];
+function modeloKey(m){const s=fold(m||"").trim();if(!s)return"";for(const[re,k]of MODELOS)if(re.test(s))return k;return String(m).trim().slice(0,22)}
 function drawAb(ab,k){
   const sh=S.shapes.find(s=>s.id===ab.room);if(!sh||ab.seg>=sh.segs.length)return"";
   const wg=wallGeo(sh,ab.seg);if(!wg.L)return"";
@@ -969,15 +1010,30 @@ function drawAb(ab,k){
     return gap+`<text x="${(A.x+B.x)/2+wg.n.x*17*k}" y="${(A.y+B.y)/2+wg.n.y*17*k+3*k}" font-size="${9*k}" font-weight="700" fill="#0369a1" text-anchor="middle">RETIRAR ${f2(ab.ancho)}×${f2(ab.alto)}</text>`;
   }
   let s=`<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" style="stroke:var(--card)" stroke-width="${8*k}"/>`;
-  if(ab.kind==="ventana"){
+  const md=ab.modelo||"",o2=(p,d)=>({x:p.x+wg.n.x*d*k,y:p.y+wg.n.y*d*k}),P2=t=>({x:A.x+(B.x-A.x)*t,y:A.y+(B.y-A.y)*t}),N=(p,d)=>{const q=o2(p,d);return q.x+","+q.y};
+  const ln=(p,q,c,w,da)=>`<line x1="${p.x}" y1="${p.y}" x2="${q.x}" y2="${q.y}" stroke="${c}" stroke-width="${w*k}" ${da?`stroke-dasharray="${da*k} ${da*.6*k}"`:""} stroke-linecap="round"/>`;
+  if(ab.kind==="ventana"&&md==="corrediza"){s+=ln(o2(P2(0),-2),o2(P2(.55),-2),"#2563eb",1.6)+ln(o2(P2(.45),2),o2(P2(1),2),"#2563eb",1.6)}
+  else if(ab.kind==="ventana"&&md==="fija"){for(const d of[-3,3])s+=ln(o2(A,d),o2(B,d),"#2563eb",1.2);s+=ln(A,B,"#2563eb",.8,3)}
+  else if(ab.kind==="ventana"&&md==="proyectante"){for(const d of[-3,0,3])s+=ln(o2(A,d),o2(B,d),"#2563eb",1.2);s+=`<polyline points="${N(A,3)} ${N(P2(.5),10)} ${N(B,3)}" fill="none" stroke="#2563eb" stroke-width="${k}" stroke-dasharray="${3*k} ${2*k}"/>`}
+  else if(ab.kind==="ventana"&&md==="celosía"){for(let i=0;i<=6;i++){const p=P2(i/6);s+=ln(o2(p,-4),o2(p,4),"#2563eb",1)}}
+  else if(ab.kind==="ventana"){
     for(const d of[-3,0,3])s+=`<line x1="${A.x+wg.n.x*d*k}" y1="${A.y+wg.n.y*d*k}" x2="${B.x+wg.n.x*d*k}" y2="${B.y+wg.n.y*d*k}" stroke="#2563eb" stroke-width="${1.2*k}"/>`;
-  }else{
+  }else if(md==="plegadiza"){const n=Math.max(4,Math.min(10,Math.round(ab.ancho/.12))),pts=[];for(let i=0;i<=n;i++)pts.push(N(P2(i/n),i%2?6:-6));s+=`<polyline points="${pts.join(" ")}" fill="none" stroke="#0f766e" stroke-width="${1.6*k}" stroke-linejoin="round"/>`}
+  else if(md==="corrediza"){s+=ln(o2(P2(0),-3),o2(P2(.58),-3),"#0f766e",2.2)+ln(o2(P2(.42),3),o2(P2(1),3),"#0f766e",2.2)+`<polyline points="${N(P2(.25),-9)} ${N(P2(.75),-9)} ${N(P2(.68),-12)} ${N(P2(.75),-9)} ${N(P2(.68),-6)}" fill="none" stroke="#0f766e" stroke-width="${.9*k}"/>`}
+  else if(md==="doble"){const sg=ab.abre==="afuera"?-1:1,d={x:wg.n.x*sg,y:wg.n.y*sg},h2=ab.ancho/2;
+    for(const[H,E]of[[A,{x:wg.u.x,y:wg.u.y}],[B,{x:-wg.u.x,y:-wg.u.y}]]){const T={x:H.x+d.x*h2,y:H.y+d.y*h2},sw2=(d.x*E.y-d.y*E.x)>0?1:0;s+=ln(H,T,"#0f766e",2)+`<path d="M${T.x} ${T.y}A${h2} ${h2} 0 0 ${sw2} ${H.x+E.x*h2} ${H.y+E.y*h2}" fill="none" stroke="#0f766e" stroke-width="${k}"/>`}}
+  else if(md==="pivotante"){const M=P2(.5),sg=ab.abre==="afuera"?-1:1,e=wg.u,T1={x:M.x+e.x*ab.ancho*.42+wg.n.x*sg*ab.ancho*.3,y:M.y+e.y*ab.ancho*.42+wg.n.y*sg*ab.ancho*.3},T2={x:M.x-e.x*ab.ancho*.42-wg.n.x*sg*ab.ancho*.3,y:M.y-e.y*ab.ancho*.42-wg.n.y*sg*ab.ancho*.3};s+=ln(T2,T1,"#0f766e",2)+`<circle cx="${M.x}" cy="${M.y}" r="${2.4*k}" fill="#0f766e"/>`}
+  else if(md==="cancel"){s+=ln(o2(A,-2),o2(B,-2),"#0891b2",1.4)+ln(o2(A,2),o2(B,2),"#0891b2",1.4)+ln(A,o2(P2(.12),9),"#0891b2",1.2)}
+  else if(md==="portón"){s+=ln(A,B,"#0f766e",3.4,5)}
+  else if(md==="arco"){s+=ln(A,B,"#0f766e",1.2,3)+ln(o2(A,-5),o2(A,5),"#0f766e",1.6)+ln(o2(B,-5),o2(B,5),"#0f766e",1.6)}
+  else if(md==="reja"){for(let i=0;i<=8;i++){const p=P2(i/8);s+=ln(o2(p,-5),o2(p,5),"#475569",1)}s+=ln(A,B,"#475569",1.2)}
+  else{
     const sg=ab.abre==="afuera"?-1:1,left=ab.bisagra!=="derecha",H=left?A:B,e=left?wg.u:{x:-wg.u.x,y:-wg.u.y},d={x:wg.n.x*sg,y:wg.n.y*sg};
     const T={x:H.x+d.x*ab.ancho,y:H.y+d.y*ab.ancho},P={x:H.x+e.x*ab.ancho,y:H.y+e.y*ab.ancho},sw=(d.x*e.y-d.y*e.x)>0?1:0;
     s+=`<line x1="${H.x}" y1="${H.y}" x2="${T.x}" y2="${T.y}" stroke="#0f766e" stroke-width="${2*k}"/><path d="M${T.x} ${T.y}A${ab.ancho} ${ab.ancho} 0 0 ${sw} ${P.x} ${P.y}" fill="none" stroke="#0f766e" stroke-width="${1*k}"/>`;
   }
   const mid={x:(A.x+B.x)/2,y:(A.y+B.y)/2};
-  if(VISTA==="puertas"&&curTags.m[ab.id])s+=`<text x="${mid.x+wg.n.x*17*k}" y="${mid.y+wg.n.y*17*k+3*k}" font-size="${11*k}" font-weight="700" fill="${ab.kind==="ventana"?"#2563eb":"#0f766e"}" text-anchor="middle">${curTags.m[ab.id]}</text>`;
+  if(VISTA==="puertas"&&curTags.m[ab.id])s+=`<text x="${mid.x+wg.n.x*17*k}" y="${mid.y+wg.n.y*17*k+3*k}" font-size="${11*k}" font-weight="700" fill="${ab.kind==="ventana"?"#2563eb":"#0f766e"}" text-anchor="middle">${curTags.m[ab.id]}${md?` · ${esc(md)}`:""}</text>`;
   if(VISTA==="inventario"){
     if(est==="nueva"&&(ab.kind==="ventana"||ab.kind==="puerta")){const m=curInv.res.get(ab.id),st=m?(m.t==="exacta"?"REUSAR":(m.t==="claro"?"REUSAR (claro a medida)":"AJUSTAR")):"COMPRAR",col=m?(m.t==="ajuste"?"#d97706":"#16a34a"):"#dc2626";
       s+=`<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="${col}" stroke-width="${3.5*k}" stroke-linecap="round"/><text x="${mid.x+wg.n.x*19*k}" y="${mid.y+wg.n.y*19*k+3*k}" font-size="${9*k}" font-weight="700" fill="${col}" text-anchor="middle">${st} ${curTags.m[ab.id]||""}</text>`}
@@ -1054,9 +1110,9 @@ function qty(recs){
 }
 function tagsAb(){
   const list=(S.aberts||[]).filter(a=>a.estado!=="tapar"&&a.estado!=="retirada"),m={},g=[];
-  const key=a=>[a.ancho,a.alto,a.antepecho||0].map(r2).join("x");
+  const key=a=>[a.ancho,a.alto,a.antepecho||0].map(r2).join("x")+"|"+(a.modelo||"");
   for(const kind of["puerta","ventana"]){
-    const keys=[...new Set(list.filter(a=>a.kind===kind).map(key))].sort((x,y)=>{const[a1,b1]=x.split("x").map(Number),[a2,b2]=y.split("x").map(Number);return a1-a2||b1-b2});
+    const keys=[...new Set(list.filter(a=>a.kind===kind).map(key))].sort((x,y)=>{const[a1,b1]=x.split("|")[0].split("x").map(Number),[a2,b2]=y.split("|")[0].split("x").map(Number);return a1-a2||b1-b2||(x<y?-1:1)});
     keys.forEach((kk,i)=>g.push({kind,key:kk,tag:(kind==="puerta"?"P":"V")+(i+1)}));
   }
   for(const a of list)m[a.id]=g.find(x=>x.kind===a.kind&&x.key===key(a)).tag;
@@ -1325,8 +1381,8 @@ function cuadro(v){
     avisos=[`En muros nuevos el claro se deja a la medida de la pieza que tienes (botón “Ajustar claros a las piezas”). En muros existentes, “Reutilizar” = diferencia de hasta ${ex} cm y “Ajustar” = hasta ${nr} cm.`,"Una pieza marcada como mala no se asigna a ningún claro."];
   }else if(v==="puertas"){
     const T=tagsAb();head=["Clave","Tipo","Medida (m)","Antepecho (m)","Cant.","Ubicación"];
-    rows=T.g.map(g=>{const its=ab.filter(a=>a.estado!=="tapar"&&T.m[a.id]===g.tag),[w,h,sp]=g.key.split("x"),loc={};for(const a of its){const n=nom(S.shapes.find(s=>s.id===a.room));loc[n]=(loc[n]||0)+1}
-      return[g.tag,g.kind==="puerta"?"Puerta":"Ventana",`${w} × ${h}`,g.kind==="ventana"?sp:"—",its.length,Object.entries(loc).map(([n,c])=>c>1?`${n} (${c})`:n).join(", ")]});
+    rows=T.g.map(g=>{const its=ab.filter(a=>a.estado!=="tapar"&&T.m[a.id]===g.tag),[w,h,sp]=g.key.split("|")[0].split("x"),mdl=g.key.split("|")[1]||"",loc={};for(const a of its){const n=nom(S.shapes.find(s=>s.id===a.room));loc[n]=(loc[n]||0)+1}
+      return[g.tag,(g.kind==="puerta"?"Puerta":"Ventana")+(mdl?" "+mdl:""),`${w} × ${h}`,g.kind==="ventana"?sp:"—",its.length,Object.entries(loc).map(([n,c])=>c>1?`${n} (${c})`:n).join(", ")]});
     const nd=ab.filter(a=>a.estado!=="tapar"&&a.kind==="puerta").length,nv=ab.filter(a=>a.estado!=="tapar"&&a.kind==="ventana").length;
     foot=[[`Total: ${nd} puertas · ${nv} ventanas`,"","","","",""]];
   }else if(v==="demolicion"){
@@ -1589,9 +1645,18 @@ function ctx(){
   return{seleccion:cur()?cur().name:null,calle:S.calle||null,reglas:cfg(),verificar:preguntas(6).map(c=>({cuarto:c.sh.name||"s/n",pared:c.i+1,lado:wallGeo(c.sh,c.i).side,largo_plano:r2(baseLen(c.sg)),motivo:motivo(c)})),marcas:marksInfo().map(q=>({id:"M"+q.n,tipo:q.m.tipo,texto:q.m.texto||"",ancho:r2(q.w),largo:r2(q.h),largo_linea:r2(q.L),cae_en:q.cae})),inventario:calcInv().supply.slice(0,40).map(x=>({tipo:x.tipo,ancho:r2(x.ancho),alto:r2(x.alto),estado:x.estadoF,origen:x.origen})),humedos:S.humedos??"baño, wc, sanitario",muros:wallRecs().filter(r=>r.sh.type==="muro").map(r=>({nombre:r.sh.name,largo:r2(r.L),lado_a:r.ra?r.ra.name:"exterior",lado_b:r.rb?r.rb.name:"exterior"})),cuartos:S.shapes.filter(s=>TYPES[s.type].closed).map(sh=>{const bb=bbox(polyOf(sh));
     return{nombre:sh.name,tipo:sh.type,muros_son:sh.obra||"existente",ancho:r2(bb.x1-bb.x0),largo:r2(bb.y1-bb.y0),
       paredes:sh.segs.map((s,i)=>{const g=wallGeo(sh,i);return{n:i+1,lado:g.side,largo:r2(g.L)}}),
-      objetos:(S.objs||[]).filter(o=>o.room===sh.id).map(o=>o.kind),
-      aberturas:(S.aberts||[]).filter(a=>a.room===sh.id).map(a=>({tipo:a.kind,pared:wallGeo(sh,a.seg).side,distancia:r2(a.pos),ancho:r2(a.ancho)}))}})};
+      objetos:(S.objs||[]).filter(o=>o.room===sh.id).map(o=>o.label?"libre:"+o.label:o.kind),
+      aberturas:(S.aberts||[]).filter(a=>a.room===sh.id).map(a=>({tipo:a.kind,modelo:a.modelo||undefined,pared:wallGeo(sh,a.seg).side,distancia:r2(a.pos),ancho:r2(a.ancho)}))}})};
 }
+function placeIn(r,a,w,h){
+  const bb=bbox(polyOf(r));let cx,cy,u={x:1,y:0},n={x:0,y:1},where;
+  if(a.pared){const wg=findWall(r,a.pared);if(!wg)return{err:`❓ No encuentro la pared “${a.pared}” del cuarto ${r.name}`};
+    const pos=a.centrado||a.distancia==null||a.distancia===""?(wg.L-w)/2:+a.distancia,sep=+a.separacion||0;
+    if(pos<-0.001||pos+w>wg.L+0.01)return{err:`⚠️ No cabe: la pared ${wg.side} mide ${f2(wg.L)} m y la pieza ocuparía de ${f2(pos)} a ${f2(pos+w)} m`};
+    u=wg.u;n=wg.n;cx=wg.o.x+u.x*(pos+w/2)+n.x*(sep+h/2);cy=wg.o.y+u.y*(pos+w/2)+n.y*(sep+h/2);where=`pared ${wg.side}, a ${f2(pos)} m de la esquina`}
+  else if(a.x!=null&&a.y!=null){cx=bb.x0+(+a.x)+w/2;cy=bb.y0+(+a.y)+h/2;where=`a ${f2(+a.x)} m / ${f2(+a.y)} m de la esquina de arriba a la izquierda`}
+  else{const c=centroid(polyOf(r));cx=c.x;cy=c.y;where="centro del cuarto"}
+  return{cx,cy,u,n,where}}
 function bumpItem(room,kind,d){const key=OBJ[kind]&&OBJ[kind][3];if(!key)return;room.items=room.items||{};room.items[key]=Math.max(0,(room.items[key]||0)+d)}
 function markOpening(a,estado){
   const{r,err}=roomOrErr(a.cuarto);if(err)return err;const wg=findWall(r,a.pared);if(!wg)return`❓ No encuentro la pared “${a.pared}” del cuarto ${r.name}`;
@@ -1649,11 +1714,12 @@ function act(a){
     const kind=a.tipo==="ventana"?"ventana":"puerta",ancho=a.ancho>0?+a.ancho:(kind==="puerta"?0.9:1.2),alto=a.alto>0?+a.alto:(kind==="puerta"?2.1:1.1);
     const pos=a.distancia!=null&&a.distancia!==""?+a.distancia:(wg.L-ancho)/2;
     if(pos<0||pos+ancho>wg.L+0.01)return`⚠️ No cabe: la pared ${a.pared} mide ${f2(wg.L)} m y la ${kind} ocuparía de ${f2(pos)} a ${f2(pos+ancho)} m`;
-    S.aberts.push({id:uid(),room:r.id,seg:wg.i,kind,pos:r2(pos),ancho,alto,antepecho:a.antepecho>0?+a.antepecho:(kind==="ventana"?1:0),abre:a.abre==="afuera"?"afuera":"adentro",bisagra:a.bisagra==="derecha"?"derecha":"izquierda",estado:a.estado==="existente"?"existente":"nueva"});
-    return`${kind==="puerta"?"🚪":"🪟"} ${kind[0].toUpperCase()+kind.slice(1)} de ${f2(ancho)} × ${f2(alto)} m en la pared ${wg.side} del cuarto ${r.name}, a ${f2(pos)} m de la esquina`;
+    S.aberts.push({id:uid(),room:r.id,seg:wg.i,kind,pos:r2(pos),ancho,alto,antepecho:a.antepecho>0?+a.antepecho:(kind==="ventana"?1:0),abre:a.abre==="afuera"?"afuera":"adentro",bisagra:a.bisagra==="derecha"?"derecha":"izquierda",estado:a.estado==="existente"?"existente":"nueva",modelo:modeloKey(a.modelo),nota:a.nota?String(a.nota).slice(0,80):undefined});
+    return`${kind==="puerta"?"🚪":"🪟"} ${kind[0].toUpperCase()+kind.slice(1)}${modeloKey(a.modelo)?" "+modeloKey(a.modelo):""} de ${f2(ancho)} × ${f2(alto)} m en la pared ${wg.side} del cuarto ${r.name}, a ${f2(pos)} m de la esquina`;
   }
   if(t==="agregar_objeto"){
-    const def=OBJ[a.objeto];if(!def)return`❓ No conozco el objeto “${a.objeto}”`;
+    if(!OBJ[a.objeto])return act(Object.assign({},a,{herramienta:"agregar_elemento_libre",nombre:a.nombre||String(a.objeto||"Elemento").replace(/_/g," ")}));
+    const def=OBJ[a.objeto];
     const{r,err}=roomOrErr(a.cuarto);if(err)return err;
     const w=a.diametro>0?+a.diametro:(a.ancho>0?+a.ancho:def[0]),h=a.diametro>0?+a.diametro:(a.fondo>0?+a.fondo:def[1]);let cx,cy,u={x:1,y:0},n={x:0,y:1},where;
     const bb=bbox(polyOf(r));
@@ -1666,6 +1732,40 @@ function act(a){
     else{const c=centroid(polyOf(r));cx=c.x;cy=c.y;where="centro del cuarto"}
     S.objs.push({id:uid(),kind:a.objeto,room:r.id,cx:r2(cx),cy:r2(cy),w,h,u,n,alt:a.altura>0?+a.altura:undefined,nota:a.nota,talar:a.objeto==="arbol"&&a.accion==="talar"});bumpItem(r,a.objeto,1);
     return`${a.objeto==="arbol"?"🌳":"🪑"} ${def[2]}${a.objeto==="arbol"&&a.accion==="talar"?" (a talar)":""} (${f2(w)} × ${f2(h)} m${a.altura>0?`, a ${f2(+a.altura)} m de altura`:""}) en el cuarto ${r.name}: ${where}`;
+  }
+  if(t==="agregar_elemento_libre"){
+    const{r,err}=roomOrErr(a.cuarto);if(err)return err;
+    const forma=["circulo","texto"].includes(a.forma)?a.forma:"rectangulo",texto=forma==="texto";
+    const w=a.diametro>0?+a.diametro:(a.ancho>0?+a.ancho:(texto?.6:1)),h=a.diametro>0?+a.diametro:(a.fondo>0?+a.fondo:(texto?.3:1));
+    const pl=placeIn(r,a,w,h);if(pl.err)return pl.err;
+    const label=String(a.nombre||"Elemento").trim().slice(0,28)||"Elemento";
+    S.objs.push({id:uid(),kind:"libre",label,forma,room:r.id,cx:r2(pl.cx),cy:r2(pl.cy),w,h,u:pl.u,n:pl.n,alt:a.altura>0?+a.altura:undefined,nota:a.nota?String(a.nota).slice(0,120):undefined});
+    return`${texto?"📝":"🧩"} ${label}${texto?"":` (${f2(w)} × ${f2(h)} m${a.altura>0?`, ${f2(+a.altura)} m de alto`:""})`} en el cuarto ${r.name}: ${pl.where}`;
+  }
+  if(t==="mover_objeto"){
+    const{r,err}=roomOrErr(a.cuarto);if(err)return err;const nm=fold(a.nombre||"");
+    const lst=S.objs.filter(o=>o.room===r.id&&(a.objeto?o.kind===a.objeto:true)&&(nm?fold(o.label||(OBJ[o.kind]&&OBJ[o.kind][2])||o.kind).includes(nm):true));
+    if(!lst.length)return`❓ No encuentro ese objeto en el cuarto ${r.name}`;
+    const o=lst[lst.length-1],pl=placeIn(r,a,o.w,o.h);if(pl.err)return pl.err;
+    o.cx=r2(pl.cx);o.cy=r2(pl.cy);o.u=pl.u;o.n=pl.n;
+    return`↔️ Moví ${o.label||(OBJ[o.kind]||[0,0,o.kind])[2]} en el cuarto ${r.name}: ${pl.where}`;
+  }
+  if(t==="modificar_abertura"){
+    const{r,err}=roomOrErr(a.cuarto);if(err)return err;const wg=findWall(r,a.pared);if(!wg)return`❓ No encuentro la pared “${a.pared}” del cuarto ${r.name}`;
+    let c=S.aberts.filter(x=>x.room===r.id&&x.seg===wg.i&&x.estado!=="tapar"&&x.estado!=="retirada"&&(!a.tipo||x.kind===a.tipo));
+    if(a.distancia!=null&&a.distancia!==""&&c.length>1)c=c.slice().sort((p,q)=>Math.abs(p.pos-a.distancia)-Math.abs(q.pos-a.distancia)).slice(0,1);
+    if(!c.length)return`❓ No hay ${a.tipo||"puerta ni ventana"} en la pared ${wg.side} del cuarto ${r.name}`;
+    if(c.length>1)return`❓ Hay ${c.length} aberturas en esa pared (${c.map(x=>x.kind+" a "+f2(x.pos)+" m").join(", ")}). Dime cuál por su distancia`;
+    const x=c[0],ch=[];
+    if(a.modelo!=null&&a.modelo!==""){x.modelo=modeloKey(a.modelo);ch.push(x.modelo||"modelo estándar")}
+    if(a.ancho>0){const centro=x.pos+x.ancho/2;x.ancho=+a.ancho;x.pos=r2(Math.max(0,Math.min(wg.L-x.ancho,centro-x.ancho/2)));ch.push("ancho "+f2(x.ancho)+" m")}
+    if(a.alto>0){x.alto=+a.alto;ch.push("alto "+f2(x.alto)+" m")}
+    if(a.antepecho>0){x.antepecho=+a.antepecho;ch.push("antepecho "+f2(x.antepecho)+" m")}
+    if(a.abre){x.abre=a.abre==="afuera"?"afuera":"adentro";ch.push("abre "+x.abre)}
+    if(a.bisagra){x.bisagra=a.bisagra==="derecha"?"derecha":"izquierda";ch.push("bisagra "+x.bisagra)}
+    if(a.distancia_nueva!=null&&a.distancia_nueva!==""){const p=+a.distancia_nueva;if(p<0||p+x.ancho>wg.L+.01)return`⚠️ No cabe: la pared mide ${f2(wg.L)} m`;x.pos=r2(p);ch.push("a "+f2(p)+" m de la esquina")}
+    if(a.nota){x.nota=String(a.nota).slice(0,80);ch.push("nota")}
+    return ch.length?`🔁 ${x.kind==="puerta"?"Puerta":"Ventana"} de la pared ${wg.side} del cuarto ${r.name}: ${ch.join(", ")}`:"❓ ¿Qué cambio en la puerta o ventana?";
   }
   if(t==="dividir_cuarto"){
     const r=findRoom(a.cuarto);if(!r)return a.cuarto?`❓ No encuentro el cuarto “${a.cuarto}”`:"❓ ¿Qué cuarto quieres dividir? Selecciónalo o dime su nombre";
@@ -1778,7 +1878,7 @@ function act(a){
   }
   if(t==="quitar_objeto"){
     const{r,err}=roomOrErr(a.cuarto);if(err)return err;let n=Math.max(1,parseInt(a.cantidad)||1),q=0;
-    for(let i=S.objs.length-1;i>=0&&q<n;i--){if(S.objs[i].room===r.id&&S.objs[i].kind===a.objeto){S.objs.splice(i,1);bumpItem(r,a.objeto,-1);q++}}
+    const nmq=fold(a.nombre||"");for(let i=S.objs.length-1;i>=0&&q<n;i--){const o=S.objs[i];if(o.room===r.id&&(a.objeto?o.kind===a.objeto:true)&&(nmq?fold(o.label||(OBJ[o.kind]||[0,0,o.kind])[2]).includes(nmq):true)){S.objs.splice(i,1);bumpItem(r,o.kind,-1);q++}}
     return q?`🗑️ Quité ${q} ${(OBJ[a.objeto]||[0,0,a.objeto])[2].toLowerCase()} del cuarto ${r.name}`:`❓ No hay ${a.objeto} en el cuarto ${r.name}`;
   }
   if(t==="borrar_elemento"){
@@ -1823,16 +1923,23 @@ function act(a){
   }
   return`❓ No sé hacer “${t}”`;
 }
-async function runAgent(t,imagen){
-  const body={texto:t,contexto:ctx(),historial:HIST};if(imagen)body.imagen=imagen;
+async function runAgent(t,imagen,ronda=0,opc){
+  const body={texto:t,contexto:ctx(),historial:HIST};if(imagen)body.imagen=imagen;if(opc)Object.assign(body,opc);
   const r=await sb("/functions/v1/agente",{method:"POST",body});
   const acc=r.acciones||[],log=[];
-  if(acc.length)snapshot();
+  if(acc.length&&!ronda)snapshot();
   for(const a of acc){try{log.push(act(a))}catch(e){log.push("⚠️ "+e.message)}}
   if(r.mensaje)log.push("💬 "+r.mensaje);
-  HIST.push({role:"user",content:imagen?t+" (con una foto de la cámara)":t},{role:"assistant",content:log.join("\n")||"Sin cambios"});HIST=HIST.slice(-6);
+  HIST.push({role:"user",content:imagen?t+" (con una foto de la cámara)":t},{role:"assistant",content:log.join("\n")||"Sin cambios"});HIST=HIST.slice(-10);
   if(acc.length)render();
-  return{acc,log,msg:r.mensaje||""};
+  let msg=r.mensaje||"",all=acc.slice();
+  /* si algo falló, el agente lo ve y se corrige solo (una vez) */
+  const fails=log.filter(l=>/^(❓|⚠️)/.test(l));
+  if(fails.length&&!ronda&&acc.length){
+    try{const f=await runAgent("[SISTEMA] Resultado de tus acciones:\n"+log.filter(l=>!l.startsWith("💬")).join("\n")+"\nSi algo falló y se puede resolver con otra herramienta (por ejemplo agregar_elemento_libre, modificar_abertura, otras medidas o otra pared), hazlo ahora sin repetir lo que ya salió bien. Si falta un dato, pregúntalo en una frase corta.",null,1,opc);
+      log.push(...f.log);all.push(...f.acc);if(f.msg)msg=f.msg}catch(e){}
+  }
+  return{acc:all,log,msg};
 }
 $("bAg").onclick=async()=>{
   const t=$("agText").value.trim();if(!t)return;const out=$("agOut");out.className="status";out.textContent="⏳ Pensando…";
