@@ -235,6 +235,8 @@ body.pres .stage #cv{height:calc(100dvh - 110px)}
     <h3>🤖 Dile al agente qué dibujar</h3>
     <textarea id="agText2" rows="3" placeholder="Ej: baño de 2 por 2.5 con regadera en la esquina y puerta abajo"></textarea>
     <div class="row"><button class="sec" id="bMic2">🎤 Hablar</button><button id="bAg2">Enviar</button><button class="sec" id="bUndo2">↩️</button></div>
+    <label class="status"><input type="checkbox" id="agVoz" checked style="width:auto"> 🔊 Que me conteste con voz</label>
+    <label class="status"><input type="checkbox" id="agConv" style="width:auto"> 🔁 Modo conversación (escucha sola después de contestar)</label>
     <div class="status" id="agOut2"></div>
   </div>
 </div>
@@ -450,10 +452,21 @@ function openAgent(pre){if(!(ses&&team)){toast("🔐 Entra primero en ⚙️ Má
 $("fabAg").onclick=()=>openAgent();
 document.addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
   if(a==="agent")openAgent();else if(a==="edit")go("cuartos");else if(a==="desel"){sel=null;render()}else if(a==="fit"){closeSheets();fit();draw()}});
-$("bAg2").onclick=async()=>{const t=$("agText2").value.trim();if(!t)return;const out=$("agOut2");out.className="status";out.textContent="⏳ Pensando…";
-  try{const r=await runAgent(t);out.className="status ok";out.innerHTML=r.log.map(esc).join("<br>")||"Sin cambios";if(r.acc.length){$("agText2").value="";toast("✅ "+(r.log[0]||"Listo"));setTimeout(closeSheets,900)}}
-  catch(err){out.className="status bad";out.textContent="⚠️ "+err.message}};
-$("bMic2").onclick=()=>dictar($("agText2"),$("bMic2"),$("agOut2"),null);
+try{$("agVoz").checked=localStorage.getItem("planos-voz")!=="0";$("agConv").checked=localStorage.getItem("planos-conv")==="1"}catch(e){}
+$("agVoz").onchange=()=>{try{localStorage.setItem("planos-voz",$("agVoz").checked?"1":"0")}catch(e){}if(!$("agVoz").checked){try{speechSynthesis.cancel()}catch(e){}}};
+$("agConv").onchange=()=>{try{localStorage.setItem("planos-conv",$("agConv").checked?"1":"0")}catch(e){}if($("agConv").checked)$("agVoz").checked=true};
+function decir(txt,then){const ok=$("agVoz").checked&&window.speechSynthesis&&txt;if(!ok){if(then)then();return}
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang="es-MX";u.onend=()=>{if(then)then()};u.onerror=()=>{if(then)then()};speechSynthesis.speak(u)}catch(e){if(then)then()}}
+function primeVoz(){try{if(window.speechSynthesis&&$("agVoz").checked){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(""))}}catch(e){}}
+function escuchar(){primeVoz();dictar($("agText2"),$("bMic2"),$("agOut2"),()=>{if($("agText2").value.trim())agEnviar()},false)}
+async function agEnviar(){const t=$("agText2").value.trim();if(!t)return;const out=$("agOut2");primeVoz();$("agText2").value="";out.className="status";out.textContent="⏳ Pensando…";
+  try{const r=await runAgent(t);out.className="status ok";out.innerHTML=r.log.map(esc).join("<br>")||"Sin cambios";
+    if(r.acc.length)toast("✅ "+(r.log[0]||"Listo"));
+    const dicho=r.msg||(r.acc.length?"Listo, ya lo dibujé.":"No hice cambios.");
+    decir(dicho,()=>{if($("agConv").checked&&!$("sheetAg").hidden)escuchar();else if(r.acc.length&&!$("agVoz").checked)setTimeout(closeSheets,900)})}
+  catch(err){out.className="status bad";out.textContent="⚠️ "+err.message;decir("Hubo un problema: "+err.message)}}
+$("bAg2").onclick=agEnviar;
+$("bMic2").onclick=()=>{if(rec){rec.stop();return}try{speechSynthesis.cancel()}catch(e){}escuchar()};
 $("bUndo2").onclick=()=>{$("bUndo").click();$("agOut2").textContent=$("agOut").textContent};
 /* tarjetas plegables */
 for(const el of[$("calco"),$("verCard"),$("invCard"),$("reglas"),$("mats").closest(".card")]){el.classList.add("fold","closed");const h=el.querySelector("h2");if(h)h.onclick=()=>el.classList.toggle("closed")}
@@ -1461,15 +1474,15 @@ async function runAgent(t,imagen){
 }
 $("bAg").onclick=async()=>{
   const t=$("agText").value.trim();if(!t)return;const out=$("agOut");out.className="status";out.textContent="⏳ Pensando…";
-  try{const r=await runAgent(t);out.className="status";out.innerHTML=r.log.map(esc).join("<br>")||"Sin cambios";if(r.acc.length)$("agText").value=""}
+  try{primeVoz();const r=await runAgent(t);out.className="status";out.innerHTML=r.log.map(esc).join("<br>")||"Sin cambios";if(r.acc.length)$("agText").value="";decir(r.msg||(r.acc.length?"Listo, ya lo dibujé.":""))}
   catch(err){out.className="status bad";out.textContent="⚠️ "+err.message}
 };
 $("bUndo").onclick=()=>{const t=UNDO.pop(),out=$("agOut");if(!t){out.className="status";out.textContent="No hay nada que deshacer";return}S=JSON.parse(t);if(!S.shapes.some(s=>s.id===sel))sel=null;render();out.className="status ok";out.textContent="↩️ Deshecho. Quedan "+UNDO.length+" pasos atrás."};
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,recBtn=null;
-function dictar(ta,btn,out,onEnd){
+function dictar(ta,btn,out,onEnd,cont){
   if(!SR){out.className="status bad";out.textContent="Este navegador no trae dictado. Toca el micrófono 🎤 del teclado del iPhone para dictar.";return}
   if(rec){rec.stop();return}
-  const base=ta.value;rec=new SR();recBtn=btn;rec.lang="es-MX";rec.interimResults=true;rec.continuous=true;
+  const base=ta.value;rec=new SR();recBtn=btn;rec.lang="es-MX";rec.interimResults=true;rec.continuous=cont!==false;
   rec.onresult=e=>{let s="";for(let i=0;i<e.results.length;i++)s+=e.results[i][0].transcript;ta.value=(base?base+" ":"")+s};
   rec.onerror=ev=>{out.className="status bad";out.textContent=ev.error==="not-allowed"?"Permite el micrófono en Safari para dictar (o usa el micrófono del teclado).":"Dictado: "+ev.error};
   rec.onend=()=>{rec=null;btn.textContent="🎤 Hablar";if(onEnd)onEnd()};
