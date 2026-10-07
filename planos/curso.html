@@ -88,18 +88,34 @@ ul,ol{padding-left:20px;margin:6px 0}li{margin:3px 0}
 .cert p{margin:6px 0;color:#3a2f14}
 input[type=text]{font:inherit;width:100%;padding:12px;border-radius:12px;border:1px solid #4a3b1c;background:#15120c;color:var(--tx);font-size:16px}
 #vid{position:fixed;inset:0;z-index:50;background:#000;display:flex;flex-direction:column}
-#vid .vt{display:flex;align-items:center;gap:10px;padding:calc(6px + env(safe-area-inset-top)) 12px 6px;border-bottom:1px solid #4a3b1c}#vid .vt button{min-height:38px;padding:6px 12px}
-#vid .vt b{flex:1;font-family:Georgia,serif;color:var(--pri2);font-size:16px}
-#vid .stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;padding:4px}
-#vid .stage img{height:100%;width:auto;max-width:100%;object-fit:contain;border-radius:16px;border:1px solid #4a3b1c;animation:kb 16s ease-in-out infinite alternate}
-#vid .stage img.logo{border:0;border-radius:14px;mix-blend-mode:lighten;height:auto;width:min(92%,520px)}
-@keyframes kb{from{transform:scale(1) translateY(0)}to{transform:scale(1.07) translateY(-1.5%)}}
-#vid .cap{padding:6px 16px;font-size:18px;line-height:1.35;text-align:center;min-height:84px;display:flex;align-items:center;justify-content:center}
+#vid .vt{display:flex;align-items:center;gap:10px;padding:calc(6px + env(safe-area-inset-top)) 12px 4px}
+#vid .vt b{flex:1;font-family:Georgia,serif;color:var(--pri2);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#vid .vt button{min-height:38px;padding:6px 12px}
+#vSeg{display:flex;gap:3px;padding:0 12px 4px}
+#vSeg i{flex:1;height:5px;border-radius:3px;background:#2a2314;cursor:pointer}
+#vSeg i.on{background:var(--pri)}#vSeg i.cur{background:var(--pri2);box-shadow:0 0 8px var(--pri2)}
+#vid .stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;padding:2px;container-type:size;cursor:pointer}
+#vid .frame{position:relative;width:min(100cqw,calc(100cqh * .4621));height:min(100cqh,calc(100cqw * 2.164));border-radius:14px;overflow:hidden;border:1px solid #4a3b1c;background:#000}
+#vid .frame>img{width:100%;height:100%;display:block}
+#vOv{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+#vOv .dim{position:absolute;inset:0;width:100%;height:100%}
+.hbox{position:absolute;border:3px solid #ffd978;border-radius:14px;box-shadow:0 0 16px 3px rgba(255,217,120,.85);animation:hp 1.2s ease-in-out infinite}
+@keyframes hp{50%{box-shadow:0 0 26px 8px rgba(255,217,120,.95);transform:scale(1.015)}}
+.hlab{position:absolute;background:#ffd978;color:#17110a;font-weight:800;padding:5px 11px;border-radius:11px;font-size:14px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.6)}
+.hfinger{position:absolute;font-size:40px;line-height:1;filter:drop-shadow(0 3px 6px rgba(0,0,0,.7));animation:tapd 1.3s ease-in-out infinite}
+@keyframes tapd{0%,100%{transform:translate(-25%,12%) scale(1)}50%{transform:translate(-25%,-10%) scale(.82)}}
+#vid .chap{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:18px;max-width:520px}
+#vid .chap .ci{font-size:84px;line-height:1}#vid .chap h2{font-family:Georgia,serif;color:var(--pri2);font-size:30px;margin:0}
+#vid .chap p{color:var(--tx);font-size:19px;margin:0;line-height:1.4}
+#vid .chap .lg{width:min(80%,360px);mix-blend-mode:lighten}
+#vid .tbt{display:flex;flex-direction:column;gap:10px;margin-top:12px;width:100%;max-width:320px}
+#vid .stp{color:var(--mut);font-size:12.5px;text-align:center;line-height:1.3;padding:2px 12px}
+#vid .cap{padding:6px 16px;font-size:19px;line-height:1.35;text-align:center;min-height:92px;display:flex;align-items:center;justify-content:center}
 #vid .ctl{display:flex;gap:8px;justify-content:center;align-items:center;padding:4px 10px calc(10px + env(safe-area-inset-bottom));flex-wrap:wrap}
-#vid .ctl button,#vid .ctl select{min-height:44px}#vid .ctl button{padding:8px 12px}#vid .ctl select{max-width:44vw}
-#vid .ctl select{font:inherit;background:#15120c;color:var(--tx);border:1px solid #4a3b1c;border-radius:12px;padding:0 10px}
-#vid .vb{height:5px;background:#1b160c}#vid .vb i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--pri),var(--pri2));transition:width .3s}
-#vid .stp{color:var(--mut);font-size:12.5px;text-align:center;line-height:1.3}
+#vid .ctl button,#vid .ctl select{min-height:46px}#vid .ctl button{padding:8px 13px;font-size:18px}
+#vid .ctl select{font:inherit;background:#15120c;color:var(--tx);border:1px solid #4a3b1c;border-radius:12px;padding:0 10px;max-width:44vw}
+#vChap{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.94);overflow-y:auto;padding:calc(12px + env(safe-area-inset-top)) 14px 30px}
+#vChap .grid{grid-template-columns:1fr}
 @media print{body{background:#fff}header,.nav,.noprint,main>*:not(#certbox){display:none!important}main{padding:0}.cert{border-width:10px;margin:0 auto;box-shadow:none}.cert img{mix-blend-mode:normal}}
 </style>
 </head>
@@ -109,7 +125,8 @@ input[type=text]{font:inherit;width:100%;padding:12px;border-radius:12px;border:
   <div class="bar"><i id="pbar"></i></div>
 </header>
 <main id="app"></main>
-<div id="vid" hidden><div class="vt"><b id="vTit"></b><button class="sec" id="vX">✕ Cerrar</button></div><div class="vb"><i id="vBar"></i></div><div class="stage" id="vStage"></div><div class="stp" id="vStp"></div><div class="cap" id="vCap"></div><div id="vOpts" hidden><div class="ctl"><select id="vVoz" aria-label="Voz"></select><select id="vRate"><option value="0.6">Muy lenta</option><option value="0.7">Lenta</option><option value="0.8" selected>Normal</option><option value="0.9">Rápida</option><option value="1.0">Muy rápida</option></select></div><div class="stp" id="vVozInfo" style="padding:0 14px 6px"></div></div><div class="ctl"><button class="sec" id="vPrev">⏮</button><button id="vPlay">⏸ Pausa</button><button class="sec" id="vNext">⏭</button><button class="sec" id="vCfg" aria-label="Voz y velocidad">⚙️ Voz</button></div></div>
+<div id="vid" hidden><div class="vt"><b id="vTit"></b><button class="sec" id="vX">✕ Cerrar</button></div><div id="vSeg"></div><div class="stage" id="vStage"></div><div class="stp" id="vStp"></div><div class="cap" id="vCap"></div><div id="vOpts" hidden><div class="ctl"><select id="vVoz" aria-label="Voz"></select><select id="vRate"><option value="0.6">Muy lenta</option><option value="0.7">Lenta</option><option value="0.8" selected>Normal</option><option value="0.9">Rápida</option><option value="1.0">Muy rápida</option></select></div><div class="stp" id="vVozInfo" style="padding:0 14px 6px"></div></div><div class="ctl"><button class="sec" id="vPrev" aria-label="Escena anterior">⏮</button><button class="sec" id="vRep" aria-label="Repetir escena">↺</button><button id="vPlay">⏸</button><button class="sec" id="vNext" aria-label="Siguiente escena">⏭</button><button class="sec" id="vCapB" aria-label="Capítulos">📑</button><button class="sec" id="vCfg" aria-label="Voz y velocidad">⚙️</button></div></div>
+<div id="vChap" hidden><p><button class="sec" id="vChapX">⬅️ Volver al video</button></p><h1>📑 Escenas</h1><div class="grid" id="vChapL"></div></div>
 <script>
 const KEY="curso-patron-v1";
 let ST={done:{},prac:{},exam:0,name:""};
@@ -343,7 +360,7 @@ function home(){
   return `<div class="hero"><img src="personaje.jpg" alt="El Patrón"><div><h1>Capacitación de la app</h1><p class="lead">Elige tu camino. Con capturas reales, frases para copiar, práctica y examen.</p>
   <p><button data-act="${nx?"mod":"examx"}" ${nx?`data-id="${nx.id}"`:""}>⚡ Curso express · 10 min${pctX()?" ("+pctX()+"%)":""}</button></p>
   <p><button class="sec" data-act="${nf?"mod":"exam"}" ${nf?`data-id="${nf.id}"`:""}>📚 Curso completo · 70 min${pctF()?" ("+pctF()+"%)":""}</button></p>
-  <p><button data-video="all-e">🎬 Ver el curso express como video</button></p>
+  <p><button data-video="all-e">🎬 Ver el curso express en video guiado (≈ 20 min)</button></p>
   <p><a class="btn sec" href="index.html?tour=1">🧭 Ejercicio guiado en la app · 3 min</a></p></div></div>
   <h2>⚡ Curso express <small style="color:var(--mut);font-size:14px">· para personal nuevo · solo lo esencial</small></h2><p class="lead">4 lecciones de 2 a 3 minutos, un examen de 5 preguntas y tu constancia.</p>
   <div class="grid">${EXPRESS.map((m,i)=>card(m,i,(i+1)+". ")).join("")}
@@ -365,7 +382,7 @@ function quizHtml(qs,pref){
 }
 function modView(m){
   const L=listOf(m),i=L.indexOf(m),prev=L[i-1],next=L[i+1],ex=L===EXPRESS?"examx":"exam";
-  return `<p><button class="sec" data-act="home">⬅️ Inicio</button></p><h1>${m.ico} ${i+1}. ${esc(m.t)}</h1><p class="lead">${L===EXPRESS?"⚡ Express · ":""}${m.min} min · ${esc(m.sub)}</p><p><button data-video="${m.id}">▶️ Ver esta lección como video</button></p>
+  return `<p><button class="sec" data-act="home">⬅️ Inicio</button></p><h1>${m.ico} ${i+1}. ${esc(m.t)}</h1><p class="lead">${L===EXPRESS?"⚡ Express · ":""}${m.min} min · ${esc(m.sub)}</p><p><button data-video="${m.id}">▶️ Ver esta lección en video guiado</button></p>
   ${m.steps.map(stepHtml).join("")}
   <div class="prac"><h3>✋ Práctica en la app</h3><p class="lead" style="margin-bottom:4px">Abre la app en otra pestaña y hazlo de verdad:</p>${m.prac.map((t,k)=>`<label><input type="checkbox" data-prac="${m.id}-${k}" ${ST.prac[m.id+"-"+k]?"checked":""}><span>${esc(t)}</span></label>`).join("")}<p style="margin-top:10px"><a class="btn sec" href="index.html" target="_blank" rel="noopener">📱 Abrir la app</a> <a class="btn sec" href="index.html?tour=1" target="_blank" rel="noopener">🧭 Ejercicio guiado</a></p></div>
   <div class="quiz"><h3>📝 Mini examen</h3><div id="quiz">${quizHtml(m.quiz,m.id)}</div><p class="score" id="qres">${ST.done[m.id]!==undefined?"✅ Módulo completado ("+ST.done[m.id]+"/"+m.quiz.length+")":""}</p></div>
@@ -406,64 +423,245 @@ function wireQuiz(box,qs,pref,done){
     });
   });
 }
-/* ============ MODO VIDEO (voz del dispositivo) ============ */
-const V={on:false,clips:[],i:0,k:0,paused:false,tok:0};
+/* ============ GUIONES DEL VIDEO (express) ============ */
+const mk=(img,lines,ex)=>Object.assign({img,lines:lines.map(l=>typeof l==="string"?{t:l}:{t:l[0],k:l[1]||null,lab:l[2]||"",ty:l[3]||"ver"})},ex||{});
+const CHAP=(ico,t,sub,lines)=>({img:null,chapter:{ico,t,sub},lines:lines.map(t=>({t}))});
+const TURNO=(txt,extra)=>({img:null,turno:txt,lines:[{t:"Ahora te toca a ti."},{t:txt},{t:"Cuando termines, toca el botón Ya lo hice. Si necesitas más tiempo, no hay prisa."}],...(extra||{})});
+const ALL5="nPlano,nAgente,nCuartos,nCuadros,nMas";
+const VIDS={
+e1:[
+ CHAP("🔐","Entra y conoce la app","Cuenta, portada y las cinco secciones",["Bienvenido a la capacitación de Planos El Patrón.","En este primer capítulo vas a aprender tres cosas.","Primero, cómo entrar a tu cuenta.","Segundo, qué hay en cada sección de la aplicación.","Y tercero, cómo dejar la aplicación en la pantalla de inicio de tu teléfono.","Vamos poco a poco. Puedes pausar el video cuando quieras."]),
+ mk("v01-portada",[
+  ["Esta es la portada. Aparece cada vez que abres la aplicación.","logo","La portada","ver"],
+  ["Con este botón dorado continúas con el proyecto en el que estabas.","cont","Continuar","ver"],
+  ["Más abajo puedes hablar directamente con el agente.","voz","Agente por voz","ver"],
+  ["Con Nuevo proyecto empiezas un plano en blanco. La aplicación te pregunta antes, para que no pierdas el actual.","nuevo","Nuevo proyecto","ver"],
+  ["Mi equipo es para iniciar sesión.","equipo","Mi equipo","tap"],
+  ["Y aquí encuentras este curso y el ejercicio guiado.","curso,tour","Curso y ejercicio","ver"]],{tit:"La portada"}),
+ mk("v11-mas-login",[
+  ["Para entrar a tu cuenta, toca la sección Más, abajo a la derecha.","nMas","Toca Más","tap"],
+  ["Escribe tu correo en este campo.","correo","Tu correo","ver"],
+  ["Después, escribe tu contraseña. Debe tener al menos seis caracteres.","clave","Contraseña","ver"],
+  ["Toca el botón Entrar.","entrar","Entrar","tap"],
+  ["Si es tu primera vez, toca Crear cuenta.","crear","Crear cuenta","tap"],
+  "Después necesitas el código de invitación de tu equipo. Pídeselo al administrador.",
+  "Ese código es privado. No lo compartas con nadie."],{tit:"Entrar a tu cuenta"}),
+ mk("v12-mas-equipo",[
+  "Cuando ya entraste, aquí aparece el nombre de tu equipo.",
+  ["Con Subir proyecto guardas tu plano en la nube, para que todo tu equipo pueda verlo.","subir","Subir proyecto","tap"],
+  ["Con Salir cierras tu sesión.","salir","Salir","ver"]],{tit:"Tu equipo y la nube"}),
+ TURNO("Abre la aplicación, toca Más, escribe tu correo y tu contraseña, y toca Entrar."),
+ mk("v02-plano",[
+  ["Ahora conoce las cinco secciones. Están en la barra de abajo.",ALL5,"Cinco secciones","ver"],
+  ["Plano es tu dibujo.","nPlano","Plano","ver"],
+  ["Agente es donde hablas o escribes, y el agente dibuja por ti.","nAgente","Agente","ver"],
+  ["Cuartos sirve para crear y editar a mano.","nCuartos","Cuartos","ver"],
+  ["Cuadros muestra los materiales y el inventario.","nCuadros","Cuadros","ver"],
+  ["Y Más tiene tu equipo, la nube y las reglas de instalación.","nMas","Más","ver"]],{tit:"Las cinco secciones"}),
+ CHAP("📲","Pantalla de inicio","Deja la app como un ícono",["Un último consejo.","Para abrir la aplicación más rápido, agrégala a la pantalla de inicio de tu teléfono.","En el iPhone, abre la página en Safari, toca el botón Compartir, que es un cuadro con una flecha hacia arriba, y elige Añadir a pantalla de inicio.","Quedará con el ícono del charro.","Eso fue todo el primer capítulo. Muy bien."])
+],
+e2:[
+ CHAP("🧭","Tu plano en 2 minutos","Moverte, láminas y herramientas",["En este capítulo vas a aprender a moverte por el plano.","También a cambiar de lámina, y a usar las herramientas.","Es la pantalla que más vas a usar, así que tómate tu tiempo."]),
+ mk("v02-plano",[
+  ["Esta es la pantalla del plano. Aquí vive tu dibujo.","plano","Tu plano","ver"],
+  ["Con un dedo lo mueves. Con dos dedos, abriendo o cerrando, acercas o alejas.","plano","Arrastra y pellizca","ver"],
+  ["También puedes usar los botones de más y menos, a la derecha.","zoom","Zoom","tap"],
+  ["Abajo del dibujo está el resumen del proyecto: cuántos cuartos, cuántos metros cuadrados, cuántas puertas y cuántas ventanas.","resumen","Resumen","ver"]],{tit:"Moverte por el plano"}),
+ mk("v03-seleccion",[
+  ["Toca un cuarto y se resalta en color ámbar.","sel","Cuarto seleccionado","ver"],
+  ["Abajo aparece su tarjeta, con el nombre y los metros cuadrados.","sel","Tarjeta del cuarto","ver"],
+  ["El botón Editar te lleva a modificar ese cuarto.","editar","Editar","tap"],
+  ["El botón Decir abre la conversación con el agente, ya con ese cuarto seleccionado.","decir","Decir","tap"],
+  ["Y la equis solo quita la selección. No borra nada, no te preocupes.","x","Solo deselecciona","tap"]],{tit:"Seleccionar un cuarto"}),
+ mk("v04-laminas",[
+  ["Arriba a la izquierda está el botón de láminas. Al tocarlo se abre esta lista.","hoja","Láminas","ver"],
+  "Una lámina es una vista distinta del mismo plano.",
+  ["Distribución es el plano completo, con cuartos, medidas y muebles.","general","Distribución","ver"],
+  ["Demolición muestra lo que se va a tirar.","demolicion","Demolición","ver"],
+  ["Muros y acabados muestra la tabla roca, el Duroc y los postes.","muros","Muros y acabados","ver"],
+  ["Puertas y ventanas lista cada abertura con su medida.","puertas","Puertas y ventanas","ver"],
+  ["Eléctrico, Hidráulico y Sanitario se dibujan solos, con lo que tú colocaste.","electrico,hidraulico,sanitario","Se dibujan solas","ver"]],{tit:"Las láminas"}),
+ mk("v05-muros",[
+  ["Por ejemplo, esta es la lámina de muros y acabados.","lam","Lámina actual","ver"],
+  "Los muros nuevos de tabla roca van en color naranja.",
+  "El Duroc va en verde, y solo en la zona de la regadera y en los muros exteriores.",
+  "Debajo de cada lámina, en la sección Cuadros, está la tabla con los materiales."],{tit:"Ejemplo: muros y acabados"}),
+ mk("v06-herramientas",[
+  ["Junto al botón de láminas está el botón de herramientas.","hoja","Herramientas","ver"],
+  ["Con Cotas muestras u ocultas los números de las paredes.","cotas","Cotas","tap"],
+  ["Presentación deja solo el dibujo, limpio, para enseñárselo al cliente.","pres","Presentación","tap"],
+  ["Marcar sobre el plano te deja dibujar con el dedo, como en una libreta.","marcar","Marcar","tap"],
+  ["Y Ajustar vista centra el plano.","ajustar","Ajustar vista","tap"]],{tit:"Herramientas"}),
+ TURNO("Toca el botón de láminas y cambia a Muros y acabados. Luego toca herramientas, oculta las cotas, y vuelve a mostrarlas."),
+ CHAP("✅","Resumen","Lo que aprendiste",["Muy bien. Resumiendo este capítulo:","Con un dedo mueves el plano, y con dos lo acercas.","Al tocar un cuarto, aparece su tarjeta.","El botón de láminas cambia la vista.","Y el botón de herramientas oculta las cotas o muestra el plano limpio."])
+],
+e3:[
+ CHAP("🤖","Habla y dibuja","La conversación con el agente",["Este es el capítulo más importante.","Vas a aprender a dibujar hablando.","Es como darle instrucciones a un ayudante de obra.","Lo único que necesitas es el micrófono y tus palabras."]),
+ mk("v07-conversacion",[
+  ["Esta es la forma más rápida de dibujar: hablar con el agente.","fab","Micrófono","ver"],
+  ["Toca el micrófono una sola vez.","fab","Tócalo una vez","tap"],
+  "La primera vez, el teléfono te pedirá permiso para usar el micrófono. Toca Permitir.",
+  ["El agente te saluda y se queda escuchando. Verás esta barra.","barra","Te escucho","ver"],
+  ["Habla normal. Aquí aparece lo que va entendiendo.","txt","Lo que entendió","ver"],
+  "Cuando haces una pausa, el agente entiende y dibuja.",
+  "Después te contesta en voz alta, y vuelve a escuchar solo. No tienes que tocar nada más.",
+  ["Para terminar, di la palabra termina, o toca este botón rojo.","stop","Terminar","tap"],
+  ["El engrane sirve para cambiar la voz y la velocidad.","cfg","Voz y velocidad","tap"]],{tit:"Tocar el micrófono"}),
+ mk(null,[
+  "Veamos algunas frases que funcionan muy bien.",
+  "Ejemplo uno. Di: la calle está abajo. Así el agente sabe de qué lado queda el frente.",
+  "Ejemplo dos. Di: crea un baño de dos por tres, con regadera, inodoro y lavabo, y la puerta abajo, de ochenta centímetros.",
+  "Ejemplo tres. Di: agrega una ventana de uno veinte en la pared de arriba.",
+  "Ejemplo cuatro. Di: haz el baño de dos y medio por uno y medio. Así cambia las medidas sin borrarlo.",
+  "Ejemplo cinco. Di: borra el cuarto dos.",
+  "Mientras más claros sean los datos, mejor dibuja: medidas, el nombre del cuarto, y de qué pared hablas.",
+  "Y si le falta un dato, te lo pregunta. Respóndele con calma, como en una conversación normal."],{tit:"Frases que funcionan",logo:true}),
+ mk("v02-plano",[
+  ["Si hay mucho ruido y no puedes hablar, toca el botón del teclado, que está encima del micrófono.","teclado","Escribir","tap"]],{tit:"Cuando hay ruido"}),
+ mk("v08-escribir",[
+  ["Aquí escribes tu orden, con las mismas palabras que dirías.","texto","Escribe aquí","ver"],
+  ["Después toca Enviar.","enviar","Enviar","tap"],
+  ["O toca este micrófono para dictarla.","mic","Dictar","tap"],
+  ["Y si el agente se equivoca, toca esta flecha para deshacer.","deshacer","Deshacer","tap"],
+  ["Aquí eliges si quieres que te conteste con voz.","voz","Respuesta en voz","ver"]],{tit:"Escribir en lugar de hablar"}),
+ TURNO("Toca el micrófono y di: crea un baño de dos por tres. Cuando termine de dibujar, di: termina."),
+ CHAP("✅","Resumen","Lo que aprendiste",["Muy bien. Resumiendo este capítulo:","El micrófono se toca una sola vez, y el agente se queda escuchando.","Habla con medidas claras.","Para terminar, di termina.","Y si algo sale mal, deshaces con la flecha."])
+],
+e4:[
+ CHAP("📤","Corrige y entrega","Editar, borrar y exportar",["En este último capítulo vas a aprender a corregir lo que dibujaste.","Y a entregar tu trabajo: exportar las láminas y compartirlo con tu equipo."]),
+ mk("v09-cuartos",[
+  ["Para trabajar a mano, entra a la sección Cuartos.","nCuartos","Cuartos","tap"],
+  ["Aquí eliges qué agregar: un cuarto, un muro nuevo de tabla roca, un techo de lámina, o una demolición.","tipo","Qué agregar","ver"],
+  ["Después toca Agregar.","agregar","Agregar","tap"],
+  ["Abajo ves la lista de todo lo que tienes dibujado.","lista","Tu lista","ver"]],{tit:"La sección Cuartos"}),
+ mk("v10-editar",[
+  ["Al seleccionar un cuarto, se abre su tarjeta de edición.","nombre","Editar","ver"],
+  ["Aquí cambias el nombre del cuarto.","nombre","Nombre","ver"],
+  ["Aquí eliges si sus muros ya existen, o si son nuevos de tabla roca.","obra","Existentes o nuevos","ver"],
+  ["En este cuadro escribes las medidas de las paredes de corrido. Por ejemplo: tres treinta derecha, cinco treinta abajo.","quick","Medidas","ver"],
+  ["Y tocas Aplicar texto, para que se dibuje.","aplicar","Aplicar texto","tap"],
+  ["Para borrar el cuarto, toca este botón rojo, y confirma.","borrar","Borrar","tap"],
+  "Si te equivocas, no te preocupes. Con el agente siempre puedes deshacer."],{tit:"Editar y borrar"}),
+ mk("v13-menu",[
+  ["Para entregar tu trabajo, toca el menú de las tres rayas, arriba a la derecha.","menu","Menú","tap"],
+  ["Exportar lámina descarga la que estás viendo, con tu logo.","svg","Exportar lámina","tap"],
+  ["Todas las láminas descarga las nueve.","todas","Todas","tap"],
+  ["Materiales CSV te da la lista de materiales para abrirla en Excel.","csv","Materiales","tap"],
+  ["Guardar JSON es tu respaldo del proyecto.","json","Respaldo","tap"],
+  ["Y aquí abajo están el ejercicio guiado y este curso.","tour,curso","Ayuda","ver"]],{tit:"Exportar"}),
+ mk("v12-mas-equipo",[
+  ["Para que tu equipo vea el plano, ve a Más y toca Subir proyecto.","subir","Subir proyecto","tap"],
+  "Así todos lo abren desde su teléfono, siempre con la última versión."],{tit:"Compartir con tu equipo"}),
+ TURNO("Exporta una lámina desde el menú, y sube tu proyecto a la nube desde Más."),
+ CHAP("🎓","¡Terminaste!","Ya sabes usar la aplicación",["Felicidades. Terminaste el curso express.","Ya sabes entrar, moverte por el plano, hablar con el agente, corregir y entregar.","Ahora haz el examen express. Son cinco preguntas, y con cuatro aciertos recibes tu constancia.","Gracias por tu atención. ¡Mucho éxito con tus planos!"])
+]};
+
+/* ============ MODO VIDEO GUIADO ============ */
+const V={on:false,sc:[],i:0,k:0,paused:false,tok:0,wait:false,title:""};
+let RECTS=null;
+async function cargaRects(){if(RECTS)return;try{const r=await fetch("curso-img/rects.json",{cache:"no-cache"});RECTS=await r.json()}catch(e){RECTS={}}}
 const EMO=/[\u{1F000}-\u{1FFFF}\u{2190}-\u{21FF}\u{2300}-\u{23FF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}️‍]/gu;
 function limpia(html){const d=document.createElement("div");d.innerHTML=String(html||"").replace(/<\/(li|p|div|h3|ol|ul)>/g,". ").replace(/<br\s*\/?>/g,". ");return(d.textContent||"").replace(/\s*→\s*/g,", luego ").replace(EMO,"").replace(/[“”"]/g,"").replace(/\s*·\s*/g," ").replace(/\s+/g," ").replace(/\.(\s*\.)+/g,".").replace(/:\s*\./g,":").trim()}
 function frases(txt){return(txt.match(/[^.!?]+[.!?]*/g)||[txt]).map(x=>x.trim()).filter(x=>x.length>1)}
-function clipsDe(mods){const out=[];for(const m of mods){out.push({mod:m.t,img:null,lines:frases(`Lección: ${limpia(m.t)}. ${limpia(m.sub)}.`),logo:true});
-  m.steps.forEach((st,si)=>{let t=limpia(st.h)+". "+limpia(st.p);if(st.frases)t+=" Por ejemplo: "+st.frases.map(f=>limpia(f)).join(". Otra: ");if(st.tipx)t+=" "+limpia(st.tipx);out.push({mod:m.t,img:st.img||null,lines:frases(t),step:`${m.t} · paso ${si+1} de ${m.steps.length}`})});}
-  return out}
+function escenasDe(m){
+  if(VIDS[m.id])return VIDS[m.id].map(s=>({...s,mod:m.t}));
+  const out=[CHAP(m.ico,m.t,m.sub,[`Lección: ${limpia(m.t)}.`,limpia(m.sub)+"."])];
+  m.steps.forEach(st=>{let t=limpia(st.h)+". "+limpia(st.p);if(st.frases)t+=" Por ejemplo: "+st.frases.map(f=>limpia(f)).join(". Otra: ");if(st.tipx)t+=" "+limpia(st.tipx);
+    out.push(mk(null,frases(t),{auto:st.img||null,tit:st.h}))});
+  return out.map(s=>({...s,mod:m.t}));
+}
 const NB=/paulina|juan|ang[eé]lica|diego|jorge|m[oó]nica|marisol|carlos|francisca|esperanza|sabina|dalia/i;
 function vocesES(){let vs=[];try{vs=speechSynthesis.getVoices().filter(v=>/^es/i.test(v.lang))}catch(e){}return vs}
 function vocesListas(){return new Promise(res=>{if(vocesES().length||!window.speechSynthesis){res();return}let t=0;const f=()=>{if(vocesES().length||++t>12){res();return}setTimeout(f,150)};try{speechSynthesis.onvoiceschanged=()=>res()}catch(e){}f()})}
-try{speechSynthesis.getVoices();speechSynthesis.addEventListener&&speechSynthesis.addEventListener("voiceschanged",()=>{})}catch(e){}
-function llenaVoz(){const sel=$("vVoz"),vs=vocesES(),m=mejorVoz();let pref="";try{pref=localStorage.getItem("planos-voz-name")||""}catch(e){}
-  sel.innerHTML='<option value="">Voz: automática</option>'+vs.map(v=>`<option value="${esc(v.name)}">${esc(v.name)} (${esc(v.lang)})</option>`).join("");sel.value=vs.some(v=>v.name===pref)?pref:"";
-  const bueno=vs.some(v=>/premium|enhanced|mejorada|natural|neural/i.test(v.name));
-  $("vOpts").hidden=!(!bueno||!vs.length)?$("vOpts").hidden:false;$("vVozInfo").innerHTML=vs.length?`🗣️ Hablando con: <b>${esc(m?m.name:"voz por defecto")}</b>`+(bueno?"":"<br>⚠️ No veo voces <b>Mejoradas</b> en tu teléfono. Descárgalas en Ajustes → Accesibilidad → Lectura y voz → Contenido hablado → Voces → Español (México); luego cierra Safari por completo y vuelve a entrar."):"⚠️ El teléfono no mostró voces en español. Cierra Safari por completo y vuelve a entrar.";}
+try{speechSynthesis.getVoices()}catch(e){}
 function mejorVoz(){let vs=vocesES();let pref=null;try{pref=localStorage.getItem("planos-voz-name")}catch(e){}
   if(pref){const v=vs.find(x=>x.name===pref);if(v)return v}
   const sc=v=>(/premium|enhanced|mejorada|natural|neural/i.test(v.name)?100:0)+(/es[-_]MX/i.test(v.lang)?50:/es[-_]419/i.test(v.lang)?40:/es[-_]US/i.test(v.lang)?35:0)+(NB.test(v.name)?10:0)-(/compact|eloquence|grandma|grandpa|rocko|shelley|sandy|reed|flo|eddy/i.test(v.name)?60:0);
   return vs.slice().sort((a,b)=>sc(b)-sc(a))[0]||null}
+function llenaVoz(){const sel=$("vVoz"),vs=vocesES(),m=mejorVoz();let pref="";try{pref=localStorage.getItem("planos-voz-name")||""}catch(e){}
+  sel.innerHTML='<option value="">Voz: automática</option>'+vs.map(v=>`<option value="${esc(v.name)}">${esc(v.name)} (${esc(v.lang)})</option>`).join("");sel.value=vs.some(v=>v.name===pref)?pref:"";
+  const bueno=vs.some(v=>/premium|enhanced|mejorada|natural|neural/i.test(v.name));
+  if(!bueno||!vs.length)$("vOpts").hidden=false;
+  $("vVozInfo").innerHTML=vs.length?`🗣️ Hablando con: <b>${esc(m?m.name:"voz por defecto")}</b>`+(bueno?"":"<br>⚠️ No veo voces <b>Mejoradas</b> en tu teléfono. Descárgalas en Ajustes → Accesibilidad → Lectura y voz → Contenido hablado → Voces → Español (México); luego cierra Safari por completo y vuelve a entrar."):"⚠️ El teléfono no mostró voces en español. Cierra Safari por completo y vuelve a entrar.";}
+const sceneImg=sc=>sc.img||sc.auto||null;
+function segs(){const el=$("vSeg");if(el.childElementCount!==V.sc.length){el.innerHTML=V.sc.map((_,i)=>`<i data-i="${i}"></i>`).join("")}[...el.children].forEach((c,i)=>{c.className=i<V.i?"on":(i===V.i?"cur":"")})}
 function vShow(){
-  const c=V.clips[V.i];if(!c)return;
-  $("vTit").textContent=c.mod;$("vStp").textContent=c.step||"Introducción";
-  $("vStage").innerHTML=c.img?`<img src="${IMG(c.img)}" alt="">`:`<img class="logo" src="${c.logo?"emblema.jpg":"personaje.jpg"}" alt="">`;
-  $("vBar").style.width=Math.round(100*V.i/Math.max(1,V.clips.length-1))+"%";
+  const sc=V.sc[V.i];if(!sc)return;segs();V.k=0;
+  $("vTit").textContent=sc.mod||V.title;$("vStp").textContent=`Escena ${V.i+1} de ${V.sc.length}`+(sc.tit?` · ${sc.tit}`:"");
+  const st=$("vStage");
+  if(sc.chapter){st.innerHTML=`<div class="chap"><div class="ci">${sc.chapter.ico}</div><h2>${esc(sc.chapter.t)}</h2><p>${esc(sc.chapter.sub||"")}</p></div>`}
+  else if(sc.turno){st.innerHTML=`<div class="chap"><div class="ci">✋</div><h2>Tu turno</h2><p>${esc(sc.turno)}</p><div class="tbt" id="vTb" hidden><button id="vOk">✅ Ya lo hice, seguir</button><a class="btn sec" href="index.html" target="_blank" rel="noopener">📱 Abrir la app</a><button class="sec" id="vRe">🔁 Escuchar otra vez</button></div></div>`}
+  else{const im=sceneImg(sc);
+    if(sc.logo||!im){st.innerHTML=`<div class="chap"><img class="lg" src="emblema.jpg" alt=""></div>`}
+    else st.innerHTML=`<div class="frame"><img src="${IMG(im)}" alt=""><div id="vOv"></div></div>`}
+  vCue(null);
+}
+function vCue(line){
+  const ov=$("vOv");if(!ov)return;const sc=V.sc[V.i];
+  if(!line||!line.k||!RECTS||!RECTS[sc.img]){ov.innerHTML="";return}
+  const ks=line.k.split(",").map(k=>RECTS[sc.img][k]).filter(Boolean);if(!ks.length){ov.innerHTML="";return}
+  const P=0.012,rs=ks.map(r=>({x:Math.max(0,r[0]-P),y:Math.max(0,r[1]-P*0.6),w:Math.min(1,r[2]+2*P),h:r[3]+P*1.2}));
+  const holes=rs.map(r=>`<rect x="${r.x*1000}" y="${r.y*1000}" width="${r.w*1000}" height="${r.h*1000}" rx="14" fill="black"/>`).join("");
+  const boxes=rs.map(r=>`<div class="hbox" style="left:${r.x*100}%;top:${r.y*100}%;width:${r.w*100}%;height:${r.h*100}%"></div>`).join("");
+  const f=rs[0],cx=Math.min(84,Math.max(16,(f.x+f.w/2)*100)),above=f.y>0.16;
+  const lab=line.lab?`<div class="hlab" style="left:${cx}%;top:${above?(f.y*100-1.2):((f.y+f.h)*100+1.2)}%;transform:translate(-50%,${above?"-100%":"0"})">${esc(line.lab)}</div>`:"";
+  const fing=line.ty==="tap"?`<div class="hfinger" style="left:${(f.x+f.w*0.62)*100}%;top:${(f.y+f.h*0.55)*100}%">👆</div>`:"";
+  ov.innerHTML=`<svg class="dim" viewBox="0 0 1000 1000" preserveAspectRatio="none"><defs><mask id="mk"><rect width="1000" height="1000" fill="white"/>${holes}</mask></defs><rect width="1000" height="1000" fill="rgba(0,0,0,.66)" mask="url(#mk)"/></svg>${boxes}${lab}${fing}`;
 }
 function vSpeak(){
-  if(!V.on||V.paused)return;const c=V.clips[V.i];
-  if(!c){vEnd();return}
-  if(V.k>=c.lines.length){V.i++;V.k=0;if(V.i>=V.clips.length){vEnd();return}vShow();setTimeout(vSpeak,1000);return}
-  const txt=c.lines[V.k];$("vCap").textContent=txt;
-  if(!window.speechSynthesis){setTimeout(()=>{V.k++;vSpeak()},Math.max(1800,txt.length*70));return}
+  if(!V.on||V.paused||V.wait)return;const sc=V.sc[V.i];if(!sc){vEnd();return}
+  if(V.k>=sc.lines.length){
+    if(sc.turno){V.wait=true;const tb=$("vTb");if(tb)tb.hidden=false;$("vCap").textContent="Cuando termines, toca “Ya lo hice”.";return}
+    const my=++V.tok;setTimeout(()=>{if(my!==V.tok||!V.on)return;vGo(V.i+1)},1300);return}
+  const line=sc.lines[V.k];$("vCap").textContent=line.t;vCue(line);
+  if(!window.speechSynthesis){setTimeout(()=>{V.k++;vSpeak()},Math.max(2500,line.t.length*95));return}
   const my=++V.tok;try{speechSynthesis.cancel()}catch(e){}
-  const u=new SpeechSynthesisUtterance(txt);u.lang="es-MX";const v=mejorVoz();if(v){u.voice=v;u.lang=v.lang}
+  const u=new SpeechSynthesisUtterance(line.t);u.lang="es-MX";const v=mejorVoz();if(v){u.voice=v;u.lang=v.lang}
   u.rate=parseFloat($("vRate").value)||0.8;
-  const next=()=>{if(my!==V.tok)return;setTimeout(()=>{if(my!==V.tok)return;V.k++;vSpeak()},420)};u.onend=next;u.onerror=next;
+  const next=()=>{if(my!==V.tok)return;setTimeout(()=>{if(my!==V.tok)return;V.k++;vSpeak()},750)};u.onend=next;u.onerror=next;
   try{speechSynthesis.speak(u)}catch(e){next()}
 }
-async function vStart(clips){
-  await vocesListas();llenaVoz();
-  V.clips=clips;V.i=0;V.k=0;V.paused=false;V.on=true;$("vid").hidden=false;document.body.style.overflow="hidden";
+function vGo(i){
+  V.tok++;try{speechSynthesis.cancel()}catch(e){}V.wait=false;
+  if(i>=V.sc.length){vEnd();return}
+  V.i=Math.max(0,i);V.on=true;vShow();if(!V.paused)vSpeak()
+}
+async function vStart(scenes,title){
+  await Promise.all([vocesListas(),cargaRects()]);llenaVoz();
+  V.sc=scenes;V.title=title||"";V.paused=false;V.on=true;V.wait=false;V.i=0;$("vid").hidden=false;document.body.style.overflow="hidden";$("vChap").hidden=true;
   try{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
-  $("vPlay").textContent="⏸ Pausa";vShow();vSpeak();
+  $("vPlay").textContent="⏸";vShow();vSpeak();
 }
 function vStop(){V.on=false;V.tok++;try{speechSynthesis.cancel()}catch(e){}$("vid").hidden=true;document.body.style.overflow=""}
-function vEnd(){V.on=false;$("vCap").innerHTML="🎬 Fin del video. ¡Ahora haz tu mini examen y la práctica en la app!";$("vBar").style.width="100%";$("vPlay").textContent="↺ Ver de nuevo"}
+function vEnd(){V.on=false;V.tok++;$("vStage").innerHTML=`<div class="chap"><div class="ci">🎬</div><h2>Fin del video</h2><p>Ahora haz tu práctica y el examen.</p><div class="tbt"><button id="vEx">🏁 Hacer el examen</button><button class="sec" id="vAg">↺ Ver de nuevo</button></div></div>`;$("vCap").textContent="Gracias por tu atención. ¡Mucho éxito!";$("vPlay").textContent="↺";
+  segs();[...$("vSeg").children].forEach(c=>c.className="on")}
+document.addEventListener("click",e=>{
+  if(e.target.closest("#vOk")){V.wait=false;vGo(V.i+1);return}
+  if(e.target.closest("#vRe")){V.wait=false;V.k=0;vSpeak();return}
+  if(e.target.closest("#vEx")){const ex=V.sc.some(s=>s.mod&&EXPRESS.some(m=>m.t===s.mod));vStop();go(ex?"examx":"exam");return}
+  if(e.target.closest("#vAg")){vGo(0);return}
+  const sg=e.target.closest("#vSeg i");if(sg){vGo(+sg.dataset.i);return}
+  const ch=e.target.closest("#vChap [data-go]");if(ch){$("vChap").hidden=true;vGo(+ch.dataset.go);return}
+  if(e.target.closest("#vStage")&&!e.target.closest("button,a")&&V.sc.length&&!V.wait&&V.on){$("vPlay").click()}
+});
 $("vX").onclick=vStop;
 $("vCfg").onclick=()=>{$("vOpts").hidden=!$("vOpts").hidden};
-$("vVoz").onchange=()=>{try{localStorage.setItem("planos-voz-name",$("vVoz").value)}catch(e){}llenaVoz();if(V.on&&!V.paused){V.tok++;vSpeak()}};
-$("vPlay").onclick=()=>{if(!V.on&&V.i>=V.clips.length-1&&$("vPlay").textContent.startsWith("↺")){vStart(V.clips);return}
-  if(V.paused){V.paused=false;$("vPlay").textContent="⏸ Pausa";vSpeak()}else{V.paused=true;V.tok++;try{speechSynthesis.cancel()}catch(e){}$("vPlay").textContent="▶️ Seguir"}};
-$("vNext").onclick=()=>{V.tok++;try{speechSynthesis.cancel()}catch(e){}V.i=Math.min(V.clips.length-1,V.i+1);V.k=0;V.on=true;vShow();if(!V.paused)vSpeak()};
-$("vPrev").onclick=()=>{V.tok++;try{speechSynthesis.cancel()}catch(e){}V.i=Math.max(0,V.i-1);V.k=0;V.on=true;vShow();if(!V.paused)vSpeak()};
-$("vRate").onchange=()=>{try{localStorage.setItem("curso-rate",$("vRate").value)}catch(e){}if(V.on&&!V.paused){V.tok++;vSpeak()}};
+$("vCapB").onclick=()=>{const L=V.sc.map((s,i)=>`<button class="mod ${i===V.i?"done":""}" data-go="${i}"><div class="top"><span class="ico">${s.chapter?s.chapter.ico:s.turno?"✋":"🎞️"}</span><div><b>${esc(s.chapter?s.chapter.t:s.turno?"Tu turno":(s.tit||"Escena "+(i+1)))}</b><small>Escena ${i+1}</small></div></div></button>`).join("");$("vChapL").innerHTML=L;$("vChap").hidden=!$("vChap").hidden};
+$("vChapX").onclick=()=>$("vChap").hidden=true;
+$("vVoz").onchange=()=>{try{localStorage.setItem("planos-voz-name",$("vVoz").value)}catch(e){}llenaVoz();if(V.on&&!V.paused&&!V.wait){V.tok++;vSpeak()}};
+$("vRate").onchange=()=>{try{localStorage.setItem("curso-rate",$("vRate").value)}catch(e){}if(V.on&&!V.paused&&!V.wait){V.tok++;vSpeak()}};
 try{const r=localStorage.getItem("curso-rate");if(r&&[...$("vRate").options].some(o=>o.value===r))$("vRate").value=r}catch(e){}
-try{speechSynthesis.onvoiceschanged=()=>{}}catch(e){}
+$("vPlay").onclick=()=>{
+  if(!V.on&&V.i>=V.sc.length-1&&$("vPlay").textContent==="↺"){vGo(0);return}
+  if(V.paused){V.paused=false;$("vPlay").textContent="⏸";vSpeak()}else{V.paused=true;V.tok++;try{speechSynthesis.cancel()}catch(e){}$("vPlay").textContent="▶️"}};
+$("vNext").onclick=()=>vGo(V.i+1);
+$("vPrev").onclick=()=>vGo(V.i-1);
+$("vRep").onclick=()=>{V.paused=false;$("vPlay").textContent="⏸";vGo(V.i)};
 document.addEventListener("click",e=>{const b=e.target.closest("[data-video]");if(!b)return;const id=b.dataset.video;
-  if(id==="all-e")vStart(clipsDe(EXPRESS));else if(id==="all-f")vStart(clipsDe(MODS));else{const m=[...MODS,...EXPRESS].find(x=>x.id===id);if(m)vStart(clipsDe([m]))}});
+  if(id==="all-e")vStart(EXPRESS.flatMap(escenasDe),"Curso express");
+  else if(id==="all-f")vStart(MODS.flatMap(escenasDe),"Curso completo");
+  else{const m=[...MODS,...EXPRESS].find(x=>x.id===id);if(m)vStart(escenasDe(m),m.t)}});
+
 (function(){const h=location.hash.replace("#","").split("/");if(h[0]==="mod"&&[...MODS,...EXPRESS].some(m=>m.id===h[1])){view="mod";cur=h[1]}else if(["exam","examx","cert","certx"].includes(h[0]))view=h[0];render()})();
 </script>
 </body>
