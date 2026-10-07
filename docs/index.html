@@ -661,6 +661,21 @@ async function cvHandle(t){
   CV.busy=false;
   if(CV.on){if(CV.carry){const c=CV.carry;CV.carry="";cvHandle(c)}else cvListen()}
 }
+/* Habla con la voz del teléfono. Si la voz elegida no suena (pasa en iPhone con voces duplicadas), prueba la voz por defecto. */
+function hablarDisp(txt,rate,done){
+  let terminado=false;const fin=()=>{if(terminado)return;terminado=true;clearTimeout(wd);clearTimeout(g);done()};
+  let wd=null,intento=0;
+  const g=setTimeout(fin,8000+txt.length*130);
+  const intentar=()=>{
+    if(terminado)return;
+    let v=null;if(intento===0&&!window.__vozFalla)v=mejorVoz();
+    const u=new SpeechSynthesisUtterance(txt);u.lang="es-MX";if(v){u.voice=v;u.lang=v.lang}u.rate=rate||0.95;u.pitch=1;
+    let empezo=false;u.onstart=()=>{empezo=true;clearTimeout(wd)};u.onend=fin;u.onerror=ev=>{if(ev&&(ev.error==="canceled"||ev.error==="interrupted"))return;if(!empezo&&intento===0){window.__vozFalla=true;intento=1;intentar()}else fin()};
+    clearTimeout(wd);wd=setTimeout(()=>{if(empezo||terminado)return;try{speechSynthesis.cancel()}catch(e){}
+      if(intento===0){window.__vozFalla=true;intento=1;intentar()}else fin()},2500);
+    try{speechSynthesis.speak(u)}catch(e){fin()}};
+  intentar();
+}
 function cvSay(txt,solo){
   return new Promise(res=>{
     if(!window.speechSynthesis||!txt){res();return}
@@ -676,9 +691,7 @@ function cvSay(txt,solo){
         barge.onend=()=>{if(CV.barging){CV.barging=false}};barge.start()}catch(e){barge=null}}
     const dice=()=>{
       if(fin)return;if(i>=partes.length){cierra();return}
-      const u=new SpeechSynthesisUtterance(partes[i++]);u.lang="es-MX";const v=mejorVoz();if(v){u.voice=v;u.lang=v.lang}
-      u.rate=parseFloat($("vRate").value)||0.95;u.pitch=1;u.onend=dice;u.onerror=dice;
-      try{speechSynthesis.speak(u)}catch(e){cierra()}};
+      hablarDisp(partes[i++],parseFloat($("vRate").value)||0.95,dice)};
     dice();
   });
 }
