@@ -9,23 +9,26 @@ const PTS=[10,7,5,3,1];
 const THEMES=()=>TRACKS.filter(t=>!t.custom);
 /* ---------------------------- ajustes y calidad ---------------------------- */
 const saveSet=()=>lsSet('kart_set',SET);
-const GFX={alta:{pr:2,bil:true,glow:true,shadow:true,dust:true},media:{pr:1.5,bil:false,glow:true,shadow:true,dust:true},baja:{pr:1,bil:false,glow:false,shadow:false,dust:false}};
-const GFX_ORDER=['alta','media','baja'];
+const GFX={ultra:{pr:3,f:2,bil:true,glow:true,shadow:true,dust:true},alta:{pr:3,f:1.25,bil:true,glow:true,shadow:true,dust:true},media:{pr:2,f:1,bil:true,glow:true,shadow:true,dust:true},baja:{pr:1.5,f:1,bil:false,glow:false,shadow:false,dust:false}};
+const GFX_ORDER=['ultra','alta','media','baja'];
 let gfxLevel='alta',emaDt=0.016,slowN=0;
-function setGfx(level){const c=GFX[level]||GFX.alta;gfxLevel=level;PR=c.pr;Q.bil=c.bil;Q.glow=c.glow;Q.shadow=c.shadow;Q.dust=c.dust;cv.width=Math.round(W0*PR);cv.height=Math.round(H*PR);skyCv=null}
-function applyGfx(){setGfx(SET.gfx==='auto'?(gfxLevel&&GFX[gfxLevel]?gfxLevel:'alta'):SET.gfx)}
+function setGfx(level){const c=GFX[level]||GFX.alta;gfxLevel=level;PR=c.pr;FSS=c.f;Q.bil=c.bil;Q.glow=c.glow;Q.shadow=c.shadow;Q.dust=c.dust;cv.width=Math.round(W0*PR);cv.height=Math.round(H*PR);skyCv=null}
+function applyGfx(){setGfx(GFX[SET.gfx]?SET.gfx:'alta')}
+function setMusVol(){MUSVOL=MUSLV[SET.music]!=null?MUSLV[SET.music]:.22;if(AC)for(const g of MUSG){try{g.gain.setTargetAtTime(MUSVOL,AC.currentTime,.05)}catch(e){}}}
+function duck(dur){if(!AC)return;const t0=AC.currentTime;for(const g of MUSG){try{g.gain.cancelScheduledValues(t0);g.gain.setTargetAtTime(MUSVOL*.2,t0,.04);g.gain.setTargetAtTime(MUSVOL,t0+dur+.2,.3)}catch(e){}}}
 function autoQuality(dt){if(SET.gfx!=='auto'||state!=='race'||raceT<2.5)return;emaDt=emaDt*0.97+dt*0.03;
   if(emaDt>0.027){slowN++;if(slowN>90){const i=GFX_ORDER.indexOf(gfxLevel);if(i<GFX_ORDER.length-1){setGfx(GFX_ORDER[i+1]);say('⚙️ Bajé un poco los gráficos para que corra suave',2600)}slowN=0;emaDt=0.016}}else slowN=Math.max(0,slowN-2)}
 const SEGS=[
- {k:'tilt',t:'🎯 Sensibilidad al inclinar',o:[['Suave',30],['Normal',20],['Sensible',12]]},
+ {k:'tilt',t:'🎯 Sensibilidad al inclinar',o:[['Muy suave',48],['Suave',34],['Normal',24],['Sensible',16]]},
  {k:'assist',t:'🧭 Ayuda de dirección',o:[['Sin ayuda',0],['Poca',1],['Mucha',2]]},
  {k:'speed',t:'🚀 Velocidad del juego',o:[['Relajado',0.85],['Normal',1],['Rápido',1.12]]},
- {k:'gfx',t:'🖼️ Gráficos',o:[['Auto','auto'],['Alta','alta'],['Media','media'],['Baja','baja']]},
+ {k:'gfx',t:'🖼️ Gráficos',o:[['Ultra','ultra'],['Alta','alta'],['Media','media'],['Baja','baja']]},
+ {k:'music',t:'🎵 Volumen de la música',o:[['Sin música','off'],['Bajo','bajo'],['Medio','medio'],['Alto','alto']]},
  {k:'voz',t:'🗣️ Voces y comentarista',o:[['Sí',true],['No',false]]}
 ];
 function buildSettings(){const b=$('setBody');b.innerHTML='';
   for(const row of SEGS){const d=document.createElement('div');d.className='setrow';d.innerHTML='<b>'+row.t+'</b>';const sg=document.createElement('div');sg.className='seg';
-    for(const[lab,val]of row.o){const bt=document.createElement('button');bt.className='sec'+(SET[row.k]===val?' on':'');bt.textContent=lab;bt.onclick=()=>{SET[row.k]=val;saveSet();if(row.k==='speed')SPEEDK=val;if(row.k==='gfx'){if(val==='auto'){gfxLevel='alta'}applyGfx()}beep(660,.06);buildSettings()};sg.appendChild(bt)}
+    for(const[lab,val]of row.o){const bt=document.createElement('button');bt.className='sec'+(SET[row.k]===val?' on':'');bt.textContent=lab;bt.onclick=()=>{SET[row.k]=val;saveSet();if(row.k==='speed')SPEEDK=val;if(row.k==='gfx')applyGfx();if(row.k==='music')setMusVol();beep(660,.06);buildSettings()};sg.appendChild(bt)}
     d.appendChild(sg);b.appendChild(d)}
   const u=document.createElement('div');u.className='setrow';u.innerHTML='<b>🔄 ¿Algo raro o no se actualiza?</b>';const ub=document.createElement('button');ub.className='sec';ub.textContent='Actualizar el juego';ub.style.fontSize='14px';ub.onclick=async()=>{try{const rs=await navigator.serviceWorker.getRegistrations();for(const r of rs)await r.unregister();const ks=await caches.keys();for(const k of ks)if(k.startsWith('kart-'))await caches.delete(k)}catch(e){}location.reload()};u.appendChild(ub);b.appendChild(u)}
 /* ---------------------------- voces y comentarista ---------------------------- */
@@ -38,12 +41,12 @@ function prefetchNatural(){if(!window.VN||!VN.sesionOk||!VN.sesionOk()||!VN.pref
 async function natBuffer(text){if(VOX.nat[text]!==undefined)return VOX.nat[text];VOX.nat[text]=null;
   try{const c=await caches.open('voz-v1'),hit=await c.match(natKey(text));if(!hit)return null;const ab=await(await hit.blob()).arrayBuffer();VOX.nat[text]=await new Promise((res,rej)=>{const pr=AC.decodeAudioData(ab,res,rej);if(pr&&pr.catch)pr.catch(()=>{})})}catch(e){VOX.nat[text]=null}
   return VOX.nat[text]}
-function playBuf(b,vol){if(!b||!AC||!master)return;const s=AC.createBufferSource(),g=AC.createGain();g.gain.value=vol||1;s.buffer=b;s.connect(g);g.connect(master);VOX.playing=true;s.onended=()=>{VOX.playing=false};s.start()}
+function playBuf(b,vol){if(!b||!AC||!master)return;duck(b.duration||2);const s=AC.createBufferSource(),g=AC.createGain();g.gain.value=vol||1;s.buffer=b;s.connect(g);g.connect(master);VOX.playing=true;s.onended=()=>{VOX.playing=false};s.start()}
 function speak(key,force){if(!key||!SET.voz||muted||!AC||!VOX.table[key])return;const now=performance.now();if(!force&&(VOX.playing||now-VOX.lastT<2200))return;
   const lst=VOX.table[key],i=(Math.random()*lst.length)|0;VOX.lastT=now;playVox(key,i,lst[i])}
-async function playVox(key,i,text){if(VOX.nat[text])return playBuf(VOX.nat[text],1.05);
+async function playVox(key,i,text){if(VOX.nat[text])return playBuf(VOX.nat[text],1.6);
   natBuffer(text);   // la próxima vez sale con la voz natural
-  playBuf(VOX.buf[key+'_'+i],1.15)}
+  playBuf(VOX.buf[key+'_'+i],1.7)}
 /* ---------------------------- logros ---------------------------- */
 const ACH=[
  {id:'first',e:'🥇',n:'Primer lugar',d:'Gana una carrera'},
@@ -160,7 +163,7 @@ addEventListener('keydown',e=>{if(e.key==='j')input2.left=true;if(e.key==='l')in
 window.V4={
   gfx:()=>gfxLevel,
   prepTrack(trk){if(!SPR.mkSign)return;const pn=trk.pension?trk.pension.toUpperCase():'';const extra=pn?[[pn,'¡TU PENSIÓN FAVORITA!'],[pn,'DEPA LIBRE · ¡PREGUNTE!'],[pn,'AQUÍ SE VIVE BIEN'],['BIENVENIDO A',pn]]:[];
-    if(SPR._signKey!==pn){SPR.signs=SIGN_TXT.concat(extra,extra,extra).map(SPR.mkSign);SPR._signKey=pn}},
+    if(SPR._signKey!==pn){const base=SIGN_TXT.map(SPR.mkSign),ex=extra.map(SPR.mkSign);SPR.signs=base.concat(ex,ex,ex);SPR._signKey=pn}},
   raceStart(){EV.list=[];EV.timer=13;EV.rain=0;EV.rainEver=false;EV.hits=0;EV.narT=rnd(16,24);GRIPK=1;SPEEDK=SET.speed;applyGfx();
     GH.rec=[];GH.tNext=0;GH.wpi=Math.max(0,WPN-3);GH.lap=0;GH.best=lsGet(ghostKey(),null);emaDt=0.016;slowN=0;loadClips()},
   go(){speak('go',true)},
@@ -204,7 +207,7 @@ window.V4={
 };
 /* ---------------------------- arranque ---------------------------- */
 loadPensions();updApodo();loadVoices().then(()=>{loadClips()});
-if(SET.gfx!=='auto')setGfx(SET.gfx);else setGfx('alta');
+applyGfx();
 SPEEDK=SET.speed;
 if('serviceWorker' in navigator&&location.protocol.startsWith('http')){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
 const TIPS2=['💡 Con la lluvia el kart se resbala: ¡suave con el volante!','💡 La loza avisa con una sombra roja: ¡sal de ahí!','💡 Gánale a tu fantasma en Contrarreloj 👻','💡 Crea la pista de tu pensión en "Elegir pista"','💡 Dos jugadores en el mismo iPhone: ¡cada quien su lado!'];
