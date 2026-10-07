@@ -256,8 +256,9 @@ const $=id=>document.getElementById(id);
 const clamp=(v,a,b)=>v<a?a:v>b?b:v,lerp=(a,b,t)=>a+(b-a)*t,rnd=(a,b)=>a+Math.random()*(b-a);
 const angDiff=(a,b)=>{let d=b-a;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return d};
 const TAU=Math.PI*2;
-const SET=Object.assign({tilt:26,assist:0,speed:1,gfx:'alta',voz:true,music:'medio',vvol:'alto'},lsGet('kart_set',{}));
+const SET=Object.assign({tilt:12,assist:0,speed:1,gfx:'alta',voz:true,music:'medio',vvol:'alto'},lsGet('kart_set',{}));
 if(!SET.v5){if(SET.gfx==='auto')SET.gfx='alta';SET.v5=1}
+if(!SET.v8){SET.tilt=12;SET.v8=1;lsSet('kart_set',SET)}
 if(!SET.v6){if(SET.tilt===34||SET.tilt===20)SET.tilt=26;if(SET.music==='bajo'||!SET.music)SET.music='medio';if(!SET.vvol)SET.vvol='alto';SET.v6=1;lsSet('kart_set',SET)}
 const MUSLV={bajo:.3,medio:.55,alto:.9,off:0};let MUSVOL=MUSLV[SET.music]!=null?MUSLV[SET.music]:.55;const MUSG=[];
 const PAINT=Object.assign({c:null,l:''},lsGet('kart_paint',{}));
@@ -965,7 +966,7 @@ function onMotion(e){const a=e.accelerationIncludingGravity;if(!a||a.x==null||a.
   let A=(screen.orientation&&typeof screen.orientation.angle==='number')?screen.orientation.angle:(window.orientation||0);A=((A%360)+360)%360;
   let sx,up;if(A===90){sx=-dy;up=dx}else if(A===270){sx=dy;up=-dx}else if(A===180){sx=-dx;up=-dy}else{sx=dx;up=dy}
   if(Math.hypot(sx,up)<4)return;tilt.has=true;tilt.raw=Math.atan2(sx,-up)*180/Math.PI;
-  let d=tilt.raw-tilt.off;d=Math.abs(d)<3.5?0:d-Math.sign(d)*3.5;let t=clamp(d/SET.tilt,-1,1);t=Math.sign(t)*Math.pow(Math.abs(t),1.2);if(ctlMode===2)t=-t;tilt.s+=(t-tilt.s)*0.34;tilt.steer=tilt.s}
+  let d=tilt.raw-tilt.off;d=Math.abs(d)<1.5?0:d-Math.sign(d)*1.5;let t=clamp(d/SET.tilt*1.15,-1,1);t=Math.sign(t)*Math.pow(Math.abs(t),.85);if(ctlMode===2)t=-t;tilt.s+=(t-tilt.s)*0.5;tilt.steer=tilt.s}
 async function enableTilt(){try{if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){const r=await DeviceMotionEvent.requestPermission();if(r!=='granted')return false}
   if(!tilt.listening){addEventListener('devicemotion',onMotion);tilt.listening=true}return true}catch(e){return false}}
 const CTL_TXT=['🎮 Control: botones','📱 Control: inclinar','📱 Inclinar (al revés)'];

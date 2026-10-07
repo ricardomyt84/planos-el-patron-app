@@ -19,7 +19,7 @@ function duck(dur){if(!AC)return;const t0=AC.currentTime;for(const g of MUSG){tr
 function autoQuality(dt){if(SET.gfx!=='auto'||state!=='race'||raceT<2.5)return;emaDt=emaDt*0.97+dt*0.03;
   if(emaDt>0.027){slowN++;if(slowN>90){const i=GFX_ORDER.indexOf(gfxLevel);if(i<GFX_ORDER.length-1){setGfx(GFX_ORDER[i+1]);say('⚙️ Bajé un poco los gráficos para que corra suave',2600)}slowN=0;emaDt=0.016}}else slowN=Math.max(0,slowN-2)}
 const SEGS=[
- {k:'tilt',t:'🎯 Sensibilidad al inclinar',o:[['Suave',34],['Normal',26],['Sensible',20],['Muy sensible',14]]},
+ {k:'tilt',t:'🎯 Sensibilidad al inclinar',o:[['Suave',26],['Normal',17],['Sensible',12],['Muy sensible',8]]},
  {k:'assist',t:'🧭 Ayuda de dirección',o:[['Sin ayuda',0],['Poca',1],['Mucha',2]]},
  {k:'speed',t:'🚀 Velocidad del juego',o:[['Relajado',0.85],['Normal',1],['Rápido',1.12]]},
  {k:'gfx',t:'🖼️ Gráficos',o:[['Ultra','ultra'],['Alta','alta'],['Media','media'],['Baja','baja']]},
