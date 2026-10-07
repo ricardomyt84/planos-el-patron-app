@@ -1,0 +1,63 @@
+{
+ "patron": {
+  "n": "El Patrón",
+  "e": "🤠",
+  "q": "«¡Quiero la renta YA!»"
+ },
+ "patrona": {
+  "n": "Doña Patrona",
+  "q": "«Yo sí reviso los recibos»"
+ },
+ "albanil": {
+  "n": "El Albañil",
+  "q": "«Ya mero termino… (hace 3 meses)»"
+ },
+ "arq": {
+  "n": "La Arquitecta",
+  "q": "«El plano decía otra cosa»"
+ },
+ "plomero": {
+  "n": "Don Plomero",
+  "q": "«Es una fuga… de dinero»"
+ },
+ "nina": {
+  "n": "La Niña Patrona",
+  "e": "👧",
+  "q": "«Papá, ¿ya llegamos?»"
+ },
+ "perro": {
+  "n": "El Perro",
+  "e": "🐶",
+  "q": "«¡Dime perro… pero chino no!»"
+ },
+ "viejo": {
+  "n": "El Viejo Decrépito",
+  "e": "👴",
+  "q": "«Ya no estoy para estos trotes…»"
+ },
+ "guerrepu": {
+  "n": "La Guerrepú",
+  "e": "⚔️",
+  "q": "«¡A la guerra… pero después de comer!»"
+ },
+ "primo": {
+  "n": "El Primo Flojo",
+  "e": "😴",
+  "q": "«Mañana lo hago…»"
+ },
+ "socanibal": {
+  "n": "Socaníbal",
+  "e": "😱",
+  "q": "«¡Yo mejor me quedo en la salida!»"
+ },
+ "agricultor": {
+  "n": "El Agricultor",
+  "e": "🌾",
+  "q": "«¡Lo que se siembra, se cosecha!»"
+ },
+ "vida": {
+  "n": "Vida",
+  "e": "🔧",
+  "q": "«¿Esto se aprieta o se afloja?»"
+ }
+}

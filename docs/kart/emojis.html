@@ -1,0 +1,10 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Emojis del Patrón</title>
+<style>body{margin:0;background:#14110a;color:#fff;font-family:system-ui,sans-serif;text-align:center;padding:16px}h1{color:#e8cd85;margin:6px 0}p{color:#cfc3a0;max-width:560px;margin:6px auto}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;max-width:900px;margin:14px auto}.c{background:#1d1810;border:2px solid #3a2f14;border-radius:16px;padding:10px}.c img{width:100%;max-width:140px;-webkit-touch-callout:default;-webkit-user-select:auto}.c b{display:block;color:#e8cd85;margin-top:4px}.c i{display:block;color:#cfc3a0;font-size:12px;font-style:normal}
+a.b{display:inline-block;margin-top:8px;background:#e8cd85;color:#1a1306;border-radius:12px;padding:8px 14px;font-weight:800;text-decoration:none;font-size:14px}</style></head><body>
+<h1>🏠 Emojis de El Patrón</h1><p>Mantén presionado un emoji y elige <b>Guardar imagen</b> (iPhone) o <b>Descargar imagen</b>. Sirven como stickers en WhatsApp con cualquier app de stickers.</p>
+<a class="b" href="index.html" id="back">🏎️ Volver al juego</a>
+<div class="g" id="g"></div>
+<script>
+fetch('emojis/index.json').then(r=>r.json()).then(d=>{g.innerHTML=Object.entries(d).map(([k,v])=>`<div class="c"><img src="emojis/${k}.png" alt="${v.n}"><b>${v.e||''} ${v.n}</b><i>${v.q||''}</i><a class="b" href="emojis/${k}.png" download="${k}.png">⬇️ Guardar</a></div>`).join('')});
+</script></body></html>
