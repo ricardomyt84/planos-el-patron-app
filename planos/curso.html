@@ -88,18 +88,18 @@ ul,ol{padding-left:20px;margin:6px 0}li{margin:3px 0}
 .cert p{margin:6px 0;color:#3a2f14}
 input[type=text]{font:inherit;width:100%;padding:12px;border-radius:12px;border:1px solid #4a3b1c;background:#15120c;color:var(--tx);font-size:16px}
 #vid{position:fixed;inset:0;z-index:50;background:#000;display:flex;flex-direction:column}
-#vid .vt{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 14px 8px;border-bottom:1px solid #4a3b1c}
+#vid .vt{display:flex;align-items:center;gap:10px;padding:calc(6px + env(safe-area-inset-top)) 12px 6px;border-bottom:1px solid #4a3b1c}#vid .vt button{min-height:38px;padding:6px 12px}
 #vid .vt b{flex:1;font-family:Georgia,serif;color:var(--pri2);font-size:16px}
-#vid .stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;padding:10px}
-#vid .stage img{max-height:100%;max-width:100%;border-radius:18px;border:1px solid #4a3b1c;animation:kb 14s ease-in-out infinite alternate}
-#vid .stage img.logo{border:0;border-radius:14px;mix-blend-mode:lighten;max-width:70%}
+#vid .stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;padding:4px}
+#vid .stage img{height:100%;width:auto;max-width:100%;object-fit:contain;border-radius:16px;border:1px solid #4a3b1c;animation:kb 16s ease-in-out infinite alternate}
+#vid .stage img.logo{border:0;border-radius:14px;mix-blend-mode:lighten;height:auto;width:min(92%,520px)}
 @keyframes kb{from{transform:scale(1) translateY(0)}to{transform:scale(1.07) translateY(-1.5%)}}
-#vid .cap{padding:12px 16px;background:linear-gradient(0deg,#000 60%,transparent);font-size:19px;line-height:1.4;text-align:center;min-height:110px;display:flex;align-items:center;justify-content:center}
-#vid .ctl{display:flex;gap:10px;justify-content:center;align-items:center;padding:6px 14px calc(14px + env(safe-area-inset-bottom));flex-wrap:wrap}
-#vid .ctl button,#vid .ctl select{min-height:46px}
+#vid .cap{padding:6px 16px;font-size:18px;line-height:1.35;text-align:center;min-height:84px;display:flex;align-items:center;justify-content:center}
+#vid .ctl{display:flex;gap:8px;justify-content:center;align-items:center;padding:4px 10px calc(10px + env(safe-area-inset-bottom));flex-wrap:wrap}
+#vid .ctl button,#vid .ctl select{min-height:44px}#vid .ctl button{padding:8px 12px}#vid .ctl select{max-width:44vw}
 #vid .ctl select{font:inherit;background:#15120c;color:var(--tx);border:1px solid #4a3b1c;border-radius:12px;padding:0 10px}
 #vid .vb{height:5px;background:#1b160c}#vid .vb i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--pri),var(--pri2));transition:width .3s}
-#vid .stp{color:var(--mut);font-size:13px;text-align:center}
+#vid .stp{color:var(--mut);font-size:12.5px;text-align:center;line-height:1.3}
 @media print{body{background:#fff}header,.nav,.noprint,main>*:not(#certbox){display:none!important}main{padding:0}.cert{border-width:10px;margin:0 auto;box-shadow:none}.cert img{mix-blend-mode:normal}}
 </style>
 </head>
@@ -109,7 +109,7 @@ input[type=text]{font:inherit;width:100%;padding:12px;border-radius:12px;border:
   <div class="bar"><i id="pbar"></i></div>
 </header>
 <main id="app"></main>
-<div id="vid" hidden><div class="vt"><b id="vTit"></b><button class="sec" id="vX">✕ Cerrar</button></div><div class="vb"><i id="vBar"></i></div><div class="stage" id="vStage"></div><div class="stp" id="vStp"></div><div class="stp" id="vVozInfo" style="padding:0 14px"></div><div class="cap" id="vCap"></div><div class="ctl"><button class="sec" id="vPrev">⏮</button><button id="vPlay">⏸ Pausa</button><button class="sec" id="vNext">⏭</button><select id="vVoz" aria-label="Voz"></select><select id="vRate"><option value="0.85">0.85×</option><option value="0.95" selected>0.95×</option><option value="1.05">1.05×</option><option value="1.2">1.2×</option></select></div></div>
+<div id="vid" hidden><div class="vt"><b id="vTit"></b><button class="sec" id="vX">✕ Cerrar</button></div><div class="vb"><i id="vBar"></i></div><div class="stage" id="vStage"></div><div class="stp" id="vStp"></div><div class="cap" id="vCap"></div><div id="vOpts" hidden><div class="ctl"><select id="vVoz" aria-label="Voz"></select><select id="vRate"><option value="0.6">Muy lenta</option><option value="0.7">Lenta</option><option value="0.8" selected>Normal</option><option value="0.9">Rápida</option><option value="1.0">Muy rápida</option></select></div><div class="stp" id="vVozInfo" style="padding:0 14px 6px"></div></div><div class="ctl"><button class="sec" id="vPrev">⏮</button><button id="vPlay">⏸ Pausa</button><button class="sec" id="vNext">⏭</button><button class="sec" id="vCfg" aria-label="Voz y velocidad">⚙️ Voz</button></div></div>
 <script>
 const KEY="curso-patron-v1";
 let ST={done:{},prac:{},exam:0,name:""};
@@ -421,7 +421,7 @@ try{speechSynthesis.getVoices();speechSynthesis.addEventListener&&speechSynthesi
 function llenaVoz(){const sel=$("vVoz"),vs=vocesES(),m=mejorVoz();let pref="";try{pref=localStorage.getItem("planos-voz-name")||""}catch(e){}
   sel.innerHTML='<option value="">Voz: automática</option>'+vs.map(v=>`<option value="${esc(v.name)}">${esc(v.name)} (${esc(v.lang)})</option>`).join("");sel.value=vs.some(v=>v.name===pref)?pref:"";
   const bueno=vs.some(v=>/premium|enhanced|mejorada|natural|neural/i.test(v.name));
-  $("vVozInfo").innerHTML=vs.length?`🗣️ Hablando con: <b>${esc(m?m.name:"voz por defecto")}</b>`+(bueno?"":"<br>⚠️ No veo voces <b>Mejoradas</b> en tu teléfono. Descárgalas en Ajustes → Accesibilidad → Lectura y voz → Contenido hablado → Voces → Español (México); luego cierra Safari por completo y vuelve a entrar."):"⚠️ El teléfono no mostró voces en español. Cierra Safari por completo y vuelve a entrar.";}
+  $("vOpts").hidden=!(!bueno||!vs.length)?$("vOpts").hidden:false;$("vVozInfo").innerHTML=vs.length?`🗣️ Hablando con: <b>${esc(m?m.name:"voz por defecto")}</b>`+(bueno?"":"<br>⚠️ No veo voces <b>Mejoradas</b> en tu teléfono. Descárgalas en Ajustes → Accesibilidad → Lectura y voz → Contenido hablado → Voces → Español (México); luego cierra Safari por completo y vuelve a entrar."):"⚠️ El teléfono no mostró voces en español. Cierra Safari por completo y vuelve a entrar.";}
 function mejorVoz(){let vs=vocesES();let pref=null;try{pref=localStorage.getItem("planos-voz-name")}catch(e){}
   if(pref){const v=vs.find(x=>x.name===pref);if(v)return v}
   const sc=v=>(/premium|enhanced|mejorada|natural|neural/i.test(v.name)?100:0)+(/es[-_]MX/i.test(v.lang)?50:/es[-_]419/i.test(v.lang)?40:/es[-_]US/i.test(v.lang)?35:0)+(NB.test(v.name)?10:0)-(/compact|eloquence|grandma|grandpa|rocko|shelley|sandy|reed|flo|eddy/i.test(v.name)?60:0);
@@ -435,13 +435,13 @@ function vShow(){
 function vSpeak(){
   if(!V.on||V.paused)return;const c=V.clips[V.i];
   if(!c){vEnd();return}
-  if(V.k>=c.lines.length){V.i++;V.k=0;if(V.i>=V.clips.length){vEnd();return}vShow();setTimeout(vSpeak,500);return}
+  if(V.k>=c.lines.length){V.i++;V.k=0;if(V.i>=V.clips.length){vEnd();return}vShow();setTimeout(vSpeak,1000);return}
   const txt=c.lines[V.k];$("vCap").textContent=txt;
   if(!window.speechSynthesis){setTimeout(()=>{V.k++;vSpeak()},Math.max(1800,txt.length*70));return}
   const my=++V.tok;try{speechSynthesis.cancel()}catch(e){}
   const u=new SpeechSynthesisUtterance(txt);u.lang="es-MX";const v=mejorVoz();if(v){u.voice=v;u.lang=v.lang}
-  u.rate=parseFloat($("vRate").value)||0.95;
-  const next=()=>{if(my!==V.tok)return;V.k++;vSpeak()};u.onend=next;u.onerror=next;
+  u.rate=parseFloat($("vRate").value)||0.8;
+  const next=()=>{if(my!==V.tok)return;setTimeout(()=>{if(my!==V.tok)return;V.k++;vSpeak()},420)};u.onend=next;u.onerror=next;
   try{speechSynthesis.speak(u)}catch(e){next()}
 }
 async function vStart(clips){
@@ -453,12 +453,14 @@ async function vStart(clips){
 function vStop(){V.on=false;V.tok++;try{speechSynthesis.cancel()}catch(e){}$("vid").hidden=true;document.body.style.overflow=""}
 function vEnd(){V.on=false;$("vCap").innerHTML="🎬 Fin del video. ¡Ahora haz tu mini examen y la práctica en la app!";$("vBar").style.width="100%";$("vPlay").textContent="↺ Ver de nuevo"}
 $("vX").onclick=vStop;
+$("vCfg").onclick=()=>{$("vOpts").hidden=!$("vOpts").hidden};
 $("vVoz").onchange=()=>{try{localStorage.setItem("planos-voz-name",$("vVoz").value)}catch(e){}llenaVoz();if(V.on&&!V.paused){V.tok++;vSpeak()}};
 $("vPlay").onclick=()=>{if(!V.on&&V.i>=V.clips.length-1&&$("vPlay").textContent.startsWith("↺")){vStart(V.clips);return}
   if(V.paused){V.paused=false;$("vPlay").textContent="⏸ Pausa";vSpeak()}else{V.paused=true;V.tok++;try{speechSynthesis.cancel()}catch(e){}$("vPlay").textContent="▶️ Seguir"}};
 $("vNext").onclick=()=>{V.tok++;try{speechSynthesis.cancel()}catch(e){}V.i=Math.min(V.clips.length-1,V.i+1);V.k=0;V.on=true;vShow();if(!V.paused)vSpeak()};
 $("vPrev").onclick=()=>{V.tok++;try{speechSynthesis.cancel()}catch(e){}V.i=Math.max(0,V.i-1);V.k=0;V.on=true;vShow();if(!V.paused)vSpeak()};
-$("vRate").onchange=()=>{if(V.on&&!V.paused){V.tok++;vSpeak()}};
+$("vRate").onchange=()=>{try{localStorage.setItem("curso-rate",$("vRate").value)}catch(e){}if(V.on&&!V.paused){V.tok++;vSpeak()}};
+try{const r=localStorage.getItem("curso-rate");if(r&&[...$("vRate").options].some(o=>o.value===r))$("vRate").value=r}catch(e){}
 try{speechSynthesis.onvoiceschanged=()=>{}}catch(e){}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-video]");if(!b)return;const id=b.dataset.video;
   if(id==="all-e")vStart(clipsDe(EXPRESS));else if(id==="all-f")vStart(clipsDe(MODS));else{const m=[...MODS,...EXPRESS].find(x=>x.id===id);if(m)vStart(clipsDe([m]))}});
