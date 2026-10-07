@@ -1,5 +1,5 @@
 /* El Patrón Kart · service worker: funciona sin internet y carga rápido. */
-const C='kart-v7-5';
+const C='kart-v7-6';
 const CORE=['./','index.html','v4.js','net.js','chars.js','emojis.html','emojis/index.json','vendor/supabase.js','manifest.webmanifest','head-patron.png','personaje.jpg','icon-192.png','icon-512.png','apple-touch-icon.png','voces/voices.json','cancion.m4a','instrumental.m4a'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>Promise.all(CORE.map(u=>c.add(u).catch(()=>{})))).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('kart-')&&k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
