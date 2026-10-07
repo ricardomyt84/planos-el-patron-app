@@ -577,20 +577,26 @@ $("bMic2").onclick=()=>{if(rec){rec.stop();return}try{speechSynthesis.cancel()}c
 $("bUndo2").onclick=()=>{$("bUndo").click();$("agOut2").textContent=$("agOut").textContent};
 /* ---------- conversación continua (manos libres) ---------- */
 const CV={on:false,busy:false,rec:null,idle:null,wl:null,carry:"",cancel:null};
-const NOMBRES_BUENOS=/paulina|juan|ang[eé]lica|diego|jorge|m[oó]nica|marisol|carlos|francisca|esperanza|sabina|dalia|jorge|alvaro|elvira/i;
-function vocesES(){try{return(speechSynthesis.getVoices()||[]).filter(v=>/^es/i.test(v.lang))}catch(e){return[]}}
-function mejorVoz(){const vs=vocesES();let pref=null;try{pref=localStorage.getItem("planos-voz-name")}catch(e){}
-  if(pref){const v=vs.find(x=>x.name===pref);if(v)return v}
-  const sc=v=>(/premium|enhanced|mejorada|natural|neural/i.test(v.name)?100:0)+(/es[-_]MX/i.test(v.lang)?50:/es[-_]419/i.test(v.lang)?40:/es[-_]US/i.test(v.lang)?35:0)+(NOMBRES_BUENOS.test(v.name)?10:0)-(/compact|eloquence|grandma|grandpa|rocko|shelley|sandy|reed|flo|eddy/i.test(v.name)?60:0);
-  return vs.slice().sort((a,b)=>sc(b)-sc(a))[0]||null}
-function llenaVoces(){const sel=$("vSel");if(!sel)return;const vs=vocesES(),m=mejorVoz();
-  sel.innerHTML='<option value="">Automática (la mejor)</option>'+vs.map(v=>`<option value="${esc(v.name)}">${esc(v.name)} · ${esc(v.lang)}</option>`).join("");
-  let pref="";try{pref=localStorage.getItem("planos-voz-name")||""}catch(e){}sel.value=vs.some(v=>v.name===pref)?pref:"";}
+const VK="planos-voz-uri";
+const NB=/paulina|juan|ang[eé]lica|diego|jorge|m[oó]nica|marisol|carlos|francisca|esperanza|sabina|dalia|alvaro|elvira/i;
+const VCAL=["Básica","Estándar","Mejorada","Premium"];
+const vUri=v=>v.voiceURI||(v.name+"|"+v.lang);
+function vCalidad(v){const u=(v.voiceURI||"")+" "+(v.name||"");return /premium/i.test(u)?3:/enhanced|mejorada|natural|neural/i.test(u)?2:/compact/i.test(u)?0:1}
+const VCACHE=new Map();
+function vocesES(){let vs=[];try{vs=speechSynthesis.getVoices()||[]}catch(e){}for(const v of vs)if(/^es/i.test(v.lang))VCACHE.set(vUri(v),v);return[...VCACHE.values()]}
+function vScore(v){return vCalidad(v)*100+(/es[-_]MX/i.test(v.lang)?50:/es[-_]419/i.test(v.lang)?40:/es[-_]US/i.test(v.lang)?35:0)+(NB.test(v.name)?10:0)-(/eloquence|grandma|grandpa|rocko|shelley|sandy|reed|flo|eddy/i.test(v.name)?200:0)}
+function mejorVoz(){const vs=vocesES();let pref="";try{pref=localStorage.getItem(VK)||""}catch(e){}
+  if(pref){const v=vs.find(x=>vUri(x)===pref);if(v)return v}
+  return vs.slice().sort((a,b)=>vScore(b)-vScore(a))[0]||null}
+const vEtiqueta=v=>`${v.name} · ${VCAL[vCalidad(v)]} (${v.lang})`;
+function llenaVoces(){const sel=$("vSel");if(!sel)return;const vs=vocesES().sort((a,b)=>vScore(b)-vScore(a));
+  sel.innerHTML='<option value="">Automática (la mejor)</option>'+vs.map(v=>`<option value="${esc(vUri(v))}">${esc(vEtiqueta(v))}</option>`).join("");
+  let pref="";try{pref=localStorage.getItem(VK)||""}catch(e){}sel.value=vs.some(v=>vUri(v)===pref)?pref:"";}
 try{speechSynthesis.onvoiceschanged=llenaVoces}catch(e){}
 llenaVoces();
 try{$("vRate").value=localStorage.getItem("planos-voz-rate")||"0.95";$("vAud").checked=localStorage.getItem("planos-aud")==="1"}catch(e){}
 $("vRateT").textContent=$("vRate").value+"×";
-$("vSel").onchange=()=>{try{localStorage.setItem("planos-voz-name",$("vSel").value)}catch(e){}};
+$("vSel").onchange=()=>{try{localStorage.setItem(VK,$("vSel").value)}catch(e){}};
 $("vRate").oninput=()=>{$("vRateT").textContent=$("vRate").value+"×";try{localStorage.setItem("planos-voz-rate",$("vRate").value)}catch(e){}};
 $("vAud").onchange=()=>{try{localStorage.setItem("planos-aud",$("vAud").checked?"1":"0")}catch(e){}};
 $("vTest").onclick=()=>{try{speechSynthesis.cancel()}catch(e){};cvSay("Hola, soy el agente de El Patrón. ¿Qué dibujamos hoy?",true)};
