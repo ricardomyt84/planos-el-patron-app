@@ -248,27 +248,83 @@ const MODS=[
  ]}
 ];
 
+const EXPRESS=[
+{id:"e1",ico:"🔐",t:"Entra y conoce la app",min:2,sub:"Cuenta y las 5 secciones",
+ steps:[
+  {h:"Entra a tu equipo",img:"16-mas",cap:"⚙️ Más → Equipo y nube.",p:`<ol><li>Toca <b>⚙️ Más</b> (abajo, a la derecha).</li><li>En <b>Equipo y nube</b> escribe tu correo y contraseña y toca <b>Entrar</b>. Primera vez: <b>Crear cuenta</b> y une tu cuenta con el <b>código de invitación</b> de tu equipo.</li></ol><div class="warn">🔒 El código es privado: no lo compartas.</div>`},
+  {h:"Las 5 secciones",img:"01-plano",cap:"La barra de abajo.",p:`<ul><li>🗺️ <b>Plano</b>: tu dibujo.</li><li>🤖 <b>Agente</b>: hablas y él dibuja.</li><li>🏠 <b>Cuartos</b>: crear y editar a mano.</li><li>📊 <b>Cuadros</b>: materiales e inventario.</li><li>⚙️ <b>Más</b>: equipo, nube y reglas.</li></ul><div class="tip">📱 En Safari: Compartir → <b>Añadir a pantalla de inicio</b> y queda con el ícono del charro.</div>`}
+ ],
+ prac:["Entré con mi correo","Agregué la app a mi pantalla de inicio"],
+ quiz:[
+  {q:"¿Dónde inicias sesión?",o:["⚙️ Más → Equipo y nube","☰ Menú","🗺️ Plano"],a:0,e:"Todo lo de cuenta vive en Más."},
+  {q:"¿Cuántas secciones tiene la barra de abajo?",o:["3","5","9"],a:1,e:"Plano, Agente, Cuartos, Cuadros y Más."}
+ ]},
+{id:"e2",ico:"🧭",t:"Tu plano en 2 minutos",min:2,sub:"Moverte, láminas y herramientas",
+ steps:[
+  {h:"Tocar y mover",img:"01-plano",cap:"Toca un cuarto: sale su tarjeta.",p:`<ul><li>👆 Arrastra con un dedo y 🤏 pellizca con dos para acercar.</li><li>👆 <b>Toca un cuarto</b> y abajo sale su tarjeta: <b>✏️ Editar</b>, <b>🎤 Decir</b> y <b>✕</b> (solo quita la selección).</li></ul>`},
+  {h:"Láminas y herramientas",img:"03-herramientas",cap:"📄 láminas y 🛠️ herramientas, arriba del plano.",p:`<ul><li>📄 Cambia de <b>lámina</b>: Distribución, Muros, Eléctrico, Hidráulico…</li><li>🛠️ <b>Cotas</b> muestra u oculta los números; <b>Presentación</b> deja el plano limpio.</li></ul><p>👇 El <b>ejercicio guiado</b> te lleva de la mano en la app, con globos, en 3 minutos:</p><p><a class="btn" href="index.html?tour=1">🧭 Empezar el ejercicio guiado</a></p>`}
+ ],
+ prac:["Hice el ejercicio guiado completo","Cambié de lámina y oculté las cotas"],
+ quiz:[
+  {q:"Tocas un cuarto en el plano. ¿Qué sale?",o:["Una tarjeta abajo con Editar, Decir y ✕","Nada","Se borra"],a:0,e:"La ✕ solo quita la selección."},
+  {q:"¿Dónde ocultas los números de las paredes?",o:["🛠️ Herramientas → Cotas","⚙️ Más","Cerrando la app"],a:0,e:"Y se aplica también al exportar."}
+ ]},
+{id:"e3",ico:"🤖",t:"Habla y dibuja",min:3,sub:"La conversación con el agente",
+ steps:[
+  {h:"Una conversación, sin botones",img:"10-conversacion",cap:"Toca el 🎤 una vez y se queda escuchando.",p:`<ol><li>Toca el <b>🎤 grande</b> una vez y permite el micrófono.</li><li>Habla normal; al hacer una pausa, <b>dibuja</b> y te contesta en voz.</li><li>Sigue escuchando solo. Para cerrar di <b>“termina”</b> o toca ⏹.</li></ol><div class="tip">🎧 Con audífonos funciona mejor.</div>`},
+  {h:"5 frases que debes saber",p:`<p>Copia y prueba:</p>`,frases:["La calle está abajo","Crea un baño de 2 por 3 con regadera, inodoro y lavabo, puerta abajo de 80","Agrega una ventana de 1.20 en la pared de arriba","Haz el baño de 2.5 por 1.5","Borra el cuarto 2"],tipx:`<div class="tip">↩️ ¿Se equivocó? Abre ⌨️ y toca <b>↩️</b> para deshacer.</div>`}
+ ],
+ prac:["Toqué el 🎤 y dibujé un baño con la voz","Cerré la conversación diciendo “termina”","Deshice una acción con ↩️"],
+ quiz:[
+  {q:"¿Cómo empiezas la conversación?",o:["Tocas el 🎤 una vez y se queda escuchando","Mantienes presionado","Desde ☰"],a:0,e:"No es walkie-talkie."},
+  {q:"¿Cómo la terminas?",o:["Diciendo “termina” o con el botón ⏹","Apagando el teléfono","No se puede"],a:0,e:"También se pausa a los 3 minutos sin hablar."},
+  {q:"El agente se equivocó. ¿Qué haces?",o:["Abres ⌨️ y tocas ↩️","Borras todo","Reinstalas"],a:0,e:"Deshace la última acción."}
+ ]},
+{id:"e4",ico:"📤",t:"Corrige y entrega",min:2,sub:"Borrar, editar y exportar",
+ steps:[
+  {h:"Corregir",img:"12-cuartos",cap:"🏠 Cuartos → Editar.",p:`<ul><li>🎤 Con el agente: <i>“borra el cuarto 2”</i> o <i>“haz el baño de 2.5 por 1.5”</i>.</li><li>✋ A mano: toca el cuarto → <b>✏️ Editar</b> → botón rojo <b>Borrar</b>.</li></ul>`},
+  {h:"Exportar y compartir",img:"18-menu",cap:"El menú ☰.",p:`<ul><li>🖼️ <b>☰ → Exportar lámina</b>: descarga la que ves en SVG con tu logo.</li><li>📊 <b>Materiales CSV</b> para Excel.</li><li>☁️ <b>⚙️ Más → Subir proyecto</b>: tu equipo lo abre desde su teléfono.</li></ul>`}
+ ],
+ prac:["Exporté una lámina","Subí mi proyecto a la nube"],
+ quiz:[
+  {q:"¿Cómo exportas la lámina que estás viendo?",o:["☰ → Exportar lámina","⚙️ Más → Nuevo","No se puede"],a:0,e:"Sale con tu logo y sello."},
+  {q:"¿Cómo compartes el proyecto con tu equipo?",o:["⚙️ Más → Subir proyecto","Con una captura","No se puede"],a:0,e:"Todos lo ven desde su teléfono."}
+ ]}
+];
+const listOf=m=>EXPRESS.includes(m)?EXPRESS:MODS;
 const ALLQ=()=>MODS.flatMap(m=>m.quiz.map(q=>({...q,mod:m.t})));
+const EXQ=()=>EXPRESS.flatMap(m=>m.quiz.map(q=>({...q,mod:m.t})));
+ST.examX=ST.examX||0;
 
 /* ============ VISTAS ============ */
 let view="home",cur=null;
-function pct(){return Math.round(100*MODS.filter(m=>ST.done[m.id]!==undefined).length/MODS.length)}
-function bar(){const p=pct()+(ST.exam>=8?0:0);$("pbar").style.width=p+"%"}
+const nDone=l=>l.filter(m=>ST.done[m.id]!==undefined).length;
+const pctF=()=>Math.round(100*nDone(MODS)/MODS.length),pctX=()=>Math.round(100*nDone(EXPRESS)/EXPRESS.length);
+function bar(){$("pbar").style.width=Math.round(100*(nDone(MODS)+nDone(EXPRESS))/(MODS.length+EXPRESS.length))+"%"}
 function go(v,id){view=v;cur=id||null;try{history.replaceState(null,"","#"+v+(id?"/"+id:""))}catch(e){}render();window.scrollTo(0,0)}
 function render(){bar();const a=$("app");
   if(view==="home")a.innerHTML=home();
-  else if(view==="mod")a.innerHTML=modView(MODS.find(m=>m.id===cur));
-  else if(view==="exam")a.innerHTML=examView();
-  else if(view==="cert")a.innerHTML=certView();
+  else if(view==="mod")a.innerHTML=modView([...MODS,...EXPRESS].find(m=>m.id===cur));
+  else if(view==="exam"||view==="examx")a.innerHTML=examView(view==="examx");
+  else if(view==="cert"||view==="certx")a.innerHTML=certView(view==="certx");
   wire();
 }
+function card(m,i,lab){const d=ST.done[m.id]!==undefined;return `<button class="mod ${d?"done":""}" data-act="mod" data-id="${m.id}"><div class="top"><span class="ico">${m.ico}</span><div><b>${lab}${esc(m.t)}</b><small>${m.min} min · ${esc(m.sub)}</small></div><span class="chk">${d?"✅":"▫️"}</span></div></button>`}
 function home(){
-  const nextM=MODS.find(m=>ST.done[m.id]===undefined),p=pct();
-  return `<div class="hero"><img src="personaje.jpg" alt="El Patrón"><div><h1>Curso de la app</h1><p class="lead">Aprende a levantar, dibujar y sacar tus láminas en <b>${MODS.length} módulos</b> cortos con capturas reales, frases para copiar, práctica y examen. Al final te llevas tu <b>certificado</b>.</p><p><b>${p}%</b> completado ${nextM?"":" · 🎉 ¡Listo!"}</p>${nextM?`<button data-act="mod" data-id="${nextM.id}">${p?"▶️ Continuar":"🚀 Empezar"} · ${nextM.t}</button>`:`<button data-act="exam">🏁 Ir al examen final</button>`}</div></div>
-  <div class="grid">${MODS.map((m,i)=>`<button class="mod ${ST.done[m.id]!==undefined?"done":""}" data-act="mod" data-id="${m.id}"><div class="top"><span class="ico">${m.ico}</span><div><b>${i+1}. ${esc(m.t)}</b><small>${m.min} min · ${esc(m.sub)}</small></div><span class="chk">${ST.done[m.id]!==undefined?"✅":"▫️"}</span></div></button>`).join("")}
+  const nx=EXPRESS.find(m=>ST.done[m.id]===undefined),nf=MODS.find(m=>ST.done[m.id]===undefined);
+  return `<div class="hero"><img src="personaje.jpg" alt="El Patrón"><div><h1>Capacitación de la app</h1><p class="lead">Elige tu camino. Con capturas reales, frases para copiar, práctica y examen.</p>
+  <p><button data-act="${nx?"mod":"examx"}" ${nx?`data-id="${nx.id}"`:""}>⚡ Curso express · 10 min${pctX()?" ("+pctX()+"%)":""}</button></p>
+  <p><button class="sec" data-act="${nf?"mod":"exam"}" ${nf?`data-id="${nf.id}"`:""}>📚 Curso completo · 70 min${pctF()?" ("+pctF()+"%)":""}</button></p>
+  <p><a class="btn sec" href="index.html?tour=1">🧭 Ejercicio guiado en la app · 3 min</a></p></div></div>
+  <h2>⚡ Curso express <small style="color:var(--mut);font-size:14px">· para personal nuevo · solo lo esencial</small></h2><p class="lead">4 lecciones de 2 a 3 minutos, un examen de 5 preguntas y tu constancia.</p>
+  <div class="grid">${EXPRESS.map((m,i)=>card(m,i,(i+1)+". ")).join("")}
+  <button class="mod ${ST.examX>=4?"done":""}" data-act="examx"><div class="top"><span class="ico">🏁</span><div><b>Examen express</b><small>5 preguntas · necesitas 4 · ${ST.examX?"mejor: "+ST.examX+"/5":"sin intentar"}</small></div><span class="chk">${ST.examX>=4?"✅":"▫️"}</span></div></button>
+  <button class="mod" data-act="certx"><div class="top"><span class="ico">🎓</span><div><b>Mi constancia express</b><small>${ST.examX>=4?"Disponible para imprimir":"Se desbloquea al aprobar"}</small></div><span class="chk">${ST.examX>=4?"🔓":"🔒"}</span></div></button></div>
+  <h2 style="margin-top:26px">📚 Curso completo <small style="color:var(--mut);font-size:14px">· ${pctF()}%</small></h2><p class="lead">${MODS.length} módulos con todo el detalle: láminas, instalaciones, inventario, cámara y más.</p>
+  <div class="grid">${MODS.map((m,i)=>card(m,i,(i+1)+". ")).join("")}
   <button class="mod ${ST.exam>=8?"done":""}" data-act="exam"><div class="top"><span class="ico">🏁</span><div><b>Examen final</b><small>10 preguntas · necesitas 8 · ${ST.exam?"mejor: "+ST.exam+"/10":"sin intentar"}</small></div><span class="chk">${ST.exam>=8?"✅":"▫️"}</span></div></button>
   <button class="mod" data-act="cert"><div class="top"><span class="ico">🎓</span><div><b>Mi certificado</b><small>${ST.exam>=8?"Disponible para imprimir":"Se desbloquea al aprobar el examen"}</small></div><span class="chk">${ST.exam>=8?"🔓":"🔒"}</span></div></button></div>
-  <p class="lead" style="margin-top:18px">💡 Tu avance se guarda en este teléfono. ${p?"":"Empieza por el módulo 1."}</p>
+  <p class="lead" style="margin-top:18px">💡 Tu avance se guarda en este teléfono.</p>
   <p><a class="btn sec" href="index.html">↩️ Volver a la app</a></p>`;
 }
 function stepHtml(s,i){
@@ -278,33 +334,35 @@ function quizHtml(qs,pref){
   return qs.map((q,qi)=>`<div class="q" data-q="${pref}-${qi}"><p>${qi+1}. ${esc(q.q)}</p>${q.o.map((o,oi)=>`<button class="opt" data-qi="${qi}" data-oi="${oi}">${esc(o)}</button>`).join("")}<div class="exp" hidden></div></div>`).join("");
 }
 function modView(m){
-  const i=MODS.indexOf(m),prev=MODS[i-1],next=MODS[i+1];
-  return `<p><button class="sec" data-act="home">⬅️ Módulos</button></p><h1>${m.ico} ${i+1}. ${esc(m.t)}</h1><p class="lead">${m.min} min · ${esc(m.sub)}</p>
+  const L=listOf(m),i=L.indexOf(m),prev=L[i-1],next=L[i+1],ex=L===EXPRESS?"examx":"exam";
+  return `<p><button class="sec" data-act="home">⬅️ Inicio</button></p><h1>${m.ico} ${i+1}. ${esc(m.t)}</h1><p class="lead">${L===EXPRESS?"⚡ Express · ":""}${m.min} min · ${esc(m.sub)}</p>
   ${m.steps.map(stepHtml).join("")}
-  <div class="prac"><h3>✋ Práctica en la app</h3><p class="lead" style="margin-bottom:4px">Abre la app en otra pestaña y hazlo de verdad:</p>${m.prac.map((t,k)=>`<label><input type="checkbox" data-prac="${m.id}-${k}" ${ST.prac[m.id+"-"+k]?"checked":""}><span>${esc(t)}</span></label>`).join("")}<p style="margin-top:10px"><a class="btn sec" href="index.html" target="_blank" rel="noopener">📱 Abrir la app</a></p></div>
+  <div class="prac"><h3>✋ Práctica en la app</h3><p class="lead" style="margin-bottom:4px">Abre la app en otra pestaña y hazlo de verdad:</p>${m.prac.map((t,k)=>`<label><input type="checkbox" data-prac="${m.id}-${k}" ${ST.prac[m.id+"-"+k]?"checked":""}><span>${esc(t)}</span></label>`).join("")}<p style="margin-top:10px"><a class="btn sec" href="index.html" target="_blank" rel="noopener">📱 Abrir la app</a> <a class="btn sec" href="index.html?tour=1" target="_blank" rel="noopener">🧭 Ejercicio guiado</a></p></div>
   <div class="quiz"><h3>📝 Mini examen</h3><div id="quiz">${quizHtml(m.quiz,m.id)}</div><p class="score" id="qres">${ST.done[m.id]!==undefined?"✅ Módulo completado ("+ST.done[m.id]+"/"+m.quiz.length+")":""}</p></div>
-  <div class="nav">${prev?`<button class="sec" data-act="mod" data-id="${prev.id}">⬅️ ${esc(prev.t)}</button>`:"<span></span>"}${next?`<button data-act="mod" data-id="${next.id}">${esc(next.t)} ➡️</button>`:`<button data-act="exam">🏁 Examen final</button>`}</div>`;
+  <div class="nav">${prev?`<button class="sec" data-act="mod" data-id="${prev.id}">⬅️ ${esc(prev.t)}</button>`:"<span></span>"}${next?`<button data-act="mod" data-id="${next.id}">${esc(next.t)} ➡️</button>`:`<button data-act="${ex}">🏁 Examen</button>`}</div>`;
 }
-let EX=null;
-function examView(){
-  if(!EX){const q=ALLQ().sort(()=>Math.random()-.5).slice(0,10);EX={q,ans:0,ok:0}}
-  return `<p><button class="sec" data-act="home">⬅️ Módulos</button></p><h1>🏁 Examen final</h1><p class="lead">10 preguntas de todo el curso. Necesitas <b>8 aciertos</b> para tu certificado. Mejor resultado: <b>${ST.exam}/10</b>.</p>
+let EX=null,EXT=null;
+function examView(x){
+  const need=x?4:8,tot=x?5:10,best=x?ST.examX:ST.exam;
+  if(!EX||EXT!==x){const q=(x?EXQ():ALLQ()).sort(()=>Math.random()-.5).slice(0,tot);EX={q};EXT=x}
+  return `<p><button class="sec" data-act="home">⬅️ Inicio</button></p><h1>🏁 Examen ${x?"express":"final"}</h1><p class="lead">${tot} preguntas${x?" de las 4 lecciones":" de todo el curso"}. Necesitas <b>${need} aciertos</b>. Mejor resultado: <b>${best}/${tot}</b>.</p>
   <div class="quiz"><div id="exq">${quizHtml(EX.q,"ex")}</div><p class="score" id="exres"></p></div><div class="nav"><button class="sec" data-act="newexam">🔄 Otro examen</button></div>`;
 }
-function certView(){
-  if(ST.exam<8)return `<p><button class="sec" data-act="home">⬅️ Módulos</button></p><h1>🎓 Certificado</h1><div class="warn">🔒 Aprueba el examen final con <b>8 de 10</b> para desbloquearlo.</div><p><button data-act="exam">🏁 Ir al examen</button></p>`;
+function certView(x){
+  const need=x?4:8,best=x?ST.examX:ST.exam,tot=x?5:10;
+  if(best<need)return `<p><button class="sec" data-act="home">⬅️ Inicio</button></p><h1>🎓 ${x?"Constancia":"Certificado"}</h1><div class="warn">🔒 Aprueba el examen con <b>${need} de ${tot}</b> para desbloquearlo.</div><p><button data-act="${x?"examx":"exam"}">🏁 Ir al examen</button></p>`;
   const f=new Date().toLocaleDateString("es-MX",{day:"numeric",month:"long",year:"numeric"});
-  return `<p class="noprint"><button class="sec" data-act="home">⬅️ Módulos</button></p><h1 class="noprint">🎓 Mi certificado</h1><div class="noprint"><label class="lead">Escribe tu nombre completo:</label><input type="text" id="cname" value="${esc(ST.name)}" placeholder="Tu nombre" autocomplete="name"><p><button id="cprint">🖨️ Imprimir o guardar PDF</button></p></div>
-  <div class="cert" id="certbox"><img src="emblema.jpg" alt="El Patrón"><p style="letter-spacing:.3em;font-size:12px">CERTIFICADO DE CAPACITACIÓN</p><h2>Planos El Patrón</h2><p>Se otorga a</p><div class="nm" id="cn">${esc(ST.name||"Tu nombre")}</div><p>por completar el curso de la aplicación de planos de referencia<br>y aprobar el examen final con <b>${ST.exam}/10</b>.</p><p>${f}</p><p style="font-size:12px;margin-top:14px">Departamentos El Patrón</p></div>`;
+  return `<p class="noprint"><button class="sec" data-act="home">⬅️ Inicio</button></p><h1 class="noprint">🎓 ${x?"Mi constancia":"Mi certificado"}</h1><div class="noprint"><label class="lead">Escribe tu nombre completo:</label><input type="text" id="cname" value="${esc(ST.name)}" placeholder="Tu nombre" autocomplete="name"><p><button id="cprint">🖨️ Imprimir o guardar PDF</button></p></div>
+  <div class="cert" id="certbox"><img src="emblema.jpg" alt="El Patrón"><p style="letter-spacing:.3em;font-size:12px">${x?"CONSTANCIA DE CAPACITACIÓN BÁSICA":"CERTIFICADO DE CAPACITACIÓN"}</p><h2>Planos El Patrón</h2><p>Se otorga a</p><div class="nm" id="cn">${esc(ST.name||"Tu nombre")}</div><p>por completar ${x?"el curso express":"el curso"} de la aplicación de planos de referencia<br>y aprobar el examen ${x?"express":"final"} con <b>${best}/${tot}</b>.</p><p>${f}</p><p style="font-size:12px;margin-top:14px">Departamentos El Patrón</p></div>`;
 }
 function wire(){
   const a=$("app");
   a.querySelectorAll("[data-act]").forEach(b=>b.onclick=()=>{const t=b.dataset.act;if(t==="newexam"){EX=null;render();return}go(t,b.dataset.id)});
   a.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{const t=b.dataset.copy;try{await navigator.clipboard.writeText(t)}catch(e){const x=document.createElement("textarea");x.value=t;document.body.appendChild(x);x.select();try{document.execCommand("copy")}catch(_){}x.remove()}const o=b.textContent;b.textContent="✅ Copiado";setTimeout(()=>b.textContent=o,1200)});
   a.querySelectorAll("[data-prac]").forEach(c=>c.onchange=()=>{ST.prac[c.dataset.prac]=c.checked;save()});
-  if(view==="mod"){const m=MODS.find(x=>x.id===cur);wireQuiz($("quiz"),m.quiz,m.id,(ok,n)=>{$("qres").textContent=`${ok}/${n} aciertos`+(ok/n>=0.6?" · ✅ ¡Módulo completado!":" · 🔁 Repasa y vuelve a intentarlo");if(ok/n>=0.6){ST.done[m.id]=Math.max(ST.done[m.id]||0,ok);save();bar()}})}
-  if(view==="exam"){wireQuiz($("exq"),EX.q,"ex",(ok,n)=>{$("exres").textContent=`${ok}/${n} aciertos`+(ok>=8?" · 🎉 ¡Aprobado! Ya puedes sacar tu certificado.":" · 🔁 Necesitas 8. Repasa e inténtalo otra vez.");if(ok>ST.exam){ST.exam=ok;save()}if(ok>=8){const b=document.createElement("p");b.innerHTML='<button data-act="cert">🎓 Ver mi certificado</button>';$("exres").after(b);b.firstChild.onclick=()=>go("cert")}})}
-  if(view==="cert"&&ST.exam>=8){$("cname").oninput=e=>{ST.name=e.target.value;save();$("cn").textContent=ST.name||"Tu nombre"};$("cprint").onclick=()=>window.print()}
+  if(view==="mod"){const m=[...MODS,...EXPRESS].find(x=>x.id===cur);wireQuiz($("quiz"),m.quiz,m.id,(ok,n)=>{$("qres").textContent=`${ok}/${n} aciertos`+(ok/n>=0.6?" · ✅ ¡Módulo completado!":" · 🔁 Repasa y vuelve a intentarlo");if(ok/n>=0.6){ST.done[m.id]=Math.max(ST.done[m.id]||0,ok);save();bar()}})}
+  if(view==="exam"||view==="examx"){const x=view==="examx",need=x?4:8,tot=x?5:10;wireQuiz($("exq"),EX.q,"ex",(ok,n)=>{$("exres").textContent=`${ok}/${n} aciertos`+(ok>=need?" · 🎉 ¡Aprobado! Ya puedes sacar tu "+(x?"constancia":"certificado")+".":" · 🔁 Necesitas "+need+". Repasa e inténtalo otra vez.");if(x){if(ok>ST.examX){ST.examX=ok;save()}}else if(ok>ST.exam){ST.exam=ok;save()}if(ok>=need){const b=document.createElement("p");b.innerHTML=`<button>🎓 Ver mi ${x?"constancia":"certificado"}</button>`;$("exres").after(b);b.firstChild.onclick=()=>go(x?"certx":"cert")}})}
+  if((view==="cert"&&ST.exam>=8)||(view==="certx"&&ST.examX>=4)){$("cname").oninput=e=>{ST.name=e.target.value;save();$("cn").textContent=ST.name||"Tu nombre"};$("cprint").onclick=()=>window.print()}
 }
 function wireQuiz(box,qs,pref,done){
   let ans=0,ok=0;
@@ -318,7 +376,7 @@ function wireQuiz(box,qs,pref,done){
     });
   });
 }
-(function(){const h=location.hash.replace("#","").split("/");if(h[0]==="mod"&&MODS.some(m=>m.id===h[1])){view="mod";cur=h[1]}else if(["exam","cert"].includes(h[0]))view=h[0];render()})();
+(function(){const h=location.hash.replace("#","").split("/");if(h[0]==="mod"&&[...MODS,...EXPRESS].some(m=>m.id===h[1])){view="mod";cur=h[1]}else if(["exam","examx","cert","certx"].includes(h[0]))view=h[0];render()})();
 </script>
 </body>
 </html>

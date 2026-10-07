@@ -102,6 +102,14 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:6px 8px;b
 .convbar[data-st="pen"] .orb{background:#60a5fa;animation:pulso 0.7s infinite}.convbar[data-st="hab"] .orb{background:#4ade80;animation:pulso 0.9s infinite}
 body.cv .selbar,body.cv .fab2{display:none}
 body.pres .convbar,body.pres .fab2{display:none!important}
+#tour{position:fixed;inset:0;z-index:80;pointer-events:none}
+#tSpot{position:fixed;border-radius:16px;box-shadow:0 0 0 9999px rgba(0,0,0,.72),0 0 0 3px var(--pri2),0 0 24px 4px rgba(232,205,133,.6);transition:all .25s;animation:tpulse 1.6s infinite}
+@keyframes tpulse{50%{box-shadow:0 0 0 9999px rgba(0,0,0,.72),0 0 0 6px var(--pri2),0 0 34px 8px rgba(232,205,133,.7)}}
+#tBub{position:fixed;left:12px;right:12px;max-width:380px;margin:0 auto;background:#17130a;border:1px solid var(--pri);border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.7);padding:14px;pointer-events:auto;z-index:81}
+#tStep{font-size:12px;color:var(--pri2);letter-spacing:.1em;font-weight:700;margin-bottom:4px}
+#tTxt{font-size:15.5px;line-height:1.45;margin-bottom:10px}
+#tBub .trow{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+#tBub button{min-height:40px;padding:8px 12px;font-size:14px}
 .sheet{position:fixed;left:10px;right:10px;bottom:calc(var(--nav) + 22px + env(safe-area-inset-bottom));z-index:40;background:var(--card);border:1px solid var(--bd);border-radius:22px;box-shadow:0 -10px 40px rgba(0,0,0,.3);padding:14px;max-height:64dvh;overflow:auto}
 .sheet h3{margin:0 0 10px;font-size:16px}
 #tabs.sheet{display:flex;flex-direction:column;gap:6px}
@@ -134,6 +142,7 @@ body.pres .stage #cv{height:calc(100dvh - 110px)}
     <button id="bCsv">📊 Materiales CSV</button>
     <button id="bSvg">🖼️ Exportar lámina</button>
     <button id="bSvgAll">🗂️ Todas las láminas</button>
+    <button id="bTour" class="wide">🧭 Ejercicio guiado (3 min)</button>
     <button id="bCurso" class="wide">🎓 Curso de capacitación</button>
   </div>
   <input type="file" id="file" accept=".json" hidden>
@@ -232,7 +241,7 @@ body.pres .stage #cv{height:calc(100dvh - 110px)}
     <div class="tabs" id="mkTools" hidden></div>
     <svg id="cv" role="img" aria-label="Plano"></svg>
     <div class="zoomcol"><button id="zi" aria-label="Acercar">＋</button><button id="zo" aria-label="Alejar">－</button><button id="zf" aria-label="Ajustar">⤢</button></div>
-    <div class="empty" id="empty" hidden><img class="hero" src="personaje.jpg" alt="El Patrón"><b>Empecemos tu plano</b><span>Toca el micrófono y di, por ejemplo: <i>“crea un cuarto de 3 por 4”</i></span><div class="row" style="justify-content:center"><button data-act="agent">🎤 Hablar con el agente</button><button class="sec" data-go="cuartos">🏠 Agregar a mano</button></div></div>
+    <div class="empty" id="empty" hidden><img class="hero" src="personaje.jpg" alt="El Patrón"><b>Empecemos tu plano</b><span>Toca el micrófono y di, por ejemplo: <i>“crea un cuarto de 3 por 4”</i></span><div class="row" style="justify-content:center"><button data-act="agent">🎤 Hablar con el agente</button><button class="sec" data-go="cuartos">🏠 Agregar a mano</button><button class="sec" data-act="tour">🧭 Ejercicio guiado</button></div></div>
     <div class="selbar" id="selbar" hidden><div id="selTxt"></div><div class="row"><button class="sec" data-act="edit">✏️ Editar</button><button data-act="agent">🎤 Decir</button><button class="sec" data-act="desel" aria-label="Quitar selección">✕</button></div></div>
     <button class="fab" id="fabAg" aria-label="Hablar con el agente">🎤</button>
     <button class="presx" id="presExit">↩️ Salir de presentación</button>
@@ -289,6 +298,7 @@ body.pres .stage #cv{height:calc(100dvh - 110px)}
 </div>
 </section>
 </main>
+<div id="tour" hidden><div id="tSpot"></div><div id="tBub"><div id="tStep"></div><div id="tTxt"></div><div class="trow"><button class="sec" id="tExit">Salir</button><button class="sec" id="tAuto" hidden>✍️ Hazlo por mí</button><button id="tNext">Siguiente ➡️</button></div></div></div>
 <div id="scrim" hidden></div><div id="toast" hidden></div>
 <nav id="nav" aria-label="Secciones">
   <button data-go="plano" class="on"><i>🗺️</i>Plano</button>
@@ -479,7 +489,7 @@ function openAgent(pre){if(!(ses&&team)){toast("🔐 Entra primero en ⚙️ Má
   const sh=S.shapes.find(x=>x.id===sel);$("agText2").value=pre!==undefined?pre:(sh&&sh.type==="cuarto"?`En el cuarto ${sh.name||""}: `:"");$("agOut2").textContent="";openSheet("sheetAg");setTimeout(()=>$("agText2").focus(),50)}
 
 document.addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
-  if(a==="agent")startConv();else if(a==="edit")go("cuartos");else if(a==="desel"){sel=null;render()}else if(a==="fit"){closeSheets();fit();draw()}});
+  if(a==="agent")startConv();else if(a==="tour")tourStart();else if(a==="edit")go("cuartos");else if(a==="desel"){sel=null;render()}else if(a==="fit"){closeSheets();fit();draw()}});
 try{$("agVoz").checked=localStorage.getItem("planos-voz")!=="0";$("agConv").checked=localStorage.getItem("planos-conv")==="1"}catch(e){}
 $("agVoz").onchange=()=>{try{localStorage.setItem("planos-voz",$("agVoz").checked?"1":"0")}catch(e){}if(!$("agVoz").checked){try{speechSynthesis.cancel()}catch(e){}}};
 $("agConv").onchange=()=>{try{localStorage.setItem("planos-conv",$("agConv").checked?"1":"0")}catch(e){}if($("agConv").checked)$("agVoz").checked=true};
@@ -582,6 +592,83 @@ $("fabAg").onclick=()=>{if(CV.on)stopConv();else startConv()};
 $("fabTxt").onclick=()=>openAgent();
 $("cvStop").onclick=stopConv;
 $("cvCfg").onclick=()=>{llenaVoces();openSheet("sheetAg")};
+/* ---------- ejercicio guiado (globos) ---------- */
+const TOUR={on:false,i:0,timer:null,backup:null,pend:false};
+const TBK="planos-tour-backup";
+const TSTEPS=[
+ {t:"👋 ¡Hola! Vamos a dibujar tu primer cuarto en 3 minutos. Es un proyecto de <b>práctica</b>: tu proyecto real queda guardado y lo recuperas al final.",sel:".stage"},
+ {t:"Abajo está la barra con las 5 secciones. Toca <b>🏠 Cuartos</b>.",sel:'#nav [data-go="cuartos"]',wait:()=>document.body.dataset.p==="cuartos"},
+ {t:"Aquí se crean los elementos. Con <b>Cuarto (existente)</b> elegido, toca <b>+ Agregar</b>.",sel:"#bAdd",pre:()=>go("cuartos"),wait:()=>S.shapes.length>0},
+ {t:"Escribe las medidas de las 4 paredes de corrido, o toca <b>✍️ Hazlo por mí</b>.",sel:"#quick",pre:()=>go("cuartos"),auto:()=>{const q=$("quick");q.value="3.30 der 5.30 abajo 3.30 izq 5.30 arriba";q.dispatchEvent(new Event("input",{bubbles:true}))},wait:()=>($("quick").value||"").trim().length>8||(S.shapes[0]&&S.shapes[0].segs.length>=4)},
+ {t:"Toca <b>Aplicar texto</b> para que se dibuje el cuarto.",sel:"#bQuick",pre:()=>go("cuartos"),wait:()=>S.shapes[0]&&S.shapes[0].segs.length>=4},
+ {t:"¡Ya existe! Regresa al <b>🗺️ Plano</b> para verlo.",sel:'#nav [data-go="plano"]',wait:()=>document.body.dataset.p==="plano"},
+ {t:"Toca el cuarto para <b>seleccionarlo</b>.",sel:"#cv",pre:()=>{go("plano");sel=null;render()},wait:()=>!!sel},
+ {t:"Abajo salió su tarjeta: <b>✏️ Editar</b> lo abre, <b>🎤 Decir</b> habla con el agente y <b>✕</b> solo quita la selección (no borra). Toca <b>Siguiente</b>.",sel:"#selbar"},
+ {t:"Toca <b>📄 Distribución</b> para ver las demás láminas.",sel:"#labBtn",pre:()=>{go("plano");closeSheets()},wait:()=>!$("tabs").hidden},
+ {t:"Elige <b>Muros y acabados</b>.",sel:'#tabs [data-v="muros"]',wait:()=>VISTA==="muros"},
+ {t:"Cada lámina muestra algo distinto. Ahora toca <b>🛠️ Herramientas</b>.",sel:"#toolBtn",pre:()=>{closeSheets()},wait:()=>!$("sheetTools").hidden},
+ {t:"Toca <b>📏 Cotas</b> para ocultar los números de las paredes.",sel:"#bCotas",wait:()=>S.cotas===false},
+ {t:"Tócalo otra vez para <b>volver a mostrarlas</b>.",sel:"#bCotas",wait:()=>S.cotas!==false},
+ {t:"Aquí abajo está el <b>🎤</b>: tócalo y di <i>“crea un baño de 2 por 3”</i>. Necesitas haber entrado en ⚙️ Más. Toca <b>Siguiente</b>.",sel:"#fabAg",pre:()=>{closeSheets();VISTA="general";render()}},
+ {t:"En <b>☰</b> exportas láminas, guardas y abres el <b>🎓 curso</b>. Toca <b>Siguiente</b>.",sel:"#menuBtn",pre:()=>closeSheets()},
+ {t:"🎉 <b>¡Terminaste!</b> Ya sabes crear un cuarto, seleccionarlo, cambiar de lámina y ocultar cotas. ¿Qué hacemos con el proyecto de práctica?",sel:null,fin:true}
+];
+function tourStart(){
+  if(TOUR.on)return;
+  if(!confirm("🧭 Ejercicio guiado\n\nUsa un proyecto de PRÁCTICA. Tu proyecto actual se guarda y lo recuperas al terminar. ¿Empezamos?"))return;
+  TOUR.backup=JSON.stringify(S);try{localStorage.setItem(TBK,TOUR.backup)}catch(e){}
+  if(CV&&CV.on)stopConv();closeSheets();
+  S=blank();sel=null;VISTA="general";fit();document.body.classList.remove("pres");go("plano");render();
+  TOUR.on=true;TOUR.i=0;$("tour").hidden=false;clearInterval(TOUR.timer);TOUR.timer=setInterval(tourTick,300);tourShow();
+}
+function tourRestore(){
+  let b=TOUR.backup;if(!b){try{b=localStorage.getItem(TBK)}catch(e){}}
+  if(b){try{S=JSON.parse(b);sel=null;VISTA="general";fit();render()}catch(e){}}
+  try{localStorage.removeItem(TBK)}catch(e){}TOUR.backup=null;
+}
+function tourEnd(restore){
+  clearInterval(TOUR.timer);TOUR.on=false;$("tour").hidden=true;closeSheets();
+  if(restore)tourRestore();else{try{localStorage.removeItem(TBK)}catch(e){}TOUR.backup=null}
+}
+function tourShow(){
+  const st=TSTEPS[TOUR.i];if(!st){TOUR.pend=false;tourEnd(true);return}
+  if(st.pre)try{st.pre()}catch(e){}
+  TOUR.pend=false;
+  $("tStep").textContent=st.fin?"FIN":`PASO ${TOUR.i+1} DE ${TSTEPS.length-1}`;
+  $("tTxt").innerHTML=st.t;
+  const manual=!st.wait&&!st.fin;
+  $("tNext").hidden=!(manual);$("tAuto").hidden=!st.auto;
+  if(st.fin){$("tNext").hidden=false;$("tNext").textContent="↩️ Restaurar mi proyecto";$("tAuto").hidden=false;$("tAuto").textContent="Seguir practicando";$("tExit").hidden=true}
+  else{$("tNext").textContent="Siguiente ➡️";$("tAuto").textContent="✍️ Hazlo por mí";$("tExit").hidden=false}
+  const el=st.sel?document.querySelector(st.sel):null;
+  if(el&&el.scrollIntoView&&st.sel!=="#cv"&&st.sel!==".stage")try{el.scrollIntoView({block:"center",behavior:"instant"})}catch(e){}
+  tourPlace();
+}
+function tourPlace(){
+  const st=TSTEPS[TOUR.i];if(!st)return;const sp=$("tSpot"),bub=$("tBub");
+  const el=st.sel?document.querySelector(st.sel):null;let r=el&&el.getBoundingClientRect();
+  if(!r||r.width===0||r.height===0||(el.offsetParent===null&&getComputedStyle(el).position!=="fixed")){sp.style.cssText="left:50%;top:40%;width:0;height:0";bub.style.top="auto";bub.style.bottom="calc(var(--nav) + 40px)";return}
+  const pad=6,H=innerHeight;sp.style.left=(r.left-pad)+"px";sp.style.top=(r.top-pad)+"px";sp.style.width=(r.width+2*pad)+"px";sp.style.height=(r.height+2*pad)+"px";
+  const bh=bub.offsetHeight||150,below=H-r.bottom,above=r.top;
+  if(below>=bh+24||below>=above){bub.style.bottom="auto";bub.style.top=Math.min(H-bh-12,r.bottom+16)+"px"}
+  else{bub.style.top="auto";bub.style.bottom=Math.min(H-bh-12,H-r.top+16)+"px"}
+}
+function tourTick(){
+  if(!TOUR.on)return;const st=TSTEPS[TOUR.i];
+  if(TOUR.pend)return;
+  if(st&&st.wait){let ok=false;try{ok=st.wait()}catch(e){}if(ok){TOUR.pend=true;TOUR.i++;setTimeout(tourShow,350);return}}
+  tourPlace();
+}
+$("tNext").onclick=()=>{const st=TSTEPS[TOUR.i];if(st&&st.fin){tourEnd(true);toast("✅ Recuperé tu proyecto");return}TOUR.i++;tourShow()};
+$("tAuto").onclick=()=>{const st=TSTEPS[TOUR.i];if(st.fin){tourEnd(false);toast("Sigues en el proyecto de práctica");return}if(st.auto)st.auto()};
+$("tExit").onclick=()=>{if(confirm("¿Salir del ejercicio? Recuperaré tu proyecto.")){tourEnd(true);toast("✅ Recuperé tu proyecto")}};
+$("bTour").onclick=()=>{$("menu").hidden=true;tourStart()};
+window.addEventListener("resize",()=>{if(TOUR.on)tourPlace()});
+{ // al abrir: ejercicio a medias o enlace ?tour=1
+  let pend=null;try{pend=localStorage.getItem(TBK)}catch(e){}
+  if(pend&&!/tour=1/.test(location.search)){setTimeout(()=>{if(confirm("Quedó un ejercicio guiado a medias. ¿Recupero tu proyecto?")){TOUR.backup=pend;tourRestore();toast("✅ Recuperé tu proyecto")}else{try{localStorage.removeItem(TBK)}catch(e){}}},600)}
+  if(/tour=1/.test(location.search)){setTimeout(()=>{try{history.replaceState(null,"",location.pathname)}catch(e){}tourStart()},500)}
+}
 /* tarjetas plegables */
 for(const el of[$("calco"),$("verCard"),$("invCard"),$("reglas"),$("mats").closest(".card")]){el.classList.add("fold","closed");const h=el.querySelector("h2");if(h)h.onclick=()=>el.classList.toggle("closed")}
 /* zoom/pan */
