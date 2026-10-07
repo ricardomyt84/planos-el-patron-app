@@ -110,6 +110,12 @@ body.pres .convbar,body.pres .fab2{display:none!important}
 #tTxt{font-size:15.5px;line-height:1.45;margin-bottom:10px}
 #tBub .trow{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
 #tBub button{min-height:40px;padding:8px 12px;font-size:14px}
+#resumen{margin-top:12px}
+#resumen .rs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;margin-bottom:10px}
+#resumen .rs div{background:#15120c;border:1px solid var(--bd);border-radius:14px;padding:8px 2px}
+#resumen .rs b{display:block;font-size:20px;color:var(--pri2)}#resumen .rs span{font-size:11px;color:var(--mut)}
+#resumen .row{margin:0}
+body.pres #resumen{display:none!important}
 .sheet{position:fixed;left:10px;right:10px;bottom:calc(var(--nav) + 22px + env(safe-area-inset-bottom));z-index:40;background:var(--card);border:1px solid var(--bd);border-radius:22px;box-shadow:0 -10px 40px rgba(0,0,0,.3);padding:14px;max-height:64dvh;overflow:auto}
 .sheet h3{margin:0 0 10px;font-size:16px}
 #tabs.sheet{display:flex;flex-direction:column;gap:6px}
@@ -248,6 +254,7 @@ body.pres .stage #cv{height:calc(100dvh - 110px)}
     <button class="fab2" id="fabTxt" aria-label="Escribir al agente">⌨️</button>
     <div class="convbar" id="convBar" hidden data-st=""><div class="orb"></div><div class="cvtx"><b id="cvSt">…</b><span id="cvTxt"></span></div><button class="sec" id="cvCfg" aria-label="Ajustes de voz">⚙️</button><button class="danger" id="cvStop" aria-label="Terminar conversación">⏹</button></div>
   </div>
+  <div class="card" id="resumen"></div>
   <div class="sheet" id="tabs" hidden></div>
   <div class="sheet" id="sheetTools" hidden>
     <h3>🛠️ Herramientas</h3>
@@ -349,7 +356,7 @@ function render(){
   if(sh){editorFill(sh)}
   {const c=cfg();$("calle").value=c.calle;$("cC").value=c.cC;$("cR").value=c.cR;$("umbral").value=c.umbral;$("pend").value=c.pend;$("pend2").value=c.pend2;$("grupo").value=c.grupo}
   $("esp").value=S.espesor||12;$("sepp").value=String(S.sepPostes||61);$("hum").value=S.humedos??"";
-  cotasBtn();selUpdate();draw();mats();renderCuadro();renderInv();mkRender();renderBit();renderVer();
+  cotasBtn();selUpdate();resumenUpd();draw();mats();renderCuadro();renderInv();mkRender();renderBit();renderVer();
 }
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 
@@ -372,10 +379,22 @@ function editorFill(sh){
 /* canvas */
 function bounds(){let xs=[],ys=[];for(const sh of S.shapes)for(const p of points(sh)){xs.push(p.x);ys.push(p.y)}if(BG&&!noBG){xs.push(BG.x,BG.x+BG.w*BG.mpp);ys.push(BG.y,BG.y+BG.h*BG.mpp)}if(S.calle&&xs.length&&!noBG){const a=Math.min(...xs),b=Math.max(...xs),c=Math.min(...ys),d=Math.max(...ys);if(S.calle==="abajo"){xs.push(a);ys.push(d+1.8)}else if(S.calle==="arriba"){xs.push(a);ys.push(c-1.8)}else if(S.calle==="izquierda"){xs.push(a-1.8);ys.push(c)}else{xs.push(b+1.8);ys.push(c)}}
   if(!xs.length)return{x:-1,y:-1,w:10,h:10};const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);const m=Math.max(0.6,(x1-x0+y1-y0)*0.05);return{x:x0-m,y:y0-m,w:Math.max(x1-x0+2*m,2),h:Math.max(y1-y0+2*m,2)}}
-function fit(){view=bounds()}
+let FITPEND=false;
+function fitAspect(b){
+  const el=$("cv");let r=el.getBoundingClientRect();if(!r.width||!r.height){FITPEND=true;return b}FITPEND=false;
+  const pres=document.body.classList.contains("pres"),pt=pres?10:58,pb=pres?10:84,pl=10,pr=(b.h/b.w>0.9&&!pres)?60:10;
+  if(innerWidth<=820){const maxH=Math.max(320,innerHeight-(pres?150:200)),want=(b.h/b.w)*(r.width-pl-pr)+pt+pb;el.style.height=Math.round(Math.min(maxH,Math.max(320,want)))+"px";r=el.getBoundingClientRect()}
+  else el.style.height="";
+  const aw=Math.max(80,r.width-pl-pr),ah=Math.max(80,r.height-pt-pb),k=Math.max(b.w/aw,b.h/ah);
+  const w=r.width*k,h=r.height*k,cx=b.x+b.w/2,cy=b.y+b.h/2;
+  return{x:cx-(pl+aw/2)*k,y:cy-(pt+ah/2)*k,w,h};
+}
+function fit(){view=fitAspect(bounds())}
 function draw(){
   const cv=$("cv");cv.setAttribute("viewBox",`${view.x} ${view.y} ${view.w} ${view.h}`);
-  const k=Math.max(view.w,view.h)/700;const fs=14*k;
+  let k=Math.max(view.w,view.h)/700;
+  if(!noBG){const rr=cv.getBoundingClientRect();if(rr.width&&rr.height)k=Math.max(view.w/rr.width,view.h/rr.height)*rr.width/700}
+  const fs=14*k;
   let g=`<defs><pattern id="rayas" width="${8*k}" height="${8*k}" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="${3*k}" height="${8*k}" fill="#2563eb" opacity=".35"/></pattern></defs>`;
   if(BG&&!noBG)g+=`<image href="${BG.url}" x="${BG.x}" y="${BG.y}" width="${BG.w*BG.mpp}" height="${BG.h*BG.mpp}" opacity="${BG.op}" preserveAspectRatio="none"/>`;
   g+=grid(k);
@@ -463,13 +482,13 @@ function sheetSvg(v){
 }
 function cotasBtn(){$("bCotas").textContent=S.cotas===false?"📏 Cotas: no":"📏 Cotas: sí"}
 $("bCotas").onclick=()=>{S.cotas=S.cotas===false;cotasBtn();save();draw()};
-$("bPres").onclick=()=>{closeSheets();const on=document.body.classList.toggle("pres");$("bPres").textContent=on?"↩️ Salir de presentación":"🖼️ Presentación";if(on)fit();selUpdate();draw()};
+$("bPres").onclick=()=>{closeSheets();const on=document.body.classList.toggle("pres");$("bPres").textContent=on?"↩️ Salir de presentación":"🖼️ Presentación";fit();selUpdate();draw()};
 $("presExit").onclick=()=>$("bPres").click();
 $("bSvg").onclick=()=>download((S.name||"plano")+"-"+VISTA+".svg",sheetSvg(VISTA),"image/svg+xml");
 $("bCurso").onclick=()=>{location.href="curso.html"};
 $("bSvgAll").onclick=()=>{VISTAS.forEach(([k],i)=>setTimeout(()=>download((S.name||"plano")+"-"+k+".svg",sheetSvg(k),"image/svg+xml"),i*600))};
 /* navegación y menú */
-function go(p){document.body.dataset.p=p;document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.go===p));try{localStorage.setItem("planos-panel",p)}catch(e){}window.scrollTo(0,0);if(p==="plano")try{draw()}catch(e){}closeSheetsSafe()}
+function go(p){document.body.dataset.p=p;document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.go===p));try{localStorage.setItem("planos-panel",p)}catch(e){}window.scrollTo(0,0);if(p==="plano")try{if(FITPEND){fit()}draw()}catch(e){}closeSheetsSafe()}
 function closeSheetsSafe(){try{closeSheets()}catch(e){}}
 document.addEventListener("click",e=>{const g=e.target.closest("[data-go]");if(g){go(g.dataset.go);return}
   const m=$("menu");if(e.target.closest("#menuBtn")){m.hidden=!m.hidden;return}
@@ -481,6 +500,11 @@ function openSheet(id){const was=!$(id).hidden;closeSheets();if(!was){$(id).hidd
 let toastT=null;function toast(t){const o=$("toast");o.textContent=t;o.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>o.hidden=true,3200)}
 $("scrim").onclick=closeSheets;
 $("labBtn").onclick=()=>openSheet("tabs");$("toolBtn").onclick=()=>openSheet("sheetTools");
+function resumenUpd(){
+  const el=$("resumen");if(!el)return;const rooms=S.shapes.filter(x=>x.type==="cuarto"),ab=S.aberts||[];
+  const m2=rooms.reduce((t,r)=>t+area(r),0),pu=ab.filter(a=>a.kind==="puerta").length,ve=ab.filter(a=>a.kind==="ventana").length;
+  el.innerHTML=`<h2>📋 Resumen del proyecto</h2><div class="rs"><div><b>${rooms.length}</b><span>cuartos</span></div><div><b>${f2(m2)}</b><span>m²</span></div><div><b>${pu}</b><span>puertas</span></div><div><b>${ve}</b><span>ventanas</span></div></div><div class="row"><button class="sec" data-go="cuadros">📊 Ver materiales</button><button class="sec" data-go="cuartos">🏠 Mis cuartos</button></div>`;
+}
 function selUpdate(){const sh=S.shapes.find(x=>x.id===sel),b=$("selbar"),pres=document.body.classList.contains("pres");
   $("empty").hidden=pres||S.shapes.length>0;
   if(!sh||pres){b.hidden=true;return}
@@ -663,7 +687,7 @@ $("tNext").onclick=()=>{const st=TSTEPS[TOUR.i];if(st&&st.fin){tourEnd(true);toa
 $("tAuto").onclick=()=>{const st=TSTEPS[TOUR.i];if(st.fin){tourEnd(false);toast("Sigues en el proyecto de práctica");return}if(st.auto)st.auto()};
 $("tExit").onclick=()=>{if(confirm("¿Salir del ejercicio? Recuperaré tu proyecto.")){tourEnd(true);toast("✅ Recuperé tu proyecto")}};
 $("bTour").onclick=()=>{$("menu").hidden=true;tourStart()};
-window.addEventListener("resize",()=>{if(TOUR.on)tourPlace()});
+window.addEventListener("resize",()=>{if(TOUR.on)tourPlace();clearTimeout(window.__rz);window.__rz=setTimeout(()=>{try{fit();draw()}catch(e){}},250)});
 { // al abrir: ejercicio a medias o enlace ?tour=1
   let pend=null;try{pend=localStorage.getItem(TBK)}catch(e){}
   if(pend&&!/tour=1/.test(location.search)){setTimeout(()=>{if(confirm("Quedó un ejercicio guiado a medias. ¿Recupero tu proyecto?")){TOUR.backup=pend;tourRestore();toast("✅ Recuperé tu proyecto")}else{try{localStorage.removeItem(TBK)}catch(e){}}},600)}
