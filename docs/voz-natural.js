@@ -37,15 +37,21 @@ VN.say=async function(texto,vel){
   const blob=await conseguir(texto,vel||1);if(!blob)return false;
   if(!VN.audio){VN.audio=new Audio();VN.audio.playsInline=true}
   return await new Promise(res=>{
-    const a=VN.audio,url=URL.createObjectURL(blob);let hecho=false;
-    const fin=ok=>{if(hecho)return;hecho=true;a.onended=null;a.onerror=null;VN.cancelFn=null;try{URL.revokeObjectURL(url)}catch(e){}res(ok)};
+    const a=VN.audio,url=URL.createObjectURL(blob);let hecho=false,w1=null,w2=null;
+    const fin=ok=>{if(hecho)return;hecho=true;clearTimeout(w1);clearTimeout(w2);a.onended=null;a.onerror=null;a.onplaying=null;a.onloadedmetadata=null;VN.cancelFn=null;try{URL.revokeObjectURL(url)}catch(e){}
+      if(!ok){VN.fallas=(VN.fallas||0)+1;VN.estado="audio_bloqueado";if(VN.fallas>=2)VN.disabled=true}else VN.fallas=0;res(ok)};
     VN.cancelFn=()=>{try{a.pause()}catch(e){}fin(true)};
-    a.onended=()=>fin(true);a.onerror=()=>fin(false);a.src=url;
+    a.onended=()=>fin(true);a.onerror=()=>fin(false);
+    a.onplaying=()=>{clearTimeout(w1)};
+    a.onloadedmetadata=()=>{const d=a.duration;if(isFinite(d)&&d>0){clearTimeout(w2);w2=setTimeout(()=>fin(true),(d+2)*1000)}};
+    w1=setTimeout(()=>{if(!hecho&&(a.paused||a.currentTime<0.05))fin(false)},3500);   // el navegador no arrancó el audio
+    w2=setTimeout(()=>fin(false),20000);
+    a.src=url;try{a.load()}catch(e){}
     const pr=a.play();if(pr&&pr.catch)pr.catch(()=>fin(false))})};
 /* Prueba de conexión para mostrar el estado. */
 VN.probar=async function(){VN.disabled=false;VN.estado="";const ok=await VN.say("Hola. Esta es la voz natural de Google.",1);return{ok,estado:VN.estado,detalle:VN.ultimoError}};
 VN.sesionOk=()=>{const s=sesion();return !!(s&&s.access_token)};
 VN.diagnostico=function(){if(!VN.pref)return"📱 Usando la voz del teléfono";if(!VN.sesionOk())return"🔐 No has iniciado sesión en esta dirección. Entra en ⚙️ Más de la app y vuelve";return(VN.estado&&VN.estado!=="sin_sesion")?VN.mensaje(VN.estado):"🎙️ Sesión iniciada. Toca ▶️ Probar voz para comprobar la voz natural"};
-VN.mensaje=e=>({ok:"✅ Voz natural activa",sin_clave:"⏳ Falta pegar la clave de Google en Supabase",sin_sesion:"🔐 Entra en ⚙️ Más para usar la voz natural",sin_red:"📶 Sin internet: uso la voz del teléfono",clave_sin_permiso:"🔑 La clave de Google no tiene permiso para Text-to-Speech",voz_invalida:"🗣️ El nombre de la voz no es válido",clave_invalida:"🔑 Google dice que la clave no es válida: vuelve a copiarla completa (empieza con AIza) y pégala de nuevo en Supabase",api_no_habilitada:"🔌 Falta habilitar Cloud Text-to-Speech API en Google Cloud",clave_restringida:"🔒 La clave tiene una restricción que bloquea a Supabase: déjala solo restringida a Cloud Text-to-Speech API",sin_facturacion:"💳 Google pide vincular la cuenta de facturación al proyecto"})[e]||("⚠️ "+(e||"Sin respuesta"));
+VN.mensaje=e=>({ok:"✅ Voz natural activa",sin_clave:"⏳ Falta pegar la clave de Google en Supabase",sin_sesion:"🔐 Entra en ⚙️ Más para usar la voz natural",sin_red:"📶 Sin internet: uso la voz del teléfono",clave_sin_permiso:"🔑 La clave de Google no tiene permiso para Text-to-Speech",audio_bloqueado:"🔇 Safari no dejó reproducir la voz natural; uso la voz del teléfono",voz_invalida:"🗣️ El nombre de la voz no es válido",clave_invalida:"🔑 Google dice que la clave no es válida: vuelve a copiarla completa (empieza con AIza) y pégala de nuevo en Supabase",api_no_habilitada:"🔌 Falta habilitar Cloud Text-to-Speech API en Google Cloud",clave_restringida:"🔒 La clave tiene una restricción que bloquea a Supabase: déjala solo restringida a Cloud Text-to-Speech API",sin_facturacion:"💳 Google pide vincular la cuenta de facturación al proyecto"})[e]||("⚠️ "+(e||"Sin respuesta"));
 window.VN=VN;
 })();

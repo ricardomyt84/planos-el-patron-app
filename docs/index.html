@@ -686,7 +686,8 @@ function cvSay(txt,solo){
     try{speechSynthesis.cancel()}catch(e){}
     const partes=(String(txt).replace(/[*_#`]/g,"").match(/[^.!?\n]+[.!?]*/g)||[String(txt)]).map(x=>x.trim()).filter(Boolean);
     let i=0,fin=false,barge=null;
-    const cierra=()=>{if(fin&&!barge)return;fin=true;try{if(barge){barge.onend=null;barge.onresult=null;barge.abort()}}catch(e){}barge=null;CV.cancel=null;res()};
+    const guard=setTimeout(()=>{if(!fin){try{speechSynthesis.cancel()}catch(e){}if(window.VN)VN.stop();cierra()}},15000+String(txt).length*140);
+    const cierra=()=>{clearTimeout(guard);if(fin&&!barge)return;fin=true;try{if(barge){barge.onend=null;barge.onresult=null;barge.abort()}}catch(e){}barge=null;CV.cancel=null;res()};
     CV.cancel=()=>{try{speechSynthesis.cancel()}catch(e){}if(window.VN)VN.stop();cierra()};
     if(!solo&&$("vAud").checked&&CV.on&&SR){ // se puede interrumpir hablando
       const armar=()=>{if(fin||!CV.on)return;try{const bg=new SR();bg.lang="es-MX";bg.interimResults=true;bg.continuous=false;barge=bg;
@@ -698,7 +699,8 @@ function cvSay(txt,solo){
       armar();}
     const rate=parseFloat($("vRate").value)||0.95;
     const dispositivo=txt=>{const u=new SpeechSynthesisUtterance(txt);u.lang="es-MX";const v=mejorVoz();if(v){u.voice=v;u.lang=v.lang}
-      u.rate=rate;u.pitch=1;u.onend=dice;u.onerror=dice;try{speechSynthesis.speak(u)}catch(e){cierra()}};
+      let ya=false;const sig=()=>{if(ya)return;ya=true;clearTimeout(wd);dice()};const wd=setTimeout(sig,4000+txt.length*110);
+      u.rate=rate;u.pitch=1;u.onend=sig;u.onerror=sig;try{speechSynthesis.speak(u)}catch(e){sig()}};
     const dice=()=>{
       if(fin)return;if(i>=partes.length){cierra();return}
       const txt=partes[i++];
