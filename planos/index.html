@@ -247,7 +247,7 @@ body.pres .stage #cv{height:calc(100dvh - 110px)}
     <div class="tabs" id="mkTools" hidden></div>
     <svg id="cv" role="img" aria-label="Plano"></svg>
     <div class="zoomcol"><button id="zi" aria-label="Acercar">＋</button><button id="zo" aria-label="Alejar">－</button><button id="zf" aria-label="Ajustar">⤢</button></div>
-    <div class="empty" id="empty" hidden><img class="hero" src="personaje.jpg" alt="El Patrón"><b>Empecemos tu plano</b><span>Toca el micrófono y di, por ejemplo: <i>“crea un cuarto de 3 por 4”</i></span><div class="row" style="justify-content:center"><button data-act="agent">🎤 Hablar con el agente</button><button class="sec" data-go="cuartos">🏠 Agregar a mano</button><button class="sec" data-act="tour">🧭 Ejercicio guiado</button></div></div>
+    <div class="empty" id="empty" hidden><img class="hero" src="personaje.jpg" alt="El Patrón"><b>Empecemos tu plano</b><span>Toca el micrófono y di, por ejemplo: <i>“crea un cuarto de 3 por 4”</i></span><div class="row" style="justify-content:center"><button data-act="agent">🎤 Hablar con el agente</button><button class="sec" data-go="cuartos">🏠 Agregar a mano</button><button class="sec" data-act="tour">🧭 Ejercicio guiado</button><button class="sec" data-href="curso.html">🎓 Curso y videos</button></div></div>
     <div class="selbar" id="selbar" hidden><div id="selTxt"></div><div class="row"><button class="sec" data-act="edit">✏️ Editar</button><button data-act="agent">🎤 Decir</button><button class="sec" data-act="desel" aria-label="Quitar selección">✕</button></div></div>
     <button class="fab" id="fabAg" aria-label="Hablar con el agente">🎤</button>
     <button class="presx" id="presExit">↩️ Salir de presentación</button>
@@ -490,7 +490,7 @@ $("bSvgAll").onclick=()=>{VISTAS.forEach(([k],i)=>setTimeout(()=>download((S.nam
 /* navegación y menú */
 function go(p){document.body.dataset.p=p;document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.go===p));try{localStorage.setItem("planos-panel",p)}catch(e){}window.scrollTo(0,0);if(p==="plano")try{if(FITPEND){fit()}draw()}catch(e){}closeSheetsSafe()}
 function closeSheetsSafe(){try{closeSheets()}catch(e){}}
-document.addEventListener("click",e=>{const g=e.target.closest("[data-go]");if(g){go(g.dataset.go);return}
+document.addEventListener("click",e=>{const hf=e.target.closest("[data-href]");if(hf){location.href=hf.dataset.href;return}const g=e.target.closest("[data-go]");if(g){go(g.dataset.go);return}
   const m=$("menu");if(e.target.closest("#menuBtn")){m.hidden=!m.hidden;return}
   if(!m.hidden&&(e.target.closest("#menu button")||!e.target.closest("header")))m.hidden=true});
 {let p="plano";try{p=localStorage.getItem("planos-panel")||"plano"}catch(e){}if(!["plano","agente","cuartos","cuadros","mas"].includes(p))p="plano";go(p)}
@@ -503,7 +503,7 @@ $("labBtn").onclick=()=>openSheet("tabs");$("toolBtn").onclick=()=>openSheet("sh
 function resumenUpd(){
   const el=$("resumen");if(!el)return;const rooms=S.shapes.filter(x=>x.type==="cuarto"),ab=S.aberts||[];
   const m2=rooms.reduce((t,r)=>t+area(r),0),pu=ab.filter(a=>a.kind==="puerta").length,ve=ab.filter(a=>a.kind==="ventana").length;
-  el.innerHTML=`<h2>📋 Resumen del proyecto</h2><div class="rs"><div><b>${rooms.length}</b><span>cuartos</span></div><div><b>${f2(m2)}</b><span>m²</span></div><div><b>${pu}</b><span>puertas</span></div><div><b>${ve}</b><span>ventanas</span></div></div><div class="row"><button class="sec" data-go="cuadros">📊 Ver materiales</button><button class="sec" data-go="cuartos">🏠 Mis cuartos</button></div>`;
+  el.innerHTML=`<h2>📋 Resumen del proyecto</h2><div class="rs"><div><b>${rooms.length}</b><span>cuartos</span></div><div><b>${f2(m2)}</b><span>m²</span></div><div><b>${pu}</b><span>puertas</span></div><div><b>${ve}</b><span>ventanas</span></div></div><div class="row"><button class="sec" data-go="cuadros">📊 Ver materiales</button><button class="sec" data-go="cuartos">🏠 Mis cuartos</button></div><div class="row" style="margin-top:8px"><button data-href="curso.html">🎓 Curso y videos de capacitación</button></div>`;
 }
 function selUpdate(){const sh=S.shapes.find(x=>x.id===sel),b=$("selbar"),pres=document.body.classList.contains("pres");
   $("empty").hidden=pres||S.shapes.length>0;

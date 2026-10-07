@@ -73,6 +73,19 @@ ul,ol{padding-left:20px;margin:6px 0}li{margin:3px 0}
 .cert .nm{font-family:Georgia,serif;font-size:30px;border-bottom:2px solid #b8923a;display:inline-block;padding:0 24px;margin:8px 0;min-width:240px}
 .cert p{margin:6px 0;color:#3a2f14}
 input[type=text]{font:inherit;width:100%;padding:12px;border-radius:12px;border:1px solid #4a3b1c;background:#15120c;color:var(--tx);font-size:16px}
+#vid{position:fixed;inset:0;z-index:50;background:#000;display:flex;flex-direction:column}
+#vid .vt{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 14px 8px;border-bottom:1px solid #4a3b1c}
+#vid .vt b{flex:1;font-family:Georgia,serif;color:var(--pri2);font-size:16px}
+#vid .stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;padding:10px}
+#vid .stage img{max-height:100%;max-width:100%;border-radius:18px;border:1px solid #4a3b1c;animation:kb 14s ease-in-out infinite alternate}
+#vid .stage img.logo{border:0;border-radius:14px;mix-blend-mode:lighten;max-width:70%}
+@keyframes kb{from{transform:scale(1) translateY(0)}to{transform:scale(1.07) translateY(-1.5%)}}
+#vid .cap{padding:12px 16px;background:linear-gradient(0deg,#000 60%,transparent);font-size:19px;line-height:1.4;text-align:center;min-height:110px;display:flex;align-items:center;justify-content:center}
+#vid .ctl{display:flex;gap:10px;justify-content:center;align-items:center;padding:6px 14px calc(14px + env(safe-area-inset-bottom));flex-wrap:wrap}
+#vid .ctl button,#vid .ctl select{min-height:46px}
+#vid .ctl select{font:inherit;background:#15120c;color:var(--tx);border:1px solid #4a3b1c;border-radius:12px;padding:0 10px}
+#vid .vb{height:5px;background:#1b160c}#vid .vb i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--pri),var(--pri2));transition:width .3s}
+#vid .stp{color:var(--mut);font-size:13px;text-align:center}
 @media print{body{background:#fff}header,.nav,.noprint,main>*:not(#certbox){display:none!important}main{padding:0}.cert{border-width:10px;margin:0 auto;box-shadow:none}.cert img{mix-blend-mode:normal}}
 </style>
 </head>
@@ -82,6 +95,7 @@ input[type=text]{font:inherit;width:100%;padding:12px;border-radius:12px;border:
   <div class="bar"><i id="pbar"></i></div>
 </header>
 <main id="app"></main>
+<div id="vid" hidden><div class="vt"><b id="vTit"></b><button class="sec" id="vX">✕ Cerrar</button></div><div class="vb"><i id="vBar"></i></div><div class="stage" id="vStage"></div><div class="stp" id="vStp"></div><div class="cap" id="vCap"></div><div class="ctl"><button class="sec" id="vPrev">⏮</button><button id="vPlay">⏸ Pausa</button><button class="sec" id="vNext">⏭</button><select id="vRate"><option value="0.85">0.85×</option><option value="0.95" selected>0.95×</option><option value="1.05">1.05×</option><option value="1.2">1.2×</option></select></div></div>
 <script>
 const KEY="curso-patron-v1";
 let ST={done:{},prac:{},exam:0,name:""};
@@ -315,11 +329,13 @@ function home(){
   return `<div class="hero"><img src="personaje.jpg" alt="El Patrón"><div><h1>Capacitación de la app</h1><p class="lead">Elige tu camino. Con capturas reales, frases para copiar, práctica y examen.</p>
   <p><button data-act="${nx?"mod":"examx"}" ${nx?`data-id="${nx.id}"`:""}>⚡ Curso express · 10 min${pctX()?" ("+pctX()+"%)":""}</button></p>
   <p><button class="sec" data-act="${nf?"mod":"exam"}" ${nf?`data-id="${nf.id}"`:""}>📚 Curso completo · 70 min${pctF()?" ("+pctF()+"%)":""}</button></p>
+  <p><button data-video="all-e">🎬 Ver el curso express como video</button></p>
   <p><a class="btn sec" href="index.html?tour=1">🧭 Ejercicio guiado en la app · 3 min</a></p></div></div>
   <h2>⚡ Curso express <small style="color:var(--mut);font-size:14px">· para personal nuevo · solo lo esencial</small></h2><p class="lead">4 lecciones de 2 a 3 minutos, un examen de 5 preguntas y tu constancia.</p>
   <div class="grid">${EXPRESS.map((m,i)=>card(m,i,(i+1)+". ")).join("")}
   <button class="mod ${ST.examX>=4?"done":""}" data-act="examx"><div class="top"><span class="ico">🏁</span><div><b>Examen express</b><small>5 preguntas · necesitas 4 · ${ST.examX?"mejor: "+ST.examX+"/5":"sin intentar"}</small></div><span class="chk">${ST.examX>=4?"✅":"▫️"}</span></div></button>
   <button class="mod" data-act="certx"><div class="top"><span class="ico">🎓</span><div><b>Mi constancia express</b><small>${ST.examX>=4?"Disponible para imprimir":"Se desbloquea al aprobar"}</small></div><span class="chk">${ST.examX>=4?"🔓":"🔒"}</span></div></button></div>
+  <p><button class="sec" data-video="all-f">🎬 Ver el curso completo como video (70 min)</button></p>
   <h2 style="margin-top:26px">📚 Curso completo <small style="color:var(--mut);font-size:14px">· ${pctF()}%</small></h2><p class="lead">${MODS.length} módulos con todo el detalle: láminas, instalaciones, inventario, cámara y más.</p>
   <div class="grid">${MODS.map((m,i)=>card(m,i,(i+1)+". ")).join("")}
   <button class="mod ${ST.exam>=8?"done":""}" data-act="exam"><div class="top"><span class="ico">🏁</span><div><b>Examen final</b><small>10 preguntas · necesitas 8 · ${ST.exam?"mejor: "+ST.exam+"/10":"sin intentar"}</small></div><span class="chk">${ST.exam>=8?"✅":"▫️"}</span></div></button>
@@ -335,7 +351,7 @@ function quizHtml(qs,pref){
 }
 function modView(m){
   const L=listOf(m),i=L.indexOf(m),prev=L[i-1],next=L[i+1],ex=L===EXPRESS?"examx":"exam";
-  return `<p><button class="sec" data-act="home">⬅️ Inicio</button></p><h1>${m.ico} ${i+1}. ${esc(m.t)}</h1><p class="lead">${L===EXPRESS?"⚡ Express · ":""}${m.min} min · ${esc(m.sub)}</p>
+  return `<p><button class="sec" data-act="home">⬅️ Inicio</button></p><h1>${m.ico} ${i+1}. ${esc(m.t)}</h1><p class="lead">${L===EXPRESS?"⚡ Express · ":""}${m.min} min · ${esc(m.sub)}</p><p><button data-video="${m.id}">▶️ Ver esta lección como video</button></p>
   ${m.steps.map(stepHtml).join("")}
   <div class="prac"><h3>✋ Práctica en la app</h3><p class="lead" style="margin-bottom:4px">Abre la app en otra pestaña y hazlo de verdad:</p>${m.prac.map((t,k)=>`<label><input type="checkbox" data-prac="${m.id}-${k}" ${ST.prac[m.id+"-"+k]?"checked":""}><span>${esc(t)}</span></label>`).join("")}<p style="margin-top:10px"><a class="btn sec" href="index.html" target="_blank" rel="noopener">📱 Abrir la app</a> <a class="btn sec" href="index.html?tour=1" target="_blank" rel="noopener">🧭 Ejercicio guiado</a></p></div>
   <div class="quiz"><h3>📝 Mini examen</h3><div id="quiz">${quizHtml(m.quiz,m.id)}</div><p class="score" id="qres">${ST.done[m.id]!==undefined?"✅ Módulo completado ("+ST.done[m.id]+"/"+m.quiz.length+")":""}</p></div>
@@ -376,6 +392,53 @@ function wireQuiz(box,qs,pref,done){
     });
   });
 }
+/* ============ MODO VIDEO (voz del dispositivo) ============ */
+const V={on:false,clips:[],i:0,k:0,paused:false,tok:0};
+const EMO=/[\u{1F000}-\u{1FFFF}\u{2190}-\u{21FF}\u{2300}-\u{23FF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}️‍]/gu;
+function limpia(html){const d=document.createElement("div");d.innerHTML=String(html||"").replace(/<\/(li|p|div|h3|ol|ul)>/g,". ").replace(/<br\s*\/?>/g,". ");return(d.textContent||"").replace(/\s*→\s*/g,", luego ").replace(EMO,"").replace(/[“”"]/g,"").replace(/\s*·\s*/g," ").replace(/\s+/g," ").replace(/\.(\s*\.)+/g,".").replace(/:\s*\./g,":").trim()}
+function frases(txt){return(txt.match(/[^.!?]+[.!?]*/g)||[txt]).map(x=>x.trim()).filter(x=>x.length>1)}
+function clipsDe(mods){const out=[];for(const m of mods){out.push({mod:m.t,img:null,lines:frases(`Lección: ${limpia(m.t)}. ${limpia(m.sub)}.`),logo:true});
+  m.steps.forEach((st,si)=>{let t=limpia(st.h)+". "+limpia(st.p);if(st.frases)t+=" Por ejemplo: "+st.frases.map(f=>limpia(f)).join(". Otra: ");if(st.tipx)t+=" "+limpia(st.tipx);out.push({mod:m.t,img:st.img||null,lines:frases(t),step:`${m.t} · paso ${si+1} de ${m.steps.length}`})});}
+  return out}
+const NB=/paulina|juan|ang[eé]lica|diego|jorge|m[oó]nica|marisol|carlos|francisca|esperanza|sabina|dalia/i;
+function mejorVoz(){let vs=[];try{vs=speechSynthesis.getVoices().filter(v=>/^es/i.test(v.lang))}catch(e){}let pref=null;try{pref=localStorage.getItem("planos-voz-name")}catch(e){}
+  if(pref){const v=vs.find(x=>x.name===pref);if(v)return v}
+  const sc=v=>(/premium|enhanced|mejorada|natural|neural/i.test(v.name)?100:0)+(/es[-_]MX/i.test(v.lang)?50:/es[-_]419/i.test(v.lang)?40:/es[-_]US/i.test(v.lang)?35:0)+(NB.test(v.name)?10:0)-(/compact|eloquence|grandma|grandpa|rocko|shelley|sandy|reed|flo|eddy/i.test(v.name)?60:0);
+  return vs.slice().sort((a,b)=>sc(b)-sc(a))[0]||null}
+function vShow(){
+  const c=V.clips[V.i];if(!c)return;
+  $("vTit").textContent=c.mod;$("vStp").textContent=c.step||"Introducción";
+  $("vStage").innerHTML=c.img?`<img src="${IMG(c.img)}" alt="">`:`<img class="logo" src="${c.logo?"emblema.jpg":"personaje.jpg"}" alt="">`;
+  $("vBar").style.width=Math.round(100*V.i/Math.max(1,V.clips.length-1))+"%";
+}
+function vSpeak(){
+  if(!V.on||V.paused)return;const c=V.clips[V.i];
+  if(!c){vEnd();return}
+  if(V.k>=c.lines.length){V.i++;V.k=0;if(V.i>=V.clips.length){vEnd();return}vShow();setTimeout(vSpeak,500);return}
+  const txt=c.lines[V.k];$("vCap").textContent=txt;
+  if(!window.speechSynthesis){setTimeout(()=>{V.k++;vSpeak()},Math.max(1800,txt.length*70));return}
+  const my=++V.tok;try{speechSynthesis.cancel()}catch(e){}
+  const u=new SpeechSynthesisUtterance(txt);u.lang="es-MX";const v=mejorVoz();if(v){u.voice=v;u.lang=v.lang}
+  u.rate=parseFloat($("vRate").value)||0.95;
+  const next=()=>{if(my!==V.tok)return;V.k++;vSpeak()};u.onend=next;u.onerror=next;
+  try{speechSynthesis.speak(u)}catch(e){next()}
+}
+function vStart(clips){
+  V.clips=clips;V.i=0;V.k=0;V.paused=false;V.on=true;$("vid").hidden=false;document.body.style.overflow="hidden";
+  try{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+  $("vPlay").textContent="⏸ Pausa";vShow();vSpeak();
+}
+function vStop(){V.on=false;V.tok++;try{speechSynthesis.cancel()}catch(e){}$("vid").hidden=true;document.body.style.overflow=""}
+function vEnd(){V.on=false;$("vCap").innerHTML="🎬 Fin del video. ¡Ahora haz tu mini examen y la práctica en la app!";$("vBar").style.width="100%";$("vPlay").textContent="↺ Ver de nuevo"}
+$("vX").onclick=vStop;
+$("vPlay").onclick=()=>{if(!V.on&&V.i>=V.clips.length-1&&$("vPlay").textContent.startsWith("↺")){vStart(V.clips);return}
+  if(V.paused){V.paused=false;$("vPlay").textContent="⏸ Pausa";vSpeak()}else{V.paused=true;V.tok++;try{speechSynthesis.cancel()}catch(e){}$("vPlay").textContent="▶️ Seguir"}};
+$("vNext").onclick=()=>{V.tok++;try{speechSynthesis.cancel()}catch(e){}V.i=Math.min(V.clips.length-1,V.i+1);V.k=0;V.on=true;vShow();if(!V.paused)vSpeak()};
+$("vPrev").onclick=()=>{V.tok++;try{speechSynthesis.cancel()}catch(e){}V.i=Math.max(0,V.i-1);V.k=0;V.on=true;vShow();if(!V.paused)vSpeak()};
+$("vRate").onchange=()=>{if(V.on&&!V.paused){V.tok++;vSpeak()}};
+try{speechSynthesis.onvoiceschanged=()=>{}}catch(e){}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-video]");if(!b)return;const id=b.dataset.video;
+  if(id==="all-e")vStart(clipsDe(EXPRESS));else if(id==="all-f")vStart(clipsDe(MODS));else{const m=[...MODS,...EXPRESS].find(x=>x.id===id);if(m)vStart(clipsDe([m]))}});
 (function(){const h=location.hash.replace("#","").split("/");if(h[0]==="mod"&&[...MODS,...EXPRESS].some(m=>m.id===h[1])){view="mod";cur=h[1]}else if(["exam","examx","cert","certx"].includes(h[0]))view=h[0];render()})();
 </script>
 </body>
