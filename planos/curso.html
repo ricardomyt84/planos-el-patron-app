@@ -598,15 +598,23 @@ function escenasDe(m){
 const VK="planos-voz-uri";
 const NB=/paulina|juan|ang[eé]lica|diego|jorge|m[oó]nica|marisol|carlos|francisca|esperanza|sabina|dalia|alvaro|elvira/i;
 const VCAL=["Básica","Estándar","Mejorada","Premium"];
-const vUri=v=>v.voiceURI||(v.name+"|"+v.lang);
-function vCalidad(v){const u=(v.voiceURI||"")+" "+(v.name||"");return /premium/i.test(u)?3:/enhanced|mejorada|natural|neural/i.test(u)?2:/compact/i.test(u)?0:1}
-const VCACHE=new Map();
-function vocesES(){let vs=[];try{vs=speechSynthesis.getVoices()||[]}catch(e){}for(const v of vs)if(/^es/i.test(v.lang))VCACHE.set(vUri(v),v);return[...VCACHE.values()]}
+const VKEY=new Map(),VQ=new Map(),VVAR=new Map(),VCACHE=new Map();
+const vUri=v=>VKEY.get(v)||v.voiceURI||(v.name+"|"+v.lang);
+function vCalBase(v){const u=(v.voiceURI||"")+" "+(v.name||"");return /premium/i.test(u)?3:/enhanced|mejorada|natural|neural/i.test(u)?2:/compact/i.test(u)?0:1}
+const vCalidad=v=>VQ.has(v)?VQ.get(v):vCalBase(v);
+function vocesES(){let vs=[];try{vs=speechSynthesis.getVoices()||[]}catch(e){}
+  const seen={},grp={};
+  for(const v of vs.filter(x=>/^es/i.test(x.lang))){
+    const base=v.voiceURI||(v.name+"|"+v.lang),n=(seen[base]=(seen[base]||0)+1)-1,key=base+(n?"#"+n:"");
+    VKEY.set(v,key);VCACHE.set(key,v);const g=v.name+"|"+v.lang;(grp[g]=grp[g]||[]).push(v)}
+  for(const g in grp){const L=grp[g];L.forEach((v,i)=>VVAR.set(v,L.length>1?i+1:0));
+    if(L.length>1&&L.every(v=>vCalBase(v)===1))L.forEach((v,i)=>VQ.set(v,i===0?0:2))}
+  return[...VCACHE.values()]}
 function vScore(v){return vCalidad(v)*100+(/es[-_]MX/i.test(v.lang)?50:/es[-_]419/i.test(v.lang)?40:/es[-_]US/i.test(v.lang)?35:0)+(NB.test(v.name)?10:0)-(/eloquence|grandma|grandpa|rocko|shelley|sandy|reed|flo|eddy/i.test(v.name)?200:0)}
 function mejorVoz(){const vs=vocesES();let pref="";try{pref=localStorage.getItem(VK)||""}catch(e){}
   if(pref){const v=vs.find(x=>vUri(x)===pref);if(v)return v}
   return vs.slice().sort((a,b)=>vScore(b)-vScore(a))[0]||null}
-const vEtiqueta=v=>`${v.name} · ${VCAL[vCalidad(v)]} (${v.lang})`;
+const vEtiqueta=v=>`${v.name} · ${VCAL[vCalidad(v)]}${VVAR.get(v)?` (variante ${VVAR.get(v)})`:""} (${v.lang})`;
 function vocesListas(){return new Promise(res=>{if(vocesES().length||!window.speechSynthesis){res();return}let t=0;const f=()=>{if(vocesES().length||++t>12){res();return}setTimeout(f,150)};try{speechSynthesis.onvoiceschanged=()=>res()}catch(e){}f()})}
 try{speechSynthesis.getVoices()}catch(e){}
 function llenaVoz(){const sel=$("vVoz"),vs=vocesES().sort((a,b)=>vScore(b)-vScore(a)),m=mejorVoz();let pref="";try{pref=localStorage.getItem(VK)||""}catch(e){}
