@@ -14,21 +14,22 @@ const GFX_ORDER=['ultra','alta','media','baja'];
 let gfxLevel='alta',emaDt=0.016,slowN=0;
 function setGfx(level){const c=GFX[level]||GFX.alta;gfxLevel=level;PR=c.pr;FSS=c.f;Q.bil=c.bil;Q.glow=c.glow;Q.shadow=c.shadow;Q.dust=c.dust;cv.width=Math.round(W0*PR);cv.height=Math.round(H*PR);skyCv=null}
 function applyGfx(){setGfx(GFX[SET.gfx]?SET.gfx:'alta')}
-function setMusVol(){MUSVOL=MUSLV[SET.music]!=null?MUSLV[SET.music]:.22;if(AC)for(const g of MUSG){try{g.gain.setTargetAtTime(MUSVOL,AC.currentTime,.05)}catch(e){}}}
-function duck(dur){if(!AC)return;const t0=AC.currentTime;for(const g of MUSG){try{g.gain.cancelScheduledValues(t0);g.gain.setTargetAtTime(MUSVOL*.2,t0,.04);g.gain.setTargetAtTime(MUSVOL,t0+dur+.2,.3)}catch(e){}}}
+function setMusVol(){MUSVOL=MUSLV[SET.music]!=null?MUSLV[SET.music]:.55;if(AC)for(const g of MUSG){try{g.gain.setTargetAtTime(MUSVOL,AC.currentTime,.05)}catch(e){}}}
+function duck(dur){if(!AC)return;const t0=AC.currentTime;for(const g of MUSG){try{g.gain.cancelScheduledValues(t0);g.gain.setTargetAtTime(MUSVOL*.4,t0,.04);g.gain.setTargetAtTime(MUSVOL,t0+dur+.2,.3)}catch(e){}}}
 function autoQuality(dt){if(SET.gfx!=='auto'||state!=='race'||raceT<2.5)return;emaDt=emaDt*0.97+dt*0.03;
   if(emaDt>0.027){slowN++;if(slowN>90){const i=GFX_ORDER.indexOf(gfxLevel);if(i<GFX_ORDER.length-1){setGfx(GFX_ORDER[i+1]);say('⚙️ Bajé un poco los gráficos para que corra suave',2600)}slowN=0;emaDt=0.016}}else slowN=Math.max(0,slowN-2)}
 const SEGS=[
- {k:'tilt',t:'🎯 Sensibilidad al inclinar',o:[['Muy suave',48],['Suave',34],['Normal',24],['Sensible',16]]},
+ {k:'tilt',t:'🎯 Sensibilidad al inclinar',o:[['Suave',34],['Normal',26],['Sensible',20],['Muy sensible',14]]},
  {k:'assist',t:'🧭 Ayuda de dirección',o:[['Sin ayuda',0],['Poca',1],['Mucha',2]]},
  {k:'speed',t:'🚀 Velocidad del juego',o:[['Relajado',0.85],['Normal',1],['Rápido',1.12]]},
  {k:'gfx',t:'🖼️ Gráficos',o:[['Ultra','ultra'],['Alta','alta'],['Media','media'],['Baja','baja']]},
  {k:'music',t:'🎵 Volumen de la música',o:[['Sin música','off'],['Bajo','bajo'],['Medio','medio'],['Alto','alto']]},
+ {k:'vvol',t:'🗣️ Volumen de las voces',o:[['Bajo','bajo'],['Medio','medio'],['Alto','alto'],['Muy alto','max']]},
  {k:'voz',t:'🗣️ Voces y comentarista',o:[['Sí',true],['No',false]]}
 ];
 function buildSettings(){const b=$('setBody');b.innerHTML='';
   for(const row of SEGS){const d=document.createElement('div');d.className='setrow';d.innerHTML='<b>'+row.t+'</b>';const sg=document.createElement('div');sg.className='seg';
-    for(const[lab,val]of row.o){const bt=document.createElement('button');bt.className='sec'+(SET[row.k]===val?' on':'');bt.textContent=lab;bt.onclick=()=>{SET[row.k]=val;saveSet();if(row.k==='speed')SPEEDK=val;if(row.k==='gfx')applyGfx();if(row.k==='music')setMusVol();beep(660,.06);buildSettings()};sg.appendChild(bt)}
+    for(const[lab,val]of row.o){const bt=document.createElement('button');bt.className='sec'+(SET[row.k]===val?' on':'');bt.textContent=lab;bt.onclick=()=>{SET[row.k]=val;saveSet();if(row.k==='speed')SPEEDK=val;if(row.k==='gfx')applyGfx();if(row.k==='music')setMusVol();if(row.k==='vvol'||row.k==='voz')speak('first',true);else beep(660,.06);buildSettings()};sg.appendChild(bt)}
     d.appendChild(sg);b.appendChild(d)}
   const u=document.createElement('div');u.className='setrow';u.innerHTML='<b>🔄 ¿Algo raro o no se actualiza?</b>';const ub=document.createElement('button');ub.className='sec';ub.textContent='Actualizar el juego';ub.style.fontSize='14px';ub.onclick=async()=>{try{const rs=await navigator.serviceWorker.getRegistrations();for(const r of rs)await r.unregister();const ks=await caches.keys();for(const k of ks)if(k.startsWith('kart-'))await caches.delete(k)}catch(e){}location.reload()};u.appendChild(ub);b.appendChild(u)}
 /* ---------------------------- voces y comentarista ---------------------------- */
@@ -41,7 +42,9 @@ function prefetchNatural(){if(!window.VN||!VN.sesionOk||!VN.sesionOk()||!VN.pref
 async function natBuffer(text){if(VOX.nat[text]!==undefined)return VOX.nat[text];VOX.nat[text]=null;
   try{const c=await caches.open('voz-v1'),hit=await c.match(natKey(text));if(!hit)return null;const ab=await(await hit.blob()).arrayBuffer();VOX.nat[text]=await new Promise((res,rej)=>{const pr=AC.decodeAudioData(ab,res,rej);if(pr&&pr.catch)pr.catch(()=>{})})}catch(e){VOX.nat[text]=null}
   return VOX.nat[text]}
-function playBuf(b,vol){if(!b||!AC||!master)return;duck(b.duration||2);const s=AC.createBufferSource(),g=AC.createGain();g.gain.value=vol||1;s.buffer=b;s.connect(g);g.connect(master);VOX.playing=true;s.onended=()=>{VOX.playing=false};s.start()}
+let voxBus=null;const VVOL={bajo:1,medio:1.8,alto:2.8,max:4};
+function bus(){if(!voxBus){const g=AC.createGain(),c=AC.createDynamicsCompressor();c.threshold.value=-12;c.knee.value=8;c.ratio.value=8;c.attack.value=.003;c.release.value=.15;g.connect(c);c.connect(AC.destination);voxBus=g}return voxBus}
+function playBuf(b,vol){if(!b||!AC)return;duck(b.duration||2);const s=AC.createBufferSource(),g=AC.createGain();g.gain.value=(vol||1)*(VVOL[SET.vvol]||2.8)/1.6;s.buffer=b;s.connect(g);g.connect(bus());VOX.playing=true;s.onended=()=>{VOX.playing=false};s.start()}
 function speak(key,force){if(!key||!SET.voz||muted||!AC||!VOX.table[key])return;const now=performance.now();if(!force&&(VOX.playing||now-VOX.lastT<2200))return;
   const lst=VOX.table[key],i=(Math.random()*lst.length)|0;VOX.lastT=now;playVox(key,i,lst[i])}
 async function playVox(key,i,text){if(VOX.nat[text])return playBuf(VOX.nat[text],1.6);
@@ -77,10 +80,15 @@ const ghostKey=()=>'kart_gh_'+TRK.id;
 function ghostPos(tm){const d=GH.best&&GH.best.d;if(!d)return null;const n=d.length/3-1;let f=tm*10;if(f<0)f=0;if(f>=n)return null;const i=f|0,u=f-i;const a0=d[i*3+2]/100,a1=d[i*3+5]/100;return{x:lerp(d[i*3],d[i*3+3],u),y:lerp(d[i*3+1],d[i*3+4],u),a:a0+angDiff(a0,a1)*u}}
 /* ---------------------------- eventos en la pista ---------------------------- */
 const EV={list:[],timer:13,rain:0,rainEver:false,hits:0,narT:18};
-function evSpawn(){const r=Math.random(),ref=player;if(!ref)return;
-  if(r<0.38){const w=WP[(ref.wpi+26+((Math.random()*14)|0))%WPN];EV.list.push({k:'barrow',x:w.x-w.nx*120,y:w.y-w.ny*120,vx:w.nx*100,vy:w.ny*100,life:3.2,hit:{}});say('🛒 ¡Ahí va la carretilla loca!',2200);speak('barrow',true)}
-  else if(r<0.78){const w=WP[(ref.wpi+30+((Math.random()*10)|0))%WPN],o=rnd(-48,48);EV.list.push({k:'slab',x:w.x+w.nx*o,y:w.y+w.ny*o,t:0,warn:1.8,done:false,seen:false});say('⚠️ ¡Cuidado, cae la loza!',2200);speak('slab',true)}
-  else if(EV.rain<=0){EV.rain=15;EV.rainEver=true;GRIPK=0.8;say('🌧️ ¡Aguas! Se mojó el asfalto',2600);speak('rain',true);noiseHit(.5,.12,2500)}}
+function evSpawnFrom(d){
+  if(d.k==='barrow'){const w=WP[d.idx%WPN];EV.list.push({k:'barrow',x:w.x-w.nx*120,y:w.y-w.ny*120,vx:w.nx*100,vy:w.ny*100,life:3.2,hit:{}});say('🛒 ¡Ahí va la carretilla loca!',2200);speak('barrow',true)}
+  else if(d.k==='slab'){const w=WP[d.idx%WPN];EV.list.push({k:'slab',x:w.x+w.nx*d.o,y:w.y+w.ny*d.o,t:0,warn:1.8,done:false,seen:false});say('⚠️ ¡Cuidado, cae la loza!',2200);speak('slab',true)}
+  else if(d.k==='rain'&&EV.rain<=0){EV.rain=15;EV.rainEver=true;GRIPK=0.8;say('🌧️ ¡Aguas! Se mojó el asfalto',2600);speak('rain',true);noiseHit(.5,.12,2500)}}
+function evSpawn(){const online=MODE==='online'&&window.NETG&&NETG.on;if(online&&!NETG.host)return;const r=Math.random(),ref=player;if(!ref)return;let d;
+  if(r<0.38)d={k:'barrow',idx:(ref.wpi+26+((Math.random()*14)|0))%WPN};
+  else if(r<0.78)d={k:'slab',idx:(ref.wpi+30+((Math.random()*10)|0))%WPN,o:Math.round(rnd(-48,48))};
+  else if(EV.rain<=0)d={k:'rain'};else return;
+  evSpawnFrom(d);if(online)NETG.send({t:'ev',d})}
 function evTick(dt){
   if(EV.rain>0){EV.rain-=dt;if(EV.rain<=0){GRIPK=1;say('☀️ Salió el sol, ya se secó',2000)}}
   if(MODE!=='tt'){EV.timer-=dt;if(EV.timer<=0){evSpawn();EV.timer=rnd(14,22)}}
@@ -162,6 +170,7 @@ addEventListener('keydown',e=>{if(e.key==='j')input2.left=true;if(e.key==='l')in
 /* ---------------------------- API hacia el juego ---------------------------- */
 window.V4={
   gfx:()=>gfxLevel,
+  mkCustom,evFrom:evSpawnFrom,
   prepTrack(trk){if(!SPR.mkSign)return;const pn=trk.pension?trk.pension.toUpperCase():'';const extra=pn?[[pn,'¡TU PENSIÓN FAVORITA!'],[pn,'DEPA LIBRE · ¡PREGUNTE!'],[pn,'AQUÍ SE VIVE BIEN'],['BIENVENIDO A',pn]]:[];
     if(SPR._signKey!==pn){const base=SIGN_TXT.map(SPR.mkSign),ex=extra.map(SPR.mkSign);SPR.signs=base.concat(ex,ex,ex);SPR._signKey=pn}},
   raceStart(){EV.list=[];EV.timer=13;EV.rain=0;EV.rainEver=false;EV.hits=0;EV.narT=rnd(16,24);GRIPK=1;SPEEDK=SET.speed;applyGfx();

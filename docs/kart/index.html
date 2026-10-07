@@ -77,10 +77,13 @@ button.sec{background:#1b1608;color:var(--gold);box-shadow:0 5px 0 #000,0 0 0 2p
 #res table{margin:2px auto}#res .row{margin-top:6px}
 #champ{justify-content:flex-start;overflow-y:auto;background:rgba(10,8,4,.9);padding-top:6px}
 .hero{width:min(34vw,32vh,260px)}
-.mgrid{display:grid;grid-template-columns:repeat(4,auto);gap:8px;justify-content:center;margin-top:4px}
+.mgrid{display:grid;grid-template-columns:repeat(5,auto);gap:8px;justify-content:center;margin-top:4px}
 .mgrid button{padding:10px 14px;font-size:clamp(12px,2.7vw,17px)}
 @media (orientation:landscape) and (max-height:480px){.hero{width:min(21vh,120px)}#title .title{font-size:clamp(22px,5vw,40px)}.mgrid button{padding:8px 10px}}
 @media (orientation:portrait){.mgrid{grid-template-columns:repeat(2,auto)}}
+#lobby{justify-content:flex-start;overflow-y:auto;padding-top:6px}.lcode{font:900 clamp(34px,10vw,64px)/1 system-ui;letter-spacing:.25em;color:var(--gold);text-shadow:0 3px 0 #6b4e10;margin:2px 0}
+.lplayers{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:min(96vw,720px);margin:6px 0}.lp{background:#15110a;border:2px solid #3a2f14;border-radius:12px;padding:6px 12px;font:800 clamp(13px,3.4vw,18px) system-ui;color:#fff;display:flex;gap:8px;align-items:center}.lp .dot{width:14px;height:14px;border-radius:50%;display:inline-block;border:2px solid #fff}
+#lobby .title{font-size:clamp(18px,4.6vw,32px)!important}
 .seg{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}.seg button{padding:6px 12px;font-size:clamp(12px,3vw,15px);box-shadow:0 3px 0 #000}.seg button.on{outline:3px solid #fff;background:linear-gradient(135deg,#b8923a,#f4dc9a);color:#1a1306}
 #settings{justify-content:flex-start;overflow-y:auto;padding-top:6px}#settings .title{font-size:clamp(18px,4.4vw,30px)!important}
 #setBody{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 18px;width:min(96vw,780px)}
@@ -108,10 +111,10 @@ button.sec{background:#1b1608;color:var(--gold);box-shadow:0 5px 0 #000,0 0 0 2p
 
 <div id="title" class="scr on glass">
   <img class="hero" src="personaje.jpg" alt="El Patrón">
-  <div class="title"><small>DEPARTAMENTOS</small>EL PATRÓN KART<small style="letter-spacing:.12em;color:#ffd9a0;margin-top:4px">v4 · EDICIÓN «SE RENTA» 🔑</small></div>
+  <div class="title"><small>DEPARTAMENTOS</small>EL PATRÓN KART<small style="letter-spacing:.12em;color:#ffd9a0;margin-top:4px">v5 · EDICIÓN «SE RENTA» 🔑</small></div>
   <div id="apodo" class="hint" style="margin:2px 0 6px"></div>
   <div class="mgrid">
-    <button id="mRace">🏁 Carrera</button><button id="mChamp">🏆 Campeonato</button><button id="mTT">⏱️ Contrarreloj</button><button id="m2P">👥 2 jugadores</button>
+    <button id="mRace">🏁 Carrera</button><button id="mChamp">🏆 Campeonato</button><button id="mTT">⏱️ Contrarreloj</button><button id="m2P">👥 2 jugadores</button><button id="mOnline">🌐 En línea</button>
     <button class="sec" id="bRec">🏅 Récords</button><button class="sec" id="bAch">🎖️ Logros</button><button class="sec" id="bSet">⚙️ Ajustes</button><button class="sec" id="bHow">❓ Cómo se juega</button>
   </div>
   <button id="bPlay" style="display:none"></button>
@@ -137,6 +140,21 @@ button.sec{background:#1b1608;color:var(--gold);box-shadow:0 5px 0 #000,0 0 0 2p
   <div id="recTabs"></div>
   <div id="recBody" class="hint">Cargando…</div>
   <div class="row"><button class="sec" id="bRecBack">⬅️ Atrás</button></div>
+</div>
+
+<div id="online" class="scr glass">
+  <div class="title" style="font-size:clamp(20px,5.4vw,36px)">🌐 JUGAR EN LÍNEA</div>
+  <div class="hint" style="font-size:clamp(12px,3vw,16px)">Carreras y torneos con amigos, cada quien en su celular.</div>
+  <input id="onName" maxlength="12" placeholder="Tu nombre" style="font:700 18px system-ui;padding:10px;border-radius:12px;border:2px solid #b8923a;background:#15110a;color:#fff;width:min(60vw,260px);text-align:center;margin:8px 0;-webkit-user-select:text;user-select:text">
+  <div class="row"><button id="onCreate">🏁 Crear sala</button></div>
+  <div class="row" style="margin-top:8px"><input id="onCode" maxlength="4" placeholder="CÓDIGO" style="font:900 22px system-ui;letter-spacing:.2em;padding:10px;border-radius:12px;border:2px solid #b8923a;background:#15110a;color:#fff;width:150px;text-align:center;text-transform:uppercase;-webkit-user-select:text;user-select:text"><button class="sec" id="onJoin">➡️ Unirme</button></div>
+  <div id="onMsg" class="hint" style="min-height:1.4em;color:#ffd9a0"></div>
+  <div class="row"><button class="sec" id="onBack">⬅️ Atrás</button></div>
+</div>
+
+<div id="lobby" class="scr glass">
+  <div id="lobbyBody"></div>
+  <div class="row"><button class="sec" id="lbLeave">🚪 Salir</button><button class="sec" id="lbShare">📤 Invitar</button><button id="lbStart">🚦 ¡EMPEZAR!</button></div>
 </div>
 
 <div id="settings" class="scr glass">
@@ -215,9 +233,10 @@ const $=id=>document.getElementById(id);
 const clamp=(v,a,b)=>v<a?a:v>b?b:v,lerp=(a,b,t)=>a+(b-a)*t,rnd=(a,b)=>a+Math.random()*(b-a);
 const angDiff=(a,b)=>{let d=b-a;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return d};
 const TAU=Math.PI*2;
-const SET=Object.assign({tilt:34,assist:0,speed:1,gfx:'alta',voz:true,music:'bajo'},lsGet('kart_set',{}));
-if(!SET.v5){if(SET.tilt===20)SET.tilt=34;if(SET.gfx==='auto')SET.gfx='alta';SET.v5=1;lsSet('kart_set',SET)}
-const MUSLV={bajo:.22,medio:.42,alto:.7,off:0};let MUSVOL=MUSLV[SET.music]!=null?MUSLV[SET.music]:.22;const MUSG=[];
+const SET=Object.assign({tilt:26,assist:0,speed:1,gfx:'alta',voz:true,music:'medio',vvol:'alto'},lsGet('kart_set',{}));
+if(!SET.v5){if(SET.gfx==='auto')SET.gfx='alta';SET.v5=1}
+if(!SET.v6){if(SET.tilt===34||SET.tilt===20)SET.tilt=26;if(SET.music==='bajo'||!SET.music)SET.music='medio';if(!SET.vvol)SET.vvol='alto';SET.v6=1;lsSet('kart_set',SET)}
+const MUSLV={bajo:.3,medio:.55,alto:.9,off:0};let MUSVOL=MUSLV[SET.music]!=null?MUSLV[SET.music]:.55;const MUSG=[];
 const PAINT=Object.assign({c:null,l:''},lsGet('kart_paint',{}));
 const Q={bil:true,glow:true,shadow:true,dust:true};let SPEEDK=SET.speed,GRIPK=1;
 let MODE='race',P2=false,player2=null,picked2=1,CH=null,twoFirst=-1;
@@ -507,10 +526,11 @@ function startRace(){
   const pool=CHARS.map((_,i)=>i).filter(i=>i!==picked&&!(P2&&i===picked2));
   let others=MODE==='tt'?[]:(MODE==='champ'&&CH&&CH.others)?CH.others:pool.sort(()=>Math.random()-.5).slice(0,P2?3:4);
   if(MODE==='champ'&&CH&&!CH.others)CH.others=others;
-  karts=[newKart(picked,4,true)];
+  if(MODE==='online'&&window.NETG&&NETG.on){karts=NETG.makeKarts()}
+  else{karts=[newKart(picked,4,true)];
   if(P2){const k2=newKart(picked2,5,false);k2.human=true;k2.ai=false;k2.p2=true;karts.push(k2)}
-  others.forEach((c,i)=>karts.push(newKart(c,[0,1,2,3][i],false)));
-  player=karts[0];player2=P2?karts[1]:null;hazards=[];shots=[];parts=[];
+  others.forEach((c,i)=>karts.push(newKart(c,[0,1,2,3][i],false)))}
+  player=karts.find(k=>k.isPlayer)||karts[0];player2=P2?karts[1]:null;hazards=[];shots=[];parts=[];
   BOXES.forEach(b=>b.t=0);COINS.forEach(c=>c.t=0);PUDDLES.forEach(p=>p.said=0);toast=null;toastQ=[];lastPos=0;posCool=0;twoFirst=-1;GRIPK=1;
   raceT=0;countT=3.2;state='count';finishedAt=0;results=[];melI=0;musicT=AC?AC.currentTime+0.1:0;setMusic(TRK.song);tilt.sum=0;tilt.n=0;
   cam.x=player.x;cam.y=player.y;cam.a=player.a;if(P2){cam2.x=player2.x;cam2.y=player2.y;cam2.a=player2.a}
@@ -538,7 +558,7 @@ function humanCtl(k){
   const inp=k===player2?input2:input;let st=inp.steer;
   if(SET.assist>0&&!k.drift){const w=WP[(k.wpi+Math.round(5+k.spd/40))%WPN],want=Math.atan2(w.y-k.y,w.x-k.x);st=clamp(st+SET.assist*0.3*clamp(angDiff(k.a,want)*1.6,-1,1)*(1-Math.min(1,Math.abs(inp.steer)*1.6)),-1,1)}
   return{steer:st,gas:true,brake:false,drift:!!inp.drift}}
-function humanFinished(k){SFX.win();if(!P2){state='finish';finishedAt=t;return}if(player.fin&&player2.fin){state='finish';finishedAt=t}else if(twoFirst<0)twoFirst=raceT}
+function humanFinished(k){if(window.NETG&&NETG.on)NETG.finish(k);SFX.win();if(!P2){state='finish';finishedAt=t;return}if(player.fin&&player2.fin){state='finish';finishedAt=t}else if(twoFirst<0)twoFirst=raceT}
 function giveItem(k){const r=rank(),pos=r.indexOf(k);
   const pool=pos<=1?['brick','brick','cement','coffee','coffee','taco']:pos<=3?['brick','wrench','cement','rent','coffee','taco']:['rent','wrench','coffee','taco','star','star'];
   k.item=pool[(Math.random()*pool.length)|0];if(k.human){k.roll=0.9;SFX.pick();if(k.isPlayer)say(ITEM_MSG[k.item],2600)}}
@@ -597,7 +617,7 @@ function rubber(k){const pr=player.prog,d=k.prog-pr;return d>3?0.9:d<-3?1.06:1}
 /* pantalla de resultados */
 function showResults(){
   const r=rank();const body=['<table>'];
-  r.forEach((k,i)=>{body.push(`<tr class="${k.human?'me':''}"><td>${i+1}°</td><td>${esc(k.ch.n)}${P2&&k.human?(k===player?' (J1)':' (J2)'):''}</td><td>${k.fin?fmt(k.finT):'—'}</td></tr>`)});body.push('</table>');
+  r.forEach((k,i)=>{body.push(`<tr class="${k.human?'me':''}"><td>${i+1}°</td><td>${esc(k.name||k.ch.n)}${P2&&k.human?(k===player?' (J1)':' (J2)'):''}</td><td>${k.fin?fmt(k.finT):'—'}</td></tr>`)});body.push('</table>');
   const pos=r.indexOf(player)+1;
   let title=P2?('👥 ¡Ganó el Jugador '+(r.find(k=>k.human)===player?1:2)+'!'):['🏆 ¡GANASTE! Hoy cobras renta doble','🥈 Segundo… casi cobras la renta','🥉 Podio… (con goteras)','😅 Te atrasaste como la obra del vecino','🐢 Llegaste… mañana (como el albañil)'][Math.min(4,pos-1)];
   if(!P2)body.push(`<div class="hint" style="color:#8ce99a;margin:2px">💰 Renta cobrada: $${(player.coins*500).toLocaleString('en-US')} · 🪙 ${player.coins} monedas</div>`);
@@ -620,6 +640,7 @@ function step(dt){
     const rr=input.left&&!input.right?-1:input.right&&!input.left?1:0;if(!P2&&ctlMode>0&&tilt.has){input.steer=clamp(tilt.steer+rr,-1,1);const tb=$('tiltBar').firstChild;if(tb)tb.style.left=(50+input.steer*46)+'%'}else input.steer=lerp(input.steer,rr,Math.min(1,dt*9));
     if(P2){const rr2=input2.left&&!input2.right?-1:input2.right&&!input2.left?1:0;input2.steer=lerp(input2.steer,rr2,Math.min(1,dt*9))}
     for(const k of karts){
+      if(k.remote){if(window.NETG)NETG.remoteStep(k,dt);continue}
       let ctl;if(k.human&&!k.fin){ctl=humanCtl(k)}else{ctl=aiControl(k,dt)}
       if(k.ai||k.fin){const rb=k.fin?0.8:rubber(k)*k.skill;const sv=k.ch.spd;k.ch={...k.ch,spd:sv};ctl.rb=rb}
       const spd0=k.ch.spd;if(k.ai&&!k.fin)k.ch=Object.assign({},k.ch,{spd:CHARS[k.ci].spd*(ctl.rb||1)});
@@ -630,7 +651,7 @@ function step(dt){
       // cajas
       for(const b of BOXES){if(b.t>0){b.t-=dt;continue}if(!k.item&&(b.x-k.x)**2+(b.y-k.y)**2<26*26){b.t=5;giveItem(k)}}
       // ladrillos
-      for(const h of hazards)if(!h.dead&&(h.x-k.x)**2+(h.y-k.y)**2<17*17){h.dead=true;if(h.kind==='cement'){if(k.star<=0){k.mud=2.2;if(k.isPlayer){sayv('🪣 ¡Te pegaste en el cemento!','cement');if(window.V4)V4.ev('cement',k)}}}else hit(k)}
+      for(const h of hazards)if(!h.dead&&(h.x-k.x)**2+(h.y-k.y)**2<17*17){h.dead=true;if(window.NETG&&NETG.on&&h.id)NETG.gone('hzx',h);if(h.kind==='cement'){if(k.star<=0){k.mud=2.2;if(k.isPlayer){sayv('🪣 ¡Te pegaste en el cemento!','cement');if(window.V4)V4.ev('cement',k)}}}else hit(k)}
     }
     // item del jugador
     if(input.item){input.item=false;if(player.item&&!player.fin&&state==='race'&&player.roll<=0)useItem(player)}
@@ -638,10 +659,10 @@ function step(dt){
     // llaves inglesas
     for(const s of shots){s.life-=dt;if(s.tg){const tgt=s.tg,want=Math.atan2(tgt.y-s.y,tgt.x-s.x),d=angDiff(s.a,want);s.a+=clamp(d,-4*dt,4*dt)}
       s.x+=Math.cos(s.a)*(s.spd||380)*dt;s.y+=Math.sin(s.a)*(s.spd||380)*dt;
-      for(const k of karts){if(k===s.owner)continue;if((k.x-s.x)**2+(k.y-s.y)**2<20*20){hit(k);if(k.isPlayer)sayv(s.kind==='rent'?'📄 ¡NO TENGO PARA LA RENTA!':'🔧 ¡Quién dejó la llave ahí!',s.kind==='rent'?'rent_hit':null);else if(s.owner.isPlayer){say(s.kind==='rent'?'📄 ¡Le llegó la renta a '+k.ch.n+'!':'🔧 ¡Llave directa a '+k.ch.n+'!');if(window.V4)V4.ev('shothit',s,k)}s.life=0;break}}}
+      for(const k of karts){if(k===s.owner||k.remote)continue;if((k.x-s.x)**2+(k.y-s.y)**2<20*20){hit(k);if(k.isPlayer)sayv(s.kind==='rent'?'📄 ¡NO TENGO PARA LA RENTA!':'🔧 ¡Quién dejó la llave ahí!',s.kind==='rent'?'rent_hit':null);else if(s.owner.isPlayer){say(s.kind==='rent'?'📄 ¡Le llegó la renta a '+k.ch.n+'!':'🔧 ¡Llave directa a '+k.ch.n+'!');if(window.V4)V4.ev('shothit',s,k)}s.life=0;if(window.NETG&&NETG.on)NETG.gone('shx',s);break}}}
     shots=shots.filter(s=>s.life>0);hazards=hazards.filter(h=>!h.dead&&(h.life-=dt)>0);
     // choques entre karts
-    for(let i=0;i<karts.length;i++)for(let j=i+1;j<karts.length;j++){const a=karts[i],b=karts[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy);if(d<15&&d>0.01){const p=(15-d)/2,nx=dx/d,ny=dy/d;a.x-=nx*p;a.y-=ny*p;b.x+=nx*p;b.y+=ny*p;if(a.star>0&&b.star<=0)hit(b);else if(b.star>0&&a.star<=0)hit(a);else{const m=(a.spd+b.spd)/2;a.spd=lerp(a.spd,m,.3);b.spd=lerp(b.spd,m,.3)}}}
+    for(let i=0;i<karts.length;i++)for(let j=i+1;j<karts.length;j++){const a=karts[i],b=karts[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy);if(d<15&&d>0.01&&!a.remote&&!b.remote){const p=(15-d)/2,nx=dx/d,ny=dy/d;a.x-=nx*p;a.y-=ny*p;b.x+=nx*p;b.y+=ny*p;if(a.star>0&&b.star<=0)hit(b);else if(b.star>0&&a.star<=0)hit(a);else{const m=(a.spd+b.spd)/2;a.spd=lerp(a.spd,m,.3);b.spd=lerp(b.spd,m,.3)}}}
     // avisos graciosos
     if(toast){toast.t+=dt;if(toast.t>toast.ms/1000)toast=toastQ.length?(q=>({txt:q[0],t:0,ms:q[1]}))(toastQ.shift()):null}
     posCool-=dt;if(state==='race'&&(((t*2)|0)!==step._p)){step._p=(t*2)|0;const np=rank().indexOf(player)+1;if(lastPos&&np!==lastPos&&posCool<=0){if(np===1){sayv('👑 ¡Aquí manda el Patrón!','first');posCool=6}else if(np===karts.length&&raceT>10){sayv(BACK_MSG[(Math.random()*3)|0],'back');posCool=9}else if(np<lastPos){sayv(UP_MSG[(Math.random()*3)|0],'up');posCool=7}}lastPos=np}
@@ -649,7 +670,7 @@ function step(dt){
     if(P2&&state==='race'&&twoFirst>=0&&raceT-twoFirst>8){state='finish';finishedAt=t}
     // cámara
     cam.a+=angDiff(cam.a,player.a)*Math.min(1,dt*(player.drift?2.6:5));if(P2&&player2)cam2.a+=angDiff(cam2.a,player2.a)*Math.min(1,dt*(player2.drift?2.6:5));
-    if(state==='finish'&&t-finishedAt>3.2){showResults();state='results'}
+    if(state==='finish'&&t-finishedAt>3.2&&!(window.NETG&&NETG.hold())){showResults();state='results'}
     engineUpdate(player.spd,state==='race'||state==='count');
   }
   else if(state==='results'){for(const k of karts){const c=aiControl(k,dt);kartUpdate(k,dt,c);updateWp(k)}}
@@ -736,7 +757,7 @@ function drawSprites(){
   for(const s of shots){const p=proj(s.x,s.y);if(p)list.push({p,img:s.kind==='rent'?SPR.rent:SPR.wrench,wu:s.kind==='rent'?22:20,lift:10})}
   for(const k of karts){const p=proj(k.x,k.y);if(!p)continue;
     const rel=angDiff(cam.a,k.a);let lean=k.lean;if(Math.abs(rel)>0.18)lean=rel>0?1:-1;if(k.drift)lean=k.drift;
-    list.push({p,kart:k,img:kartSprite(k.ci,lean,k.isPlayer?PAINT:null,(((k.odo||0)/10)|0)&1),wu:26,lift:0,spin:k.spin>0?k.spinA:0,star:k.star>0})}
+    list.push({p,kart:k,img:kartSprite(k.ci,lean,k.paint||(k.isPlayer?PAINT:null),(((k.odo||0)/10)|0)&1),wu:26,lift:0,spin:k.spin>0?k.spinA:0,star:k.star>0})}
   for(const q of parts){const p=proj(q.x,q.y);if(p)list.push({p,spark:q})}
   if(window.V4)V4.addSprites(list);
   list.sort((a,b)=>b.p.z-a.p.z);
@@ -750,6 +771,7 @@ function drawSprites(){
     if(o.kart){const k=o.kart;y+=Math.sin(t*26+k.slot*2)*Math.min(1,k.spd/260)*0.8*Math.min(2.2,p.sc*.3);
       if(o.spin){ctx.save();ctx.translate(p.sx,y+h/2);ctx.rotate(o.spin);ctx.drawImage(o.img,-w/2,-h/2,w,h);ctx.restore()}
       else ctx.drawImage(o.img,x,y,w,h);
+      if(k.remote&&k.name){const fs=Math.max(8,Math.min(15,w*.1));ctx.font=`bold ${fs}px Arial`;ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.lineWidth=3;ctx.lineJoin='round';ctx.strokeStyle='rgba(0,0,0,.85)';ctx.strokeText(k.name,p.sx,y-2);ctx.fillStyle='#fff';ctx.fillText(k.name,p.sx,y-2)}
       if(o.star){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.4+.3*Math.sin(t*30);ctx.drawImage(o.img,x,y,w,h);ctx.restore();GLOWS.push([p.sx,y+h*.5,w*.7,`hsl(${(t*400)%360},100%,60%)`,.55])}
       if(k.boost>0){const fw=w*0.2,fh=fw*1.4*(0.85+0.3*Math.sin(t*50));ctx.drawImage(SPR.flame,p.sx-w*0.28-fw/2,y+h*0.82,fw,fh);ctx.drawImage(SPR.flame,p.sx+w*0.28-fw/2,y+h*0.82,fw,fh);GLOWS.push([p.sx,y+h*.9,w*.5,'#ff9d2e',.5])}
       if(TRK.night){GLOWS.push([p.sx-w*.26,y+h*.53,w*.022,'#ff2a2a',.7],[p.sx+w*.26,y+h*.53,w*.022,'#ff2a2a',.7])}
@@ -874,7 +896,7 @@ function onMotion(e){const a=e.accelerationIncludingGravity;if(!a||a.x==null||a.
   let A=(screen.orientation&&typeof screen.orientation.angle==='number')?screen.orientation.angle:(window.orientation||0);A=((A%360)+360)%360;
   let sx,up;if(A===90){sx=-dy;up=dx}else if(A===270){sx=dy;up=-dx}else if(A===180){sx=-dx;up=-dy}else{sx=dx;up=dy}
   if(Math.hypot(sx,up)<4)return;tilt.has=true;tilt.raw=Math.atan2(sx,-up)*180/Math.PI;
-  let d=tilt.raw-tilt.off;d=Math.abs(d)<5?0:d-Math.sign(d)*5;let t=clamp(d/SET.tilt,-1,1);t=Math.sign(t)*Math.pow(Math.abs(t),1.45);if(ctlMode===2)t=-t;tilt.s+=(t-tilt.s)*0.26;tilt.steer=tilt.s}
+  let d=tilt.raw-tilt.off;d=Math.abs(d)<3.5?0:d-Math.sign(d)*3.5;let t=clamp(d/SET.tilt,-1,1);t=Math.sign(t)*Math.pow(Math.abs(t),1.2);if(ctlMode===2)t=-t;tilt.s+=(t-tilt.s)*0.34;tilt.steer=tilt.s}
 async function enableTilt(){try{if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){const r=await DeviceMotionEvent.requestPermission();if(r!=='granted')return false}
   if(!tilt.listening){addEventListener('devicemotion',onMotion);tilt.listening=true}return true}catch(e){return false}}
 const CTL_TXT=['🎮 Control: botones','📱 Control: inclinar','📱 Inclinar (al revés)'];
@@ -918,5 +940,6 @@ window.__boot=boot;setTimeout(()=>{if(!window.__started){window.__started=1;boot
 </script>
 <script src="../voz-natural.js"></script>
 <script src="v4.js"></script>
+<script src="net.js"></script>
 </body>
 </html>
