@@ -26,6 +26,7 @@ header #pname{margin:0;flex:1;min-width:0;background:#15120c;border:1px solid #4
 header #pname::placeholder{color:var(--mut)}
 .ghost{background:#15120c;color:var(--pri2);border:1px solid #4a3b1c;width:44px;padding:0;font-size:20px;box-shadow:none}
 .menu{margin-top:10px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.menu .wide{grid-column:1/-1;border-color:var(--pri)!important;color:var(--pri2)!important}
 .menu button{background:#15120c;color:var(--tx);border:1px solid #4a3b1c;box-shadow:none;font-size:14px}
 button,select,input,textarea{font:inherit;color:inherit}
 button{background:linear-gradient(135deg,var(--pri),var(--pri2));color:var(--on);border:0;border-radius:12px;padding:10px 14px;min-height:42px;cursor:pointer;font-weight:700;box-shadow:0 2px 10px rgba(184,146,58,.28);transition:transform .08s,opacity .15s}
@@ -133,6 +134,7 @@ body.pres .stage #cv{height:calc(100dvh - 110px)}
     <button id="bCsv">📊 Materiales CSV</button>
     <button id="bSvg">🖼️ Exportar lámina</button>
     <button id="bSvgAll">🗂️ Todas las láminas</button>
+    <button id="bCurso" class="wide">🎓 Curso de capacitación</button>
   </div>
   <input type="file" id="file" accept=".json" hidden>
 </header>
@@ -454,6 +456,7 @@ $("bCotas").onclick=()=>{S.cotas=S.cotas===false;cotasBtn();save();draw()};
 $("bPres").onclick=()=>{closeSheets();const on=document.body.classList.toggle("pres");$("bPres").textContent=on?"↩️ Salir de presentación":"🖼️ Presentación";if(on)fit();selUpdate();draw()};
 $("presExit").onclick=()=>$("bPres").click();
 $("bSvg").onclick=()=>download((S.name||"plano")+"-"+VISTA+".svg",sheetSvg(VISTA),"image/svg+xml");
+$("bCurso").onclick=()=>{location.href="curso.html"};
 $("bSvgAll").onclick=()=>{VISTAS.forEach(([k],i)=>setTimeout(()=>download((S.name||"plano")+"-"+k+".svg",sheetSvg(k),"image/svg+xml"),i*600))};
 /* navegación y menú */
 function go(p){document.body.dataset.p=p;document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.go===p));try{localStorage.setItem("planos-panel",p)}catch(e){}window.scrollTo(0,0);if(p==="plano")try{draw()}catch(e){}closeSheetsSafe()}

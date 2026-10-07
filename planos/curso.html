@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Curso · Planos El Patrón</title>
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<link rel="icon" type="image/png" href="logo-icon-96.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root{--bg:#000;--card:#0e0d0b;--card2:#15120c;--tx:#f3e9d2;--mut:#a89c80;--bd:#2d261a;--pri:#b8923a;--pri2:#e8cd85;--on:#17110a;--ok:#4ade80;--bad:#ef4444;--sh:0 8px 24px rgba(0,0,0,.55);color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden}
+[hidden]{display:none!important}
+header{position:sticky;top:0;z-index:10;background:#000;border-bottom:1px solid #4a3b1c;padding:calc(8px + env(safe-area-inset-top)) 14px 10px;box-shadow:0 6px 24px rgba(184,146,58,.18)}
+.hr{display:flex;align-items:center;gap:10px;max-width:980px;margin:0 auto}
+.hr img{width:42px;height:42px;border-radius:10px}
+.hr b{font-family:Georgia,"Times New Roman",serif;letter-spacing:.06em;color:var(--pri2);font-size:17px;display:block;line-height:1.1}
+.hr small{color:var(--mut);font-size:11px;letter-spacing:.14em}
+.hr .sp{flex:1}
+.bar{max-width:980px;margin:8px auto 0;height:8px;border-radius:99px;background:#1b160c;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--pri),var(--pri2));transition:width .4s}
+a.btn,button{font:inherit;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:10px 16px;border:0;border-radius:12px;background:linear-gradient(135deg,var(--pri),var(--pri2));color:var(--on);font-weight:700;cursor:pointer;text-decoration:none;box-shadow:0 2px 10px rgba(184,146,58,.28)}
+button.sec,a.sec{background:var(--card2);color:var(--tx);border:1px solid #4a3b1c;box-shadow:none}
+button:active{transform:scale(.97)}
+main{max-width:980px;margin:0 auto;padding:16px 14px 90px}
+h1{font-family:Georgia,serif;font-size:28px;margin:6px 0 6px;color:var(--pri2);line-height:1.15}
+h2{font-size:22px;margin:0 0 4px}
+h3{font-size:17px;margin:0 0 6px;color:var(--pri2)}
+.lead{color:var(--mut);margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.mod{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:14px;box-shadow:var(--sh);text-align:left;color:var(--tx);display:block;width:100%;font-weight:400;min-height:0}
+.mod:active{transform:scale(.98)}
+.mod .top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.mod .ico{font-size:30px}
+.mod b{font-size:16px;display:block}
+.mod small{color:var(--mut)}
+.mod .chk{margin-left:auto;font-size:22px}
+.mod.done{border-color:#2f6b45}
+.hero{display:flex;gap:16px;align-items:center;background:var(--card);border:1px solid #4a3b1c;border-radius:20px;padding:16px;margin-bottom:16px;flex-wrap:wrap}
+.hero img{width:150px;border-radius:14px;mix-blend-mode:lighten}
+.hero>div{flex:1;min-width:220px}
+.step{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:var(--sh)}
+.step .row{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:760px){.step .row.has{grid-template-columns:1fr 280px;align-items:start}}
+.step img{width:100%;max-width:280px;border-radius:16px;border:1px solid #4a3b1c;display:block;margin:0 auto}
+.step figcaption{font-size:12.5px;color:var(--mut);text-align:center;margin-top:6px}
+figure{margin:0}
+.num{display:inline-flex;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--pri2));color:var(--on);font-weight:800;align-items:center;justify-content:center;margin-right:8px;font-size:14px}
+ul,ol{padding-left:20px;margin:6px 0}li{margin:3px 0}
+.tip,.warn{border-radius:12px;padding:10px 12px;margin:10px 0;font-size:14.5px}
+.tip{background:#142016;border:1px solid #2f6b45}.warn{background:#2a1a10;border:1px solid #9a5a1c}
+.frase{display:flex;gap:8px;align-items:center;background:var(--card2);border:1px solid var(--bd);border-radius:12px;padding:8px 10px;margin:6px 0}
+.frase span{flex:1;font-style:italic}
+.frase button{min-height:36px;padding:4px 10px;font-size:13px}
+.prac{background:var(--card);border:1px dashed var(--pri);border-radius:18px;padding:14px;margin-bottom:14px}
+.prac label{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--bd);cursor:pointer}
+.prac label:last-child{border:0}
+.prac input{width:22px;height:22px;margin-top:2px;accent-color:#b8923a;flex:none}
+.prac input:checked+span{color:var(--mut);text-decoration:line-through}
+.quiz{background:var(--card);border:1px solid #4a3b1c;border-radius:18px;padding:14px;margin-bottom:14px}
+.q{margin:14px 0 18px}
+.q p{font-weight:700;margin:0 0 8px}
+.opt{display:block;width:100%;text-align:left;margin:6px 0;background:var(--card2);color:var(--tx);border:1px solid var(--bd);box-shadow:none;font-weight:500;justify-content:flex-start;min-height:46px}
+.opt.good{border-color:var(--ok);background:#10231a}.opt.bad{border-color:var(--bad);background:#2a1212}
+.exp{font-size:14px;color:var(--mut);margin-top:6px}
+.nav{display:flex;gap:10px;justify-content:space-between;margin:16px 0;flex-wrap:wrap}
+.score{font-size:20px;font-weight:800}
+.cert{background:#fff;color:#1a1306;border:8px double #b8923a;border-radius:6px;padding:28px 18px;text-align:center;max-width:720px;margin:12px auto}
+.cert img{width:190px;border-radius:12px}
+.cert h2{font-family:Georgia,serif;font-size:30px;color:#7a5a12;margin:10px 0}
+.cert .nm{font-family:Georgia,serif;font-size:30px;border-bottom:2px solid #b8923a;display:inline-block;padding:0 24px;margin:8px 0;min-width:240px}
+.cert p{margin:6px 0;color:#3a2f14}
+input[type=text]{font:inherit;width:100%;padding:12px;border-radius:12px;border:1px solid #4a3b1c;background:#15120c;color:var(--tx);font-size:16px}
+@media print{body{background:#fff}header,.nav,.noprint,main>*:not(#certbox){display:none!important}main{padding:0}.cert{border-width:10px;margin:0 auto;box-shadow:none}.cert img{mix-blend-mode:normal}}
+</style>
+</head>
+<body>
+<header class="noprint">
+  <div class="hr"><img src="logo-icon.png" alt="El Patrón"><div><b>CURSO · EL PATRÓN</b><small>PLANOS DE REFERENCIA</small></div><span class="sp"></span><a class="btn sec" href="index.html">↩️ App</a></div>
+  <div class="bar"><i id="pbar"></i></div>
+</header>
+<main id="app"></main>
+<script>
+const KEY="curso-patron-v1";
+let ST={done:{},prac:{},exam:0,name:""};
+try{ST=Object.assign(ST,JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const IMG=n=>`curso-img/${n}.jpg`;
+
+/* ============ CONTENIDO ============ */
+const MODS=[
+{id:"m0",ico:"👋",t:"Bienvenido",min:4,sub:"Qué es la app y cómo se organiza",
+ steps:[
+  {h:"Para qué sirve",p:`<p>Sustituye tus planos hechos a mano en CorelDRAW. Con ella <b>levantas</b> la obra, <b>dibujas</b> cuartos, muros de tabla roca, techos de lámina y demoliciones, y te saca <b>láminas</b> listas: acabados, puertas y ventanas, inventario, eléctrico, hidráulico y sanitario.</p><div class="tip">🎯 Es un <b>plano de referencia</b>: sirve para que todos entiendan la remodelación. Las medidas finales se confirman en obra, así que no hace falta la exactitud de un plano de ingeniería.</div>`},
+  {h:"Las 5 secciones",img:"01-plano",cap:"Abajo siempre ves la barra con las 5 secciones.",p:`<ul><li>🗺️ <b>Plano</b>: tu dibujo grande.</li><li>🤖 <b>Agente</b>: hablas o escribes y él dibuja. Incluye la cámara.</li><li>🏠 <b>Cuartos</b>: lista y edición a mano, calco del escaneo y verificación.</li><li>📊 <b>Cuadros</b>: totales, materiales e inventario.</li><li>⚙️ <b>Más</b>: tu equipo, la nube y las reglas de instalación.</li></ul><div class="tip">💡 Arriba tienes tu logo y el nombre del proyecto. El botón ☰ guarda, abre y exporta.</div>`},
+  {h:"Cómo se aprende aquí",p:`<p>Cada módulo tiene <b>pasos con capturas</b>, <b>frases para copiar</b>, una <b>práctica</b> y un <b>mini examen</b>. Al final hay un examen general y tu <b>certificado</b> con tu nombre. Puedes parar y seguir cuando quieras: tu avance se guarda en este teléfono.</p>`}
+ ],
+ prac:["Abrí la app y encontré las 5 secciones de abajo","Toqué ☰ y vi las opciones del menú"],
+ quiz:[
+  {q:"¿Qué tipo de plano genera la app?",o:["Un plano de ingeniería exacto al milímetro","Un plano de referencia para que todos entiendan la remodelación; las medidas finales se confirman en obra","Solo croquis a mano alzada"],a:1,e:"Es de referencia: no necesitas exactitud extrema."},
+  {q:"¿Cuántas secciones tiene la barra de abajo?",o:["3","5","8"],a:1,e:"Plano, Agente, Cuartos, Cuadros y Más."},
+  {q:"¿Necesitas cuenta para empezar a dibujar?",o:["Sí, sin cuenta no abre","No para dibujar; la cuenta se necesita para el agente y la nube","Solo para exportar"],a:1,e:"La app funciona sin cuenta. El agente y compartir con tu equipo sí requieren entrar."}
+ ]},
+
+{id:"m1",ico:"🔐",t:"Entrar y tu equipo",min:5,sub:"Cuenta, código de invitación, nube",
+ steps:[
+  {h:"Entrar con tu correo",img:"16-mas",cap:"⚙️ Más → Equipo y nube.",p:`<ol><li>Toca <b>⚙️ Más</b> en la barra de abajo.</li><li>En <b>Equipo y nube</b> escribe tu correo y contraseña (mínimo 6) y toca <b>Entrar</b>. Si es tu primera vez, toca <b>Crear cuenta</b>.</li><li>Une tu cuenta a tu equipo con el <b>código de invitación</b> que te dé el administrador.</li></ol><div class="warn">🔒 El código de invitación es privado. No lo publiques ni lo mandes a desconocidos. (En esta captura es un código de ejemplo.)</div>`},
+  {h:"Subir y abrir proyectos",p:`<ul><li>☁️ <b>Subir proyecto</b>: guarda el plano en la nube para todo tu equipo.</li><li>Abajo aparece la lista de proyectos del equipo; tócalos para abrirlos.</li><li>💾 Además, en ☰ puedes <b>Guardar JSON</b> como respaldo en tu teléfono.</li></ul>`},
+  {h:"Deja la app en tu pantalla de inicio",p:`<ol><li>Abre la app en <b>Safari</b> (iPhone) o Chrome (Android).</li><li>Toca <b>Compartir</b> (el cuadro con flecha).</li><li>Elige <b>Añadir a pantalla de inicio</b>. Quedará con el ícono del charro. 🎩</li></ol>`}
+ ],
+ prac:["Entré con mi correo","Veo el nombre de mi equipo en Equipo y nube","Agregué la app a mi pantalla de inicio"],
+ quiz:[
+  {q:"¿Dónde inicias sesión?",o:["En ☰ Menú","En ⚙️ Más → Equipo y nube","En 🗺️ Plano"],a:1,e:"Todo lo de cuenta y equipo vive en ⚙️ Más."},
+  {q:"¿Para qué sirve el código de invitación?",o:["Para borrar el proyecto","Para que otra persona se una a tu equipo y vea los mismos planos","Para exportar a PDF"],a:1,e:"Y por eso es privado."},
+  {q:"¿Cómo dejas el ícono en tu pantalla de inicio en iPhone?",o:["Compartir → Añadir a pantalla de inicio","Mantener presionado el logo","Ajustes → Apps"],a:0,e:"Funciona desde Safari."}
+ ]},
+
+{id:"m2",ico:"🗺️",t:"Conoce el plano",min:6,sub:"Láminas, herramientas, zoom y selección",
+ steps:[
+  {h:"Moverte por el plano",img:"01-plano",cap:"Toca un cuarto y abajo aparece su tarjeta.",p:`<ul><li>👆 <b>Arrastra</b> con un dedo para mover.</li><li>🤏 <b>Pellizca</b> con dos dedos para acercar o alejar (o usa ＋ － a la derecha).</li><li>⤢ <b>Ajustar</b> centra todo el plano.</li><li>👆 <b>Toca un cuarto</b>: se resalta y abajo sale su tarjeta con el nombre, los m², y los botones <b>✏️ Editar</b>, <b>🎤 Decir</b> y <b>✕</b> (quita la selección).</li></ul>`},
+  {h:"Cambiar de lámina",img:"02-laminas",cap:"Toca el botón 📄 de arriba a la izquierda.",p:`<p>Cada lámina es una vista distinta del mismo plano: <b>Distribución, Croquis, Demolición, Muros y acabados, Puertas y ventanas, Inventario, Eléctrico, Hidráulico y Sanitario</b>. Eliges una y el plano cambia al instante.</p>`},
+  {h:"Herramientas",img:"03-herramientas",cap:"Botón 🛠️ junto al de láminas.",p:`<ul><li>✏️ <b>Marcar sobre el plano</b>: dibujas con el dedo (lápiz, pared, cuarto, techo, flecha, texto).</li><li>📏 <b>Cotas</b>: muestra u oculta los números de las paredes.</li><li>🖼️ <b>Presentación</b>: deja solo el plano limpio para enseñarlo o tomarle captura.</li><li>⤢ <b>Ajustar vista</b>.</li></ul>`},
+  {h:"Los colores",p:`<ul><li>⬜ <b>Gris</b>: muros existentes.</li><li>🟧 <b>Naranja</b>: muros nuevos de tabla roca.</li><li>🟦 <b>Azul rayado</b>: techo nuevo de lámina.</li><li>🟥 <b>Rojo punteado</b>: demolición.</li></ul>`}
+ ],
+ prac:["Moví y acerqué el plano con mis dedos","Cambié de lámina con el botón 📄","Toqué un cuarto y vi su tarjeta","Probé Cotas: no y volví a ponerlas"],
+ quiz:[
+  {q:"¿Cómo cambias de lámina?",o:["Con el botón 📄 de arriba a la izquierda del plano","En ⚙️ Más","Girando el teléfono"],a:0,e:"El botón muestra el nombre de la lámina actual."},
+  {q:"Tocas un cuarto: ¿qué aparece?",o:["Nada","Una tarjeta abajo con su nombre, m² y los botones Editar, Decir y ✕","Se borra"],a:1,e:"Y el cuarto se resalta en ámbar."},
+  {q:"¿Dónde están Cotas y Presentación?",o:["En 🛠️ Herramientas","En 🏠 Cuartos","En ⚙️ Más"],a:0,e:"El botón de las herramientas está junto al de láminas."},
+  {q:"¿Qué color tienen los muros nuevos de tabla roca?",o:["Gris","Naranja","Azul"],a:1,e:"Gris es existente, azul es lámina y rojo es demolición."}
+ ]},
+
+{id:"m3",ico:"🤖",t:"Habla con tu agente",min:8,sub:"Conversación sin botones, frases y correcciones",
+ steps:[
+  {h:"Una conversación sin botones",img:"10-conversacion",cap:"Una vez que tocas el 🎤, se queda escuchando.",p:`<ol><li>Toca el <b>🎤 grande</b> una sola vez y permite el micrófono.</li><li>El agente dice <i>“Te escucho. Dime qué dibujamos.”</i></li><li>Habla normal. Cuando haces una pausa, <b>entiende y dibuja</b>.</li><li>Te contesta en voz alta y <b>vuelve a escuchar solo</b>.</li><li>Para terminar di <b>“termina”</b> o toca el botón rojo ⏹.</li></ol><p>La barra de abajo te dice qué hace: <b>Te escucho… · Pensando… · Hablando…</b></p><div class="tip">🎧 Con audífonos funciona mucho mejor, y puedes <b>interrumpirlo hablando</b> si lo activas en ⚙️ de la barra.</div>`},
+  {h:"Frases que funcionan",p:`<p>Toca <b>Copiar</b> para llevarte la frase y pégala en el cuadro del agente, o dila con tu voz:</p>`,frases:["Crea un cuarto de 4 por 3","Crea un baño de 2 por 3 con regadera, inodoro y lavabo, puerta abajo de 80","Agrega una ventana de 1.20 en la pared de arriba","Pon 3 focos y 4 contactos en el cuarto 2","La calle está abajo","Divide el patio en tres cuartos iguales empezando por el fondo","Demuele la pared de arriba del cuarto 1","Tapa la ventana de la pared izquierda de 1.20"]},
+  {h:"Corregir y borrar",p:`<p>Puedes pedirle también:</p>`,frases:["Haz el baño de 2.5 por 1.5","Cámbiale el nombre al cuarto 3 a Cocina","Quita la puerta de la pared de abajo del baño","Borra el cuarto 2","Borra todo el plano"],tipx:`<div class="tip">↩️ ¿Se equivocó? Abre ⌨️ y toca <b>↩️</b> para deshacer. “Borra todo el plano” primero te pregunta si estás seguro.</div>`},
+  {h:"Escribir en lugar de hablar",img:"11-agente-escribir",cap:"El botón ⌨️ abre este cuadro.",p:`<p>Si hay mucho ruido, toca <b>⌨️</b> (encima del 🎤). Escribes la orden, tocas <b>Enviar</b>, y puedes activar <b>🔊 Que me conteste con voz</b>. Ahí también eliges la <b>voz</b> y la <b>velocidad</b>.</p><div class="tip">🎙️ Para una voz más natural: Ajustes del iPhone → Accesibilidad → Contenido hablado → Voces → Español (México) → descarga una voz <b>Mejorada</b> o <b>Premium</b>, y elígela en esta hoja.</div>`},
+  {h:"Cuando no sabe, pregunta",p:`<p>El agente <b>no adivina</b>: si falta algo, te lo pregunta. Por ejemplo, si dices “al fondo” y no has dicho dónde está la calle, te preguntará de qué lado queda. Define la calle una vez (⚙️ Más → Reglas → <b>La calle está…</b>, o dile <i>“la calle está abajo”</i>) y ya no vuelve a preguntar.</p><div class="warn">🔇 Si no oyes la voz, revisa que el <b>interruptor de silencio</b> del iPhone esté desactivado. Si bloqueas la pantalla, Safari corta el micrófono.</div>`}
+ ],
+ prac:["Toqué el 🎤 y dije: “Crea un baño de 2 por 3”","Le dije “termina” para cerrar la conversación","Probé ⌨️ y escribí una orden","Deshice una acción con ↩️","Le pedí cambiar las medidas de un cuarto"],
+ quiz:[
+  {q:"¿Cómo empiezas la conversación con el agente?",o:["Tocas el 🎤 una vez y se queda escuchando","Mantienes presionado el 🎤 todo el tiempo","Escribes en ☰ Menú"],a:0,e:"Ya no es tipo walkie-talkie: queda escuchando."},
+  {q:"¿Cómo la terminas?",o:["Cerrando Safari","Diciendo “termina” o tocando el botón rojo ⏹","No se puede terminar"],a:1,e:"También se pausa sola tras 3 minutos sin hablar."},
+  {q:"El agente se equivocó. ¿Qué haces?",o:["Borras todo a mano","Abres ⌨️ y tocas ↩️ para deshacer","Reinstalas la app"],a:1,e:"Se pueden deshacer hasta 20 acciones."},
+  {q:"¿Qué orden es mejor para el agente?",o:["Hazme un cuarto","Crea un baño de 2 por 3 con regadera, inodoro y lavabo, puerta abajo de 80","Pon algo ahí"],a:1,e:"Con medidas y detalles dibuja más rápido y mejor."},
+  {q:"Dices “al fondo” sin haber definido la calle. ¿Qué pasa?",o:["Dibuja en cualquier lado","Te pregunta de qué lado está la calle","Da error y se cierra"],a:1,e:"No adivina: pregunta lo que le falta."}
+ ]},
+
+{id:"m4",ico:"🏠",t:"Dibuja a mano",min:7,sub:"Cuartos, muros, medidas, borrar",
+ steps:[
+  {h:"Agregar elementos",img:"12-cuartos",cap:"La pestaña 🏠 Cuartos.",p:`<ol><li>Ve a <b>🏠 Cuartos</b>.</li><li>Elige qué agregas: <b>Cuarto (existente)</b>, <b>Muro nuevo tabla roca</b>, <b>Techo nuevo lámina</b> o <b>Demolición</b>.</li><li>Toca <b>+ Agregar</b> y se crea un elemento vacío.</li><li>En <b>Editar</b> ponle nombre y escribe sus medidas.</li></ol>`},
+  {h:"Medidas rápidas con el láser",p:`<p>En <b>Medidas (láser)</b> escribe todas las paredes de corrido y toca <b>Aplicar texto</b>:</p><div class="frase"><span>3.30 der 5.30 abajo 3.30 izq 5.30 arriba</span></div><p>Eso dibuja un cuarto de 3.30 × 5.30 m. También puedes agregar cada <b>+ Pared</b> con su largo y dirección. Debajo ves si <b>el cuarto cierra</b>.</p><div class="tip">🎯 Si “no cierra” por un par de centímetros, toca <b>Cerrar ajustando paredes sin confirmar</b>. Es plano de referencia, no hace falta perfecto.</div>`},
+  {h:"Existentes o nuevos",p:`<ul><li>🏚️ <b>Existentes (levantamiento)</b>: lo que ya hay en la obra.</li><li>🧱 <b>Nuevos (tabla roca / Duroc)</b>: los muros llevan estructura de postes y acabado, y cuentan en materiales.</li><li>📐 <b>Nivel de piso</b>: sube o baja el piso en cm; la app calcula relleno y escalones.</li></ul>`},
+  {h:"Seleccionar, borrar y deshacer",p:`<ol><li>Toca el cuarto en el plano para seleccionarlo.</li><li>Toca <b>✏️ Editar</b> en su tarjeta; te lleva a <b>🏠 Cuartos</b>.</li><li>En la tarjeta <b>Editar</b> toca el botón rojo <b>Borrar</b> y confirma.</li></ol><div class="tip">🎤 Más rápido: toca el cuarto, abre el agente y di <i>“bórralo”</i>.</div>`}
+ ],
+ prac:["Creé un cuarto escribiendo “3.30 der 5.30 abajo 3.30 izq 5.30 arriba”","Cambié sus muros de Existentes a Nuevos","Agregué un muro nuevo de tabla roca","Borré un cuarto de práctica"],
+ quiz:[
+  {q:"¿Cómo capturas rápido las 4 paredes de un cuarto?",o:["3.30 der 5.30 abajo 3.30 izq 5.30 arriba","Una por una en ⚙️ Más","No se puede"],a:0,e:"Medida + dirección, de corrido, y Aplicar texto."},
+  {q:"¿Qué significa “Muros de este cuarto: Nuevos”?",o:["Que ya existen","Que llevan estructura y acabado y cuentan en los materiales","Que están demolidos"],a:1,e:"Los existentes son solo levantamiento."},
+  {q:"¿Dónde borras un cuarto a mano?",o:["En 🏠 Cuartos, en la tarjeta Editar, botón rojo Borrar","En ☰ → Nuevo","En ⚙️ Más"],a:0,e:"Puedes llegar desde ✏️ Editar en la tarjeta del plano."}
+ ]},
+
+{id:"m5",ico:"📷",t:"Levantar con Magicplan",min:7,sub:"Calco del escaneo y verificación de medidas",
+ steps:[
+  {h:"El método híbrido",p:`<p>El escaneo con Magicplan dibuja bien, pero <b>sus medidas se pueden desviar 10 a 20 cm</b>. Por eso usamos los dos: <b>Magicplan para la forma</b> y tu <b>láser para confirmar</b> las paredes clave.</p><ol><li>Escanea con Magicplan y toma <b>captura de pantalla</b> del plano.</li><li>Calca esa captura en la app.</li><li>Confirma unas pocas paredes con el láser.</li></ol>`},
+  {h:"Calcar el escaneo",img:"13-calco",cap:"🏠 Cuartos → Calco del escaneo.",p:`<ol><li>En <b>Calco del escaneo</b> elige la captura de Magicplan.</li><li><b>1. Calibrar escala</b>: toca dos puntos del dibujo y escribe cuánto miden realmente (tu medida del láser).</li><li><b>2. Trazar</b>: toca las esquinas de cada cuarto sobre la imagen.</li><li><b>Terminar traza</b> cuando cierres el cuarto.</li><li>Ajusta la <b>transparencia</b> o quita el fondo cuando termines.</li></ol>`},
+  {h:"Verificar con el láser",p:`<p>En <b>🎯 Verificación de medidas</b> la app te dice <b>qué paredes conviene confirmar</b> (las más largas y las que más pesan). Mide esas con el láser y escribe el valor.</p><ul><li>Con <b>4 a 8 medidas</b> basta; no hace falta medir todo.</li><li>La app <b>recalcula las demás paredes por proporción</b> y te dice qué cambió.</li></ul><div class="tip">🗣️ También puedes decírselo al agente: <i>“la pared de arriba del cuarto 1 mide 5.30”</i>.</div>`}
+ ],
+ prac:["Calibré la escala con una medida del láser","Tracé un cuarto sobre la captura","Confirmé al menos 3 paredes con el láser"],
+ quiz:[
+  {q:"¿Para qué calibras la escala?",o:["Para cambiar el color","Para decirle a la app cuánto mide en la realidad una distancia del escaneo","Para exportar"],a:1,e:"Dos puntos y la medida real con el láser."},
+  {q:"¿Cuántas paredes conviene confirmar con el láser?",o:["Todas","Entre 4 y 8, las que la app sugiere","Ninguna"],a:1,e:"La app recalcula el resto por proporción."},
+  {q:"Confirmas una pared. ¿Qué hace la app?",o:["Nada","Recalcula las demás paredes por proporción","Borra el cuarto"],a:1,e:"Y te resume el cambio."}
+ ]},
+
+{id:"m6",ico:"📄",t:"Las láminas",min:8,sub:"Qué muestra cada una y cómo leerla",
+ steps:[
+  {h:"Distribución y Croquis",img:"01-plano",cap:"Distribución: cuartos, medidas, puertas, ventanas y muebles.",p:`<ul><li><b>Distribución</b>: el plano completo con cuartos, m², muebles, puertas y ventanas.</li><li><b>Croquis</b>: la vista limpia para dibujos a mano y notas.</li></ul>`},
+  {h:"Demolición",img:"08-demolicion",cap:"Lo que se tira, en rojo punteado.",p:`<p>Muestra las paredes por <b>demoler</b> y los vanos por <b>abrir o tapar</b>, con su medida. Lo que se retira entra solo al inventario.</p>`},
+  {h:"Muros y acabados",img:"04-muros",cap:"Tabla roca, Duroc y postes.",p:`<ul><li>🟧 <b>Tabla roca</b> en las caras interiores, con <b>base de Duroc de 10 cm</b> sobre el piso.</li><li>🟩 <b>Duroc completo</b> solo en la <b>zona de la regadera</b> y en las caras exteriores.</li><li>Postes <b>a cada 61 cm</b> (se puede cambiar a 40.6).</li></ul><p>Abajo del plano, en 📊 <b>Cuadros</b>, ves los m² de tabla roca y Duroc, postes y canal.</p>`},
+  {h:"Puertas y ventanas",img:"09-puertas",cap:"Cada abertura con su etiqueta y medida.",p:`<p>Lista de todas las aberturas con ancho, alto y si son <b>nuevas</b> (hay que abrir el vano) o <b>existentes</b>.</p>`},
+  {h:"Eléctrico, Hidráulico y Sanitario",img:"05-electrico",cap:"Eléctrico: tableros, ramal al medidor y circuitos.",p:`<p>Se trazan <b>solas</b> a partir de lo que pusiste (medidor, toma de agua, registro, focos, contactos y muebles de baño), buscando la ruta que gasta menos cable y tubo.</p><ul><li>⚡ <b>Eléctrico</b>: tablero individual por cuarto, ramal al medidor y cable por tramo.</li><li>💧 <b>Hidráulico</b>: agua fría y caliente con llaves de paso por grupo de cuartos.</li><li>🚽 <b>Sanitario</b>: drenaje con diámetros y pendientes.</li></ul>`}
+ ],
+ prac:["Revisé cada una de las 9 láminas de un proyecto","Encontré la zona de Duroc en Muros y acabados","Abrí 📊 Cuadros y leí los totales de una lámina"],
+ quiz:[
+  {q:"¿Qué acabado lleva un muro nuevo por defecto?",o:["Solo pintura","Tabla roca con base de Duroc de 10 cm; Duroc completo en la zona de regadera y exteriores","Duroc en todo"],a:1,e:"Así lo trabajas tú en obra."},
+  {q:"¿Dónde ves los totales de materiales?",o:["En 📊 Cuadros","En ⚙️ Más","En el menú ☰ → Nuevo"],a:0,e:"Y también en Materiales CSV desde ☰."},
+  {q:"¿A qué distancia van los postes por defecto?",o:["61 cm","25 cm","1 m"],a:0,e:"Se puede cambiar a 40.6 cm."},
+  {q:"Las láminas eléctrica, hidráulica y sanitaria…",o:["Hay que dibujarlas a mano","Se trazan solas con lo que colocaste","Se piden al agente una por una"],a:1,e:"Tú colocas medidor, toma de agua, registro y puntos."}
+ ]},
+
+{id:"m7",ico:"⚡",t:"Instalaciones y reglas",min:7,sub:"Eléctrico, agua, drenaje: tus reglas",
+ steps:[
+  {h:"Reglas de instalación",img:"16-mas",cap:"⚙️ Más → Reglas de instalación (toca el título para abrir).",p:`<p>Son tus criterios de obra. Ya vienen cargados:</p><ul><li>🧵 <b>Cable de uso general</b> (luces, contactos y aire acondicionado): <b>#12</b>.</li><li>🔌 Del <b>tablero del cuarto al ramal</b>: <b>#10</b>.</li><li>📏 Ramal principal al medidor: <b>#6 hasta 20 m</b>, después <b>#4</b>.</li><li>🚰 Drenaje: <b>1.5 %</b> en tubo de 4" y <b>2 %</b> en tubo de 2".</li><li>🔧 <b>Una llave de paso por cada 4 cuartos</b> (cámbialo si quieres 3).</li></ul>`},
+  {h:"Cómo piensa la instalación eléctrica",p:`<ul><li>❌ <b>No hay tablero general</b>: cada cuarto lleva su <b>tablero individual</b>, junto a su puerta.</li><li>❄️ El <b>minisplit</b> va en su <b>propio breaker y su propia caja</b>.</li><li>🔗 Los tableros se conectan a un <b>ramal compartido</b> que va al medidor en la calle.</li></ul><p>Tú solo colocas <b>medidor, focos, contactos, apagadores y minisplit</b>; los tableros se colocan solos (o dile <i>“coloca las cajas de breakers”</i>).</p>`},
+  {h:"Agua y drenaje",p:`<ul><li>🚰 Coloca la <b>toma de agua</b> (hacia la calle) y el <b>calentador</b>.</li><li>🕳️ Coloca el <b>registro</b> hacia la salida del drenaje.</li><li>La app agrupa los cuartos y marca la <b>llave de paso</b> de cada grupo, para que una fuga no deje a todos sin agua.</li></ul><div class="tip">📍 Define primero <b>de qué lado está la calle</b>: de ahí dependen el medidor, la toma y el registro.</div>`}
+ ],
+ prac:["Definí de qué lado está la calle","Coloqué medidor, toma de agua y registro","Vi la lámina Eléctrica y encontré el tablero de un cuarto","Cambié “cuartos por llave de paso” y vi el efecto en Hidráulico"],
+ quiz:[
+  {q:"¿Qué calibre se usa para luces, contactos y aire acondicionado?",o:["#14","#12","#8"],a:1,e:"Todo uso general va en #12."},
+  {q:"Ramal principal al medidor: ¿cuándo se usa #6?",o:["Hasta 20 m; después #4","Siempre","Nunca"],a:0,e:"Es un umbral que puedes cambiar."},
+  {q:"¿Hay tablero general?",o:["Sí, uno en la calle","No: cada cuarto tiene su tablero individual y el minisplit su propia caja","Solo en baños"],a:1,e:"Y todos se conectan a un ramal al medidor."},
+  {q:"Pendiente del drenaje por defecto:",o:["0.5 % y 1 %","1.5 % en 4\" y 2 % en 2\"","3 % en todo"],a:1,e:"Se cambian en Reglas de instalación."}
+ ]},
+
+{id:"m8",ico:"🪟",t:"Inventario de ventanas y puertas",min:6,sub:"Retirar, guardar y reutilizar",
+ steps:[
+  {h:"Qué entra solo",img:"15-inventario",cap:"📊 Cuadros → Inventario.",p:`<p>Todo lo que <b>retiras, tapas o demueles</b> de ventanas y puertas existentes entra solo al inventario con su medida. Dile al agente: <i>“retira la ventana de la pared izquierda del cuarto 1”</i> o <i>“tapa la ventana de 1.20”</i>.</p>`},
+  {h:"Agregar piezas que ya tienes",p:`<ol><li>En <b>Inventario</b> elige <b>Ventana</b> o <b>Puerta</b>, ancho y alto, cantidad.</li><li>Pon el <b>estado</b>: Buena, Regular o <b>Mala (no reutilizar)</b>.</li><li>Agrega <b>📷 foto</b> de la pieza, el detalle (corrediza, aluminio…) y su origen.</li><li>Toca <b>Agregar</b>.</li></ol>`},
+  {h:"Claros a la medida de tus piezas",p:`<p>En los <b>muros nuevos</b> los claros se dejan <b>a la medida de las piezas que ya tienes</b>. Toca <b>🪟 Ajustar claros nuevos a las piezas</b> (o di <i>“deja los claros según las ventanas que tengo”</i>). La lámina Inventario marca cuáles piezas se <b>reutilizan</b> y cuáles <b>hay que comprar</b>.</p>`}
+ ],
+ prac:["Registré una ventana en el inventario con foto","Marqué una pieza como “Mala” y vi que no se reutiliza","Usé “Ajustar claros nuevos a las piezas”"],
+ quiz:[
+  {q:"¿Qué entra solo al inventario?",o:["Todos los muebles","Las ventanas y puertas existentes que retiras, tapas o demueles","Los focos"],a:1,e:"Con su ancho y alto."},
+  {q:"¿Qué hace “Ajustar claros nuevos a las piezas”?",o:["Borra las piezas","Deja los claros de los muros nuevos a la medida de las piezas guardadas","Cambia el color"],a:1,e:"Así reutilizas lo que ya tienes."},
+  {q:"¿Una pieza en estado “Mala” se reutiliza?",o:["Sí","No"],a:1,e:"Aparece para comprar otra."}
+ ]},
+
+{id:"m9",ico:"🎥",t:"Cámara y marcas",min:6,sub:"Recorrer la obra y dibujar sobre el plano",
+ steps:[
+  {h:"Cámara en vivo por turnos",img:"17-agente-tab",cap:"🤖 Agente → Cámara en vivo.",p:`<ol><li>Ve a <b>🤖 Agente</b> y toca <b>📷 Abrir cámara</b>.</li><li>Camina por la obra y <b>habla</b> o escribe lo que ves y decides: <i>“este patio lo dividimos en tres y ese árbol lo cortamos”</i>.</li><li>Toca <b>📸 Mirar y enviar</b>, o deja marcado <b>Enviar solo al dejar de hablar</b>.</li><li>El agente <b>mira la foto</b>, decide, dibuja y te contesta en voz.</li></ol><div class="warn">📏 El agente <b>no mide con la imagen</b>: las medidas las das tú.</div>`},
+  {h:"Bitácora",p:`<p>Con <b>📒 Guardar la foto en la bitácora</b> cada turno guarda la foto con tu nota, para recordar qué viste y decidiste en cada rincón.</p>`},
+  {h:"Marcar sobre el plano",p:`<p>En 🗺️ <b>Plano → 🛠️ → ✏️ Marcar sobre el plano</b> dibujas con el dedo: <b>Lápiz, Pared, Cuarto, Techo, Flecha, Texto</b> y <b>Borrar</b>. Cada marca tiene un número (M1, M2…).</p><p>Luego se lo pasas al agente: </p>`,frases:["Convierte la marca M1 en un cuarto de 3 por 4","Convierte M2 en un muro de tabla roca"]}
+ ],
+ prac:["Abrí la cámara y le describí un espacio al agente","Hice una marca con el lápiz sobre el plano","Convertí una marca en un cuarto con el agente"],
+ quiz:[
+  {q:"¿Qué manda la cámara al agente?",o:["Un video completo","Un fotograma junto con lo que dices; no mide con la imagen","Medidas automáticas"],a:1,e:"Las medidas siempre las das tú."},
+  {q:"¿Para qué sirve la bitácora?",o:["Para imprimir","Para guardar las fotos con tus notas de cada turno","Para borrar"],a:1,e:"Es tu memoria del recorrido."},
+  {q:"¿Cómo conviertes una marca en un cuarto?",o:["Se pide al agente: “convierte la marca M1 en un cuarto de 3 por 4”","Es imposible","Borrándola"],a:0,e:"Si no das medidas, usa las aproximadas del dibujo."}
+ ]},
+
+{id:"m10",ico:"📤",t:"Exportar y presentar",min:5,sub:"Láminas, materiales y respaldo",
+ steps:[
+  {h:"El menú ☰",img:"18-menu",cap:"Toca ☰ arriba a la derecha.",p:`<ul><li>🖼️ <b>Exportar lámina</b>: descarga la lámina que estás viendo en <b>SVG</b>, con tu logo arriba y el sello abajo.</li><li>🗂️ <b>Todas las láminas</b>: descarga las 9.</li><li>📊 <b>Materiales CSV</b>: la lista de materiales para Excel.</li><li>💾 <b>Guardar JSON</b> y 📂 <b>Abrir</b>: respaldo de tu proyecto.</li><li>🆕 <b>Nuevo</b>: empieza un proyecto en blanco (guarda antes).</li></ul>`},
+  {h:"Cotas y presentación",img:"03-herramientas",cap:"🛠️ Herramientas.",p:`<p>Para enseñar el plano al cliente o a los albañiles: <b>🛠️ → 🖼️ Presentación</b> quita todo menos el dibujo. Combínalo con <b>📏 Cotas: no</b> para un plano limpio, o déjalas en <b>sí</b> para uno con medidas. Sales con <b>↩️ Salir de presentación</b>.</p>`},
+  {h:"Compartir con tu equipo",p:`<p>En <b>⚙️ Más → Subir proyecto</b> lo guardas en la nube y tu equipo lo abre desde su teléfono. Para mandarlo por WhatsApp o correo, exporta la lámina en SVG o toma captura en Presentación.</p>`}
+ ],
+ prac:["Exporté una lámina en SVG","Descargué los Materiales CSV","Guardé mi proyecto con Guardar JSON","Probé el modo Presentación con Cotas: no"],
+ quiz:[
+  {q:"¿Cómo exportas la lámina que estás viendo?",o:["☰ → Exportar lámina","⚙️ Más → Nuevo","No se puede"],a:0,e:"Sale en SVG con tu logo y sello."},
+  {q:"¿Cómo quitas los números de las paredes?",o:["🛠️ → Cotas: no","Borrando el cuarto","Reiniciando la app"],a:0,e:"También se aplican a lo que exportas."},
+  {q:"¿Cómo respaldas tu proyecto?",o:["Guardar JSON en ☰, o Subir proyecto en ⚙️ Más","No hace falta","Con captura de pantalla"],a:0,e:"Haz ambas para estar tranquilo."}
+ ]}
+];
+
+const ALLQ=()=>MODS.flatMap(m=>m.quiz.map(q=>({...q,mod:m.t})));
+
+/* ============ VISTAS ============ */
+let view="home",cur=null;
+function pct(){return Math.round(100*MODS.filter(m=>ST.done[m.id]!==undefined).length/MODS.length)}
+function bar(){const p=pct()+(ST.exam>=8?0:0);$("pbar").style.width=p+"%"}
+function go(v,id){view=v;cur=id||null;try{history.replaceState(null,"","#"+v+(id?"/"+id:""))}catch(e){}render();window.scrollTo(0,0)}
+function render(){bar();const a=$("app");
+  if(view==="home")a.innerHTML=home();
+  else if(view==="mod")a.innerHTML=modView(MODS.find(m=>m.id===cur));
+  else if(view==="exam")a.innerHTML=examView();
+  else if(view==="cert")a.innerHTML=certView();
+  wire();
+}
+function home(){
+  const nextM=MODS.find(m=>ST.done[m.id]===undefined),p=pct();
+  return `<div class="hero"><img src="personaje.jpg" alt="El Patrón"><div><h1>Curso de la app</h1><p class="lead">Aprende a levantar, dibujar y sacar tus láminas en <b>${MODS.length} módulos</b> cortos con capturas reales, frases para copiar, práctica y examen. Al final te llevas tu <b>certificado</b>.</p><p><b>${p}%</b> completado ${nextM?"":" · 🎉 ¡Listo!"}</p>${nextM?`<button data-act="mod" data-id="${nextM.id}">${p?"▶️ Continuar":"🚀 Empezar"} · ${nextM.t}</button>`:`<button data-act="exam">🏁 Ir al examen final</button>`}</div></div>
+  <div class="grid">${MODS.map((m,i)=>`<button class="mod ${ST.done[m.id]!==undefined?"done":""}" data-act="mod" data-id="${m.id}"><div class="top"><span class="ico">${m.ico}</span><div><b>${i+1}. ${esc(m.t)}</b><small>${m.min} min · ${esc(m.sub)}</small></div><span class="chk">${ST.done[m.id]!==undefined?"✅":"▫️"}</span></div></button>`).join("")}
+  <button class="mod ${ST.exam>=8?"done":""}" data-act="exam"><div class="top"><span class="ico">🏁</span><div><b>Examen final</b><small>10 preguntas · necesitas 8 · ${ST.exam?"mejor: "+ST.exam+"/10":"sin intentar"}</small></div><span class="chk">${ST.exam>=8?"✅":"▫️"}</span></div></button>
+  <button class="mod" data-act="cert"><div class="top"><span class="ico">🎓</span><div><b>Mi certificado</b><small>${ST.exam>=8?"Disponible para imprimir":"Se desbloquea al aprobar el examen"}</small></div><span class="chk">${ST.exam>=8?"🔓":"🔒"}</span></div></button></div>
+  <p class="lead" style="margin-top:18px">💡 Tu avance se guarda en este teléfono. ${p?"":"Empieza por el módulo 1."}</p>
+  <p><a class="btn sec" href="index.html">↩️ Volver a la app</a></p>`;
+}
+function stepHtml(s,i){
+  return `<div class="step"><h3><span class="num">${i+1}</span>${s.h}</h3><div class="row ${s.img?"has":""}"><div>${s.p||""}${(s.frases||[]).map(f=>`<div class="frase"><span>“${esc(f)}”</span><button class="sec" data-copy="${esc(f)}">📋 Copiar</button></div>`).join("")}${s.tipx||""}</div>${s.img?`<figure><img loading="lazy" src="${IMG(s.img)}" alt="${esc(s.h)}"><figcaption>${esc(s.cap||"")}</figcaption></figure>`:""}</div></div>`;
+}
+function quizHtml(qs,pref){
+  return qs.map((q,qi)=>`<div class="q" data-q="${pref}-${qi}"><p>${qi+1}. ${esc(q.q)}</p>${q.o.map((o,oi)=>`<button class="opt" data-qi="${qi}" data-oi="${oi}">${esc(o)}</button>`).join("")}<div class="exp" hidden></div></div>`).join("");
+}
+function modView(m){
+  const i=MODS.indexOf(m),prev=MODS[i-1],next=MODS[i+1];
+  return `<p><button class="sec" data-act="home">⬅️ Módulos</button></p><h1>${m.ico} ${i+1}. ${esc(m.t)}</h1><p class="lead">${m.min} min · ${esc(m.sub)}</p>
+  ${m.steps.map(stepHtml).join("")}
+  <div class="prac"><h3>✋ Práctica en la app</h3><p class="lead" style="margin-bottom:4px">Abre la app en otra pestaña y hazlo de verdad:</p>${m.prac.map((t,k)=>`<label><input type="checkbox" data-prac="${m.id}-${k}" ${ST.prac[m.id+"-"+k]?"checked":""}><span>${esc(t)}</span></label>`).join("")}<p style="margin-top:10px"><a class="btn sec" href="index.html" target="_blank" rel="noopener">📱 Abrir la app</a></p></div>
+  <div class="quiz"><h3>📝 Mini examen</h3><div id="quiz">${quizHtml(m.quiz,m.id)}</div><p class="score" id="qres">${ST.done[m.id]!==undefined?"✅ Módulo completado ("+ST.done[m.id]+"/"+m.quiz.length+")":""}</p></div>
+  <div class="nav">${prev?`<button class="sec" data-act="mod" data-id="${prev.id}">⬅️ ${esc(prev.t)}</button>`:"<span></span>"}${next?`<button data-act="mod" data-id="${next.id}">${esc(next.t)} ➡️</button>`:`<button data-act="exam">🏁 Examen final</button>`}</div>`;
+}
+let EX=null;
+function examView(){
+  if(!EX){const q=ALLQ().sort(()=>Math.random()-.5).slice(0,10);EX={q,ans:0,ok:0}}
+  return `<p><button class="sec" data-act="home">⬅️ Módulos</button></p><h1>🏁 Examen final</h1><p class="lead">10 preguntas de todo el curso. Necesitas <b>8 aciertos</b> para tu certificado. Mejor resultado: <b>${ST.exam}/10</b>.</p>
+  <div class="quiz"><div id="exq">${quizHtml(EX.q,"ex")}</div><p class="score" id="exres"></p></div><div class="nav"><button class="sec" data-act="newexam">🔄 Otro examen</button></div>`;
+}
+function certView(){
+  if(ST.exam<8)return `<p><button class="sec" data-act="home">⬅️ Módulos</button></p><h1>🎓 Certificado</h1><div class="warn">🔒 Aprueba el examen final con <b>8 de 10</b> para desbloquearlo.</div><p><button data-act="exam">🏁 Ir al examen</button></p>`;
+  const f=new Date().toLocaleDateString("es-MX",{day:"numeric",month:"long",year:"numeric"});
+  return `<p class="noprint"><button class="sec" data-act="home">⬅️ Módulos</button></p><h1 class="noprint">🎓 Mi certificado</h1><div class="noprint"><label class="lead">Escribe tu nombre completo:</label><input type="text" id="cname" value="${esc(ST.name)}" placeholder="Tu nombre" autocomplete="name"><p><button id="cprint">🖨️ Imprimir o guardar PDF</button></p></div>
+  <div class="cert" id="certbox"><img src="emblema.jpg" alt="El Patrón"><p style="letter-spacing:.3em;font-size:12px">CERTIFICADO DE CAPACITACIÓN</p><h2>Planos El Patrón</h2><p>Se otorga a</p><div class="nm" id="cn">${esc(ST.name||"Tu nombre")}</div><p>por completar el curso de la aplicación de planos de referencia<br>y aprobar el examen final con <b>${ST.exam}/10</b>.</p><p>${f}</p><p style="font-size:12px;margin-top:14px">Departamentos El Patrón</p></div>`;
+}
+function wire(){
+  const a=$("app");
+  a.querySelectorAll("[data-act]").forEach(b=>b.onclick=()=>{const t=b.dataset.act;if(t==="newexam"){EX=null;render();return}go(t,b.dataset.id)});
+  a.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{const t=b.dataset.copy;try{await navigator.clipboard.writeText(t)}catch(e){const x=document.createElement("textarea");x.value=t;document.body.appendChild(x);x.select();try{document.execCommand("copy")}catch(_){}x.remove()}const o=b.textContent;b.textContent="✅ Copiado";setTimeout(()=>b.textContent=o,1200)});
+  a.querySelectorAll("[data-prac]").forEach(c=>c.onchange=()=>{ST.prac[c.dataset.prac]=c.checked;save()});
+  if(view==="mod"){const m=MODS.find(x=>x.id===cur);wireQuiz($("quiz"),m.quiz,m.id,(ok,n)=>{$("qres").textContent=`${ok}/${n} aciertos`+(ok/n>=0.6?" · ✅ ¡Módulo completado!":" · 🔁 Repasa y vuelve a intentarlo");if(ok/n>=0.6){ST.done[m.id]=Math.max(ST.done[m.id]||0,ok);save();bar()}})}
+  if(view==="exam"){wireQuiz($("exq"),EX.q,"ex",(ok,n)=>{$("exres").textContent=`${ok}/${n} aciertos`+(ok>=8?" · 🎉 ¡Aprobado! Ya puedes sacar tu certificado.":" · 🔁 Necesitas 8. Repasa e inténtalo otra vez.");if(ok>ST.exam){ST.exam=ok;save()}if(ok>=8){const b=document.createElement("p");b.innerHTML='<button data-act="cert">🎓 Ver mi certificado</button>';$("exres").after(b);b.firstChild.onclick=()=>go("cert")}})}
+  if(view==="cert"&&ST.exam>=8){$("cname").oninput=e=>{ST.name=e.target.value;save();$("cn").textContent=ST.name||"Tu nombre"};$("cprint").onclick=()=>window.print()}
+}
+function wireQuiz(box,qs,pref,done){
+  let ans=0,ok=0;
+  box.querySelectorAll(".q").forEach((qEl,qi)=>{
+    qEl.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+      if(qEl.dataset.done)return;qEl.dataset.done="1";ans++;const oi=+b.dataset.oi,q=qs[qi];
+      qEl.querySelectorAll(".opt").forEach((x,k)=>{x.disabled=true;if(k===q.a)x.classList.add("good")});
+      if(oi===q.a)ok++;else b.classList.add("bad");
+      const e=qEl.querySelector(".exp");e.hidden=false;e.textContent=(oi===q.a?"✅ ¡Correcto! ":"❌ Casi. ")+q.e;
+      if(ans===qs.length)done(ok,qs.length);
+    });
+  });
+}
+(function(){const h=location.hash.replace("#","").split("/");if(h[0]==="mod"&&MODS.some(m=>m.id===h[1])){view="mod";cur=h[1]}else if(["exam","cert"].includes(h[0]))view=h[0];render()})();
+</script>
+</body>
+</html>
