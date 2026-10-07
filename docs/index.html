@@ -182,6 +182,7 @@ body.pres .stage #cv{height:calc(100dvh - 110px)}
     <button id="bSvgAll">🗂️ Todas las láminas</button>
     <button id="bTour" class="wide">🧭 Ejercicio guiado (3 min)</button>
     <button id="bCurso" class="wide">🎓 Curso de capacitación</button>
+    <button id="bKart" class="wide">🏎️ Jugar El Patrón Kart</button>
   </div>
   <input type="file" id="file" accept=".json" hidden>
 </header>
@@ -279,7 +280,7 @@ body.pres .stage #cv{height:calc(100dvh - 110px)}
     <div class="tabs" id="mkTools" hidden></div>
     <svg id="cv" role="img" aria-label="Plano"></svg>
     <div class="zoomcol"><button id="zi" aria-label="Acercar">＋</button><button id="zo" aria-label="Alejar">－</button><button id="zf" aria-label="Ajustar">⤢</button></div>
-    <div class="empty" id="empty" hidden><img class="hero" src="personaje.jpg" alt="El Patrón"><b>Empecemos tu plano</b><span>Toca el micrófono y di, por ejemplo: <i>“crea un cuarto de 3 por 4”</i></span><div class="row" style="justify-content:center"><button data-act="agent">🎤 Hablar con el agente</button><button class="sec" data-go="cuartos">🏠 Agregar a mano</button><button class="sec" data-act="tour">🧭 Ejercicio guiado</button><button class="sec" data-href="curso.html">🎓 Curso y videos</button></div></div>
+    <div class="empty" id="empty" hidden><img class="hero" src="personaje.jpg" alt="El Patrón"><b>Empecemos tu plano</b><span>Toca el micrófono y di, por ejemplo: <i>“crea un cuarto de 3 por 4”</i></span><div class="row" style="justify-content:center"><button data-act="agent">🎤 Hablar con el agente</button><button class="sec" data-go="cuartos">🏠 Agregar a mano</button><button class="sec" data-act="tour">🧭 Ejercicio guiado</button><button class="sec" data-href="curso.html">🎓 Curso y videos</button><button class="sec" data-href="kart/index.html">🏎️ Juego</button></div></div>
     <div class="selbar" id="selbar" hidden><div id="selTxt"></div><div class="row"><button class="sec" data-act="edit">✏️ Editar</button><button data-act="agent">🎤 Decir</button><button class="sec" data-act="desel" aria-label="Quitar selección">✕</button></div></div>
     <button class="fab" id="fabAg" aria-label="Hablar con el agente">🎤</button>
     <button class="presx" id="presExit">↩️ Salir de presentación</button>
@@ -348,7 +349,7 @@ body.pres .stage #cv{height:calc(100dvh - 110px)}
     <div class="hbtns">
       <button id="hCont" class="big"></button>
       <button id="hVoz" class="sec">🎤 Hablar con el agente</button>
-      <div class="hgrid"><button id="hNew" class="sec">🆕 Nuevo proyecto</button><button id="hCuenta" class="sec">🔐 Mi equipo</button><button id="hCurso" class="sec">🎓 Curso y videos</button><button id="hTour" class="sec">🧭 Ejercicio guiado</button></div>
+      <div class="hgrid"><button id="hNew" class="sec">🆕 Nuevo proyecto</button><button id="hCuenta" class="sec">🔐 Mi equipo</button><button id="hCurso" class="sec">🎓 Curso y videos</button><button id="hKart" class="sec">🏎️ El Patrón Kart</button><button id="hTour" class="sec">🧭 Ejercicio guiado</button></div>
     </div>
     <div class="hfoot">Departamentos El Patrón · plano de referencia</div>
   </div>
@@ -534,6 +535,7 @@ $("bPres").onclick=()=>{closeSheets();const on=document.body.classList.toggle("p
 $("presExit").onclick=()=>$("bPres").click();
 $("bSvg").onclick=()=>download((S.name||"plano")+"-"+VISTA+".svg",sheetSvg(VISTA),"image/svg+xml");
 $("bCurso").onclick=()=>{location.href="curso.html"};
+$("bKart").onclick=()=>{location.href="kart/index.html"};
 $("bSvgAll").onclick=()=>{VISTAS.forEach(([k],i)=>setTimeout(()=>download((S.name||"plano")+"-"+k+".svg",sheetSvg(k),"image/svg+xml"),i*600))};
 /* navegación y menú */
 function go(p){document.body.dataset.p=p;document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.go===p));try{localStorage.setItem("planos-panel",p)}catch(e){}window.scrollTo(0,0);if(p==="plano")try{if(FITPEND){fit()}draw()}catch(e){}closeSheetsSafe()}
@@ -712,6 +714,7 @@ $("hVoz").onclick=()=>{homeHide();go("plano");setTimeout(()=>startConv(),150)};
 $("hNew").onclick=()=>{if(S.shapes.length&&!confirm("¿Empezar un proyecto nuevo? Guarda antes el JSON o súbelo a la nube si quieres conservar el actual."))return;S=blank();sel=null;fit();render();homeHide();go("plano")};
 $("hCuenta").onclick=()=>{homeHide();go("mas")};
 $("hCurso").onclick=()=>{location.href="curso.html"};
+$("hKart").onclick=()=>{location.href="kart/index.html"};
 $("hTour").onclick=()=>{homeHide();go("plano");setTimeout(()=>tourStart(),150)};
 document.querySelector(".brand").onclick=()=>{if(typeof CV!=="undefined"&&CV.on)return;closeSheets();homeShow()};
 /* ---------- ejercicio guiado (globos) ---------- */
