@@ -68,7 +68,8 @@ const FXMAP={
  trophy:[['🏆','👑','🎉','⭐'],64,'rain',null],
  slab:[['⚠️','🧱'],10,'rain',null],
  rain:[['☔','💧','🌧️'],26,'rain',null],
- barrow:[['🛒','😱'],8,'rise',null]};
+ barrow:[['🛒','😱'],8,'rise',null],
+ rata:[['🐀','🧀','🐁'],34,'rain',['¡YA CHILLÓ LA RATA!','🐀']]};
 function fx(key){if(P2||state==='menu')return;const sp=FXMAP[key];if(!sp)return;const now=performance.now();if(now-(fxCool[key]||0)<1400)return;fxCool[key]=now;
   const[em,n,mode,ban]=sp;if(key==='coin5'&&AC&&!muted)SFX.cash();
   for(let i=0;i<n;i++){const e=em[(Math.random()*em.length)|0];let x,y,vx,vy;
@@ -266,7 +267,7 @@ window.V4={
       const boards=ph?[mkBoard(ph,pn),mkBoard(ph,pn)]:[];SPR.signs=base.concat(ex,ex,ex,boards,boards,boards);SPR._signKey=key}},
   raceStart(){EV.list=[];EV.timer=13;EV.rain=0;EV.rainEver=false;EV.hits=0;EV.cem=0;EV.narT=rnd(16,24);GRIPK=1;SPEEDK=SET.speed;applyGfx();EV.boxT=rnd(5,8);EV.lapSeen=0;RAMPS=RAMPS.filter(r=>!r.tmp);if(TRK.weather==='rain'){EV.rain=1e9;EV.rainEver=true;GRIPK=.85}
     GH.rec=[];GH.tNext=0;GH.wpi=Math.max(0,WPN-3);GH.lap=0;GH.best=lsGet(ghostKey(),null);emaDt=0.016;slowN=0;loadClips()},
-  go(){speak('go',true)},
+  go(){if(player&&player.isPlayer&&player.ch&&player.ch.id==='chino')speak('rata',true);else speak('go',true)},
   speak,
   tick(dt){fxUpdate(dt);if(state!=='race'&&state!=='finish')return;
     if(state==='race'){evTick(dt);autoQuality(dt);if(player&&player.isPlayer&&player.lap>=1&&player.lap<=LAPS&&player.lap!==EV.lapSeen){EV.lapSeen=player.lap;lapObstacles(player.lap)}

@@ -114,5 +114,27 @@ NEWCH.vida=(g,s)=>{const R=s*.34;
   g.strokeStyle='#6c757d';g.lineWidth=R*.05;g.stroke();
   g.fillStyle='#7a1f2a';g.beginPath();g.ellipse(-R*.1,R*.6,R*.2,R*.12,.2,0,T);g.fill();
   g.fillStyle='#adb5bd';g.fillRect(-R*.9,R*.28,R*.35,R*.13);g.fillStyle='#868e96';g.fillRect(-R*.9,R*.33,R*.35,R*.03)};
+/* 🐀 EL CHINO: pelo chino (rizado) y una rata que chilla en la cabeza: «¡Ya chilló la rata!» */
+NEWCH.chino=(g,s)=>{const R=s*.34;
+  g.fillStyle='#2a1a12';for(let i=0;i<15;i++){const a=Math.PI*(1.0+i/14*1.0);g.beginPath();g.arc(Math.cos(a)*R*1.02,-R*.12+Math.sin(a)*R*1.0,R*.27,0,T);g.fill()}
+  for(let i=0;i<6;i++){g.beginPath();g.arc(-R*.62+i*R*.25,-R*.86+Math.sin(i*1.7)*R*.06,R*.27,0,T);g.fill()}
+  g.beginPath();g.arc(-R*1.02,R*.12,R*.2,0,T);g.arc(R*1.02,R*.12,R*.2,0,T);g.fill();
+  face(g,R,'#e6b88e');
+  g.fillStyle='#2a1a12';for(let i=0;i<8;i++){g.beginPath();g.arc(-R*.82+i*R*.235,-R*.6+(i%2?R*.07:0),R*.2,0,T);g.fill()}
+  brow(g,-R*.62,-R*.3,-R*.18,-R*.4,R*.1);brow(g,R*.18,-R*.4,R*.62,-R*.3,R*.1);
+  eye(g,-R*.38,-R*.08,R*.2,R*.24,R*.03,R*.02,R*.12);eye(g,R*.38,-R*.08,R*.2,R*.24,-R*.03,R*.02,R*.12);
+  cheeks(g,R,'rgba(230,90,90,.4)');
+  g.fillStyle='#d49a70';g.beginPath();g.ellipse(0,R*.12,R*.09,R*.07,0,0,T);g.fill();
+  g.fillStyle='#7a1f2a';g.beginPath();g.moveTo(-R*.5,R*.36);g.quadraticCurveTo(0,R*.98,R*.5,R*.36);g.quadraticCurveTo(0,R*.5,-R*.5,R*.36);g.fill();g.fillStyle='#fff';g.beginPath();g.moveTo(-R*.44,R*.38);g.quadraticCurveTo(0,R*.55,R*.44,R*.38);g.quadraticCurveTo(0,R*.46,-R*.44,R*.38);g.fill();
+  // la rata
+  g.save();g.translate(R*.0,-R*1.12);
+  g.strokeStyle='#f0a5b8';g.lineWidth=R*.08;g.lineCap='round';g.beginPath();g.moveTo(R*.5,R*.12);g.quadraticCurveTo(R*1.1,R*.1,R*1.0,-R*.25);g.quadraticCurveTo(R*.95,-R*.45,R*1.2,-R*.4);g.stroke();
+  const rg=g.createLinearGradient(0,-R*.4,0,R*.4);rg.addColorStop(0,'#bfc4ca');rg.addColorStop(1,'#7d838b');g.fillStyle=rg;g.beginPath();g.ellipse(R*.1,R*.02,R*.55,R*.36,0,0,T);g.fill();
+  g.beginPath();g.ellipse(-R*.42,R*.02,R*.32,R*.26,0,0,T);g.fill();
+  g.fillStyle='#a3a9b0';g.beginPath();g.arc(-R*.22,-R*.32,R*.2,0,T);g.arc(R*.12,-R*.34,R*.2,0,T);g.fill();g.fillStyle='#f4a6bb';g.beginPath();g.arc(-R*.22,-R*.32,R*.12,0,T);g.arc(R*.12,-R*.34,R*.12,0,T);g.fill();
+  g.fillStyle='#f4a6bb';g.beginPath();g.arc(-R*.72,R*.04,R*.07,0,T);g.fill();g.fillStyle='#111';g.beginPath();g.arc(-R*.46,-R*.06,R*.05,0,T);g.fill();g.fillStyle='#7a1f2a';g.beginPath();g.ellipse(-R*.6,R*.18,R*.1,R*.06,0,0,T);g.fill();
+  g.strokeStyle='#555';g.lineWidth=R*.025;for(const dy of[-.04,.04,.12]){g.beginPath();g.moveTo(-R*.62,R*(.05+dy));g.lineTo(-R*1.0,R*(dy*2+.0));g.stroke()}
+  g.fillStyle='#ffe066';g.font=`bold ${R*.36}px Arial Black,Arial`;g.textAlign='center';g.strokeStyle='#e03131';g.lineWidth=R*.09;g.strokeText('¡iii!',R*.95,-R*.62);g.fillText('¡iii!',R*.95,-R*.62);
+  g.restore()};
 NEWCH.has=id=>!!NEWCH[id]&&typeof NEWCH[id]==='function';
 })();

@@ -268,7 +268,8 @@ const CHARS=[
  {id:'primo',n:'El Primo Flojo',col:'#fcc419',col2:'#fff3bf',spd:0.74,hand:0.86,q:'«Mañana lo hago…»',e:'😴'},
  {id:'socanibal',n:'Socaníbal',col:'#82c91e',col2:'#e9fac8',spd:0.80,hand:1.00,q:'«¡Yo mejor me quedo en la salida!»',e:'😱'},
  {id:'agricultor',n:'El Agricultor',col:'#a0632a',col2:'#f3dfc1',spd:0.95,hand:0.66,q:'«¡Lo que se siembra, se cosecha!»',e:'🌾'},
- {id:'vida',n:'Vida',col:'#15aabf',col2:'#c5f6fa',spd:0.78,hand:0.72,q:'«¿Esto se aprieta o se afloja?»',e:'🔧'}
+ {id:'vida',n:'Vida',col:'#15aabf',col2:'#c5f6fa',spd:0.78,hand:0.72,q:'«¿Esto se aprieta o se afloja?»',e:'🔧'},
+ {id:'chino',n:'El Chino',col:'#5f3dc4',col2:'#e5dbff',spd:0.87,hand:0.82,q:'«¡Ya chilló la rata!»',e:'🐀'}
 ];
 const BASE=CHARS.length,FACE_COL=['#0ca678','#e8590c','#7048e8','#c2255c','#1098ad','#5c940d'];
 const IMG={};
@@ -916,7 +917,7 @@ function delCustom(i){if(!confirm('¿Borrar a '+CHARS[i].n+'?'))return;CHARS.spl
 function buildSelect(){const wrap=$('chars');wrap.innerHTML='';CHARS.forEach((c,i)=>{const d=document.createElement('div');d.className='ch'+(i===picked?' sel':'');const cn=document.createElement('canvas');cn.width=cn.height=120;const g=cn.getContext('2d');g.fillStyle='#0b0905';g.fillRect(0,0,120,120);g.fillStyle=(i===picked&&PAINT.c)?PAINT.c:c.col;g.beginPath();g.arc(60,64,46,0,TAU);g.fill();g.fillStyle='rgba(255,255,255,.12)';g.beginPath();g.arc(60,64,46,Math.PI,0);g.fill();drawHead(g,c,60,62,58);
   d.appendChild(cn);d.insertAdjacentHTML('beforeend',`<b>${esc(c.n)}</b><div class="bar"><i style="width:${c.spd*100}%"></i></div><div class="bar h"><i style="width:${c.hand*100}%"></i></div>`);
   if(c.custom){const x=document.createElement('span');x.className='x';x.textContent='✖';x.onclick=e=>{e.stopPropagation();delCustom(i)};d.appendChild(x)}
-  d.onclick=()=>{picked=i;audioUnlock();beep(660,.08);buildSelect()};wrap.appendChild(d)});
+  d.onclick=()=>{picked=i;audioUnlock();beep(660,.08);if(c.id==='chino'&&window.V4)V4.speak('rata',true);buildSelect()};wrap.appendChild(d)});
   $('chTag').textContent=(CHARS[picked].q||'«¡El nuevo inquilino del año!»');
   if(CHARS.length-BASE<6){const a=document.createElement('div');a.className='ch add';a.innerHTML='<div class="plus">📸</div><b>Tu cara</b>';a.onclick=()=>{audioUnlock();$('faceFile').click()};wrap.appendChild(a)}}
 /* ---------- pistas ---------- */
