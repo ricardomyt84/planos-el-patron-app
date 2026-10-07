@@ -91,6 +91,16 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:6px 8px;b
 .empty>*{pointer-events:auto}.emb{mix-blend-mode:lighten;display:block;width:min(240px,70%);margin:4px auto 12px;border-radius:14px}
 .hero{width:min(250px,72%);border-radius:14px;mix-blend-mode:lighten}.empty span{color:var(--mut);max-width:300px}
 #mkTools{position:absolute;top:58px;left:10px;right:62px;z-index:5;background:var(--card);border:1px solid var(--bd);border-radius:16px;box-shadow:var(--sh);padding:8px;flex-wrap:wrap;overflow:visible}
+.fab2{position:absolute;right:22px;bottom:84px;z-index:6;width:44px;height:44px;min-height:0;padding:0;border-radius:50%;font-size:19px;background:var(--card);color:var(--tx);border:1px solid var(--bd);box-shadow:var(--sh)}
+.fab.live{animation:pulso 1.4s infinite;background:linear-gradient(135deg,#e8cd85,#b8923a)}
+@keyframes pulso{0%{box-shadow:0 0 0 0 rgba(232,205,133,.6)}100%{box-shadow:0 0 0 22px rgba(232,205,133,0)}}
+.convbar{position:absolute;left:10px;right:86px;bottom:12px;z-index:7;display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--pri);border-radius:18px;box-shadow:var(--sh);padding:10px 12px}
+.convbar .cvtx{flex:1;min-width:0;display:flex;flex-direction:column}.convbar .cvtx b{font-size:14px;color:var(--pri2);white-space:nowrap}.convbar .cvtx span{font-size:13px;color:var(--mut);overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.convbar button{min-height:38px;min-width:38px;padding:6px 8px;font-size:16px;flex:none}
+.orb{width:16px;height:16px;border-radius:50%;background:var(--pri2);flex:none;box-shadow:0 0 0 0 rgba(232,205,133,.7);animation:pulso 1.4s infinite}
+.convbar[data-st="pen"] .orb{background:#60a5fa;animation:pulso 0.7s infinite}.convbar[data-st="hab"] .orb{background:#4ade80;animation:pulso 0.9s infinite}
+body.cv .selbar,body.cv .fab2{display:none}
+body.pres .convbar,body.pres .fab2{display:none!important}
 .sheet{position:fixed;left:10px;right:10px;bottom:calc(var(--nav) + 22px + env(safe-area-inset-bottom));z-index:40;background:var(--card);border:1px solid var(--bd);border-radius:22px;box-shadow:0 -10px 40px rgba(0,0,0,.3);padding:14px;max-height:64dvh;overflow:auto}
 .sheet h3{margin:0 0 10px;font-size:16px}
 #tabs.sheet{display:flex;flex-direction:column;gap:6px}
@@ -224,6 +234,8 @@ body.pres .stage #cv{height:calc(100dvh - 110px)}
     <div class="selbar" id="selbar" hidden><div id="selTxt"></div><div class="row"><button class="sec" data-act="edit">✏️ Editar</button><button data-act="agent">🎤 Decir</button><button class="sec" data-act="desel" aria-label="Quitar selección">✕</button></div></div>
     <button class="fab" id="fabAg" aria-label="Hablar con el agente">🎤</button>
     <button class="presx" id="presExit">↩️ Salir de presentación</button>
+    <button class="fab2" id="fabTxt" aria-label="Escribir al agente">⌨️</button>
+    <div class="convbar" id="convBar" hidden data-st=""><div class="orb"></div><div class="cvtx"><b id="cvSt">…</b><span id="cvTxt"></span></div><button class="sec" id="cvCfg" aria-label="Ajustes de voz">⚙️</button><button class="danger" id="cvStop" aria-label="Terminar conversación">⏹</button></div>
   </div>
   <div class="sheet" id="tabs" hidden></div>
   <div class="sheet" id="sheetTools" hidden>
@@ -240,7 +252,13 @@ body.pres .stage #cv{height:calc(100dvh - 110px)}
     <h3>🤖 Dile al agente qué dibujar</h3>
     <textarea id="agText2" rows="3" placeholder="Ej: baño de 2 por 2.5 con regadera en la esquina y puerta abajo"></textarea>
     <div class="row"><button class="sec" id="bMic2">🎤 Hablar</button><button id="bAg2">Enviar</button><button class="sec" id="bUndo2">↩️</button></div>
-    <label class="status"><input type="checkbox" id="agVoz" checked style="width:auto"> 🔊 Que me conteste con voz</label>
+    <label class="status"><input type="checkbox" id="agVoz" checked style="width:auto"> 🔊 Que me conteste con voz (al escribir)</label>
+    <div class="status" style="margin-top:10px"><b>🎧 Voz de la conversación</b></div>
+    <label class="status">Voz<select id="vSel"></select></label>
+    <label class="status">Velocidad <span id="vRateT"></span><input type="range" id="vRate" min="0.7" max="1.2" step="0.05" value="0.95"></label>
+    <label class="status"><input type="checkbox" id="vAud" style="width:auto"> 🎧 Uso audífonos (puedo interrumpirlo hablando)</label>
+    <div class="row"><button class="sec" id="vTest">▶️ Probar voz</button></div>
+    <div class="status" style="color:var(--mut)">💡 Para una voz mucho más natural: Ajustes del iPhone → Accesibilidad → Contenido hablado → Voces → Español (México) → descarga una voz <b>Mejorada</b> o <b>Premium</b>. Luego elígela aquí.</div>
     <label class="status"><input type="checkbox" id="agConv" style="width:auto"> 🔁 Modo conversación (escucha sola después de contestar)</label>
     <div class="status" id="agOut2"></div>
   </div>
@@ -456,9 +474,9 @@ function selUpdate(){const sh=S.shapes.find(x=>x.id===sel),b=$("selbar"),pres=do
   b.hidden=false;$("selTxt").innerHTML=`<b>${esc(sh.name?(sh.type==="cuarto"?"Cuarto "+sh.name:sh.name):TYPES[sh.type].l)}</b><span>${TYPES[sh.type].closed?f2(area(sh))+" m²":f2(perim(sh))+" m"}</span>`}
 function openAgent(pre){if(!(ses&&team)){toast("🔐 Entra primero en ⚙️ Más para usar el agente");go("mas");return}
   const sh=S.shapes.find(x=>x.id===sel);$("agText2").value=pre!==undefined?pre:(sh&&sh.type==="cuarto"?`En el cuarto ${sh.name||""}: `:"");$("agOut2").textContent="";openSheet("sheetAg");setTimeout(()=>$("agText2").focus(),50)}
-$("fabAg").onclick=()=>openAgent();
+
 document.addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
-  if(a==="agent")openAgent();else if(a==="edit")go("cuartos");else if(a==="desel"){sel=null;render()}else if(a==="fit"){closeSheets();fit();draw()}});
+  if(a==="agent")startConv();else if(a==="edit")go("cuartos");else if(a==="desel"){sel=null;render()}else if(a==="fit"){closeSheets();fit();draw()}});
 try{$("agVoz").checked=localStorage.getItem("planos-voz")!=="0";$("agConv").checked=localStorage.getItem("planos-conv")==="1"}catch(e){}
 $("agVoz").onchange=()=>{try{localStorage.setItem("planos-voz",$("agVoz").checked?"1":"0")}catch(e){}if(!$("agVoz").checked){try{speechSynthesis.cancel()}catch(e){}}};
 $("agConv").onchange=()=>{try{localStorage.setItem("planos-conv",$("agConv").checked?"1":"0")}catch(e){}if($("agConv").checked)$("agVoz").checked=true};
@@ -475,6 +493,92 @@ async function agEnviar(){const t=$("agText2").value.trim();if(!t)return;const o
 $("bAg2").onclick=agEnviar;
 $("bMic2").onclick=()=>{if(rec){rec.stop();return}try{speechSynthesis.cancel()}catch(e){}escuchar()};
 $("bUndo2").onclick=()=>{$("bUndo").click();$("agOut2").textContent=$("agOut").textContent};
+/* ---------- conversación continua (manos libres) ---------- */
+const CV={on:false,busy:false,rec:null,idle:null,wl:null,carry:"",cancel:null};
+const NOMBRES_BUENOS=/paulina|juan|ang[eé]lica|diego|jorge|m[oó]nica|marisol|carlos|francisca|esperanza|sabina|dalia|jorge|alvaro|elvira/i;
+function vocesES(){try{return(speechSynthesis.getVoices()||[]).filter(v=>/^es/i.test(v.lang))}catch(e){return[]}}
+function mejorVoz(){const vs=vocesES();let pref=null;try{pref=localStorage.getItem("planos-voz-name")}catch(e){}
+  if(pref){const v=vs.find(x=>x.name===pref);if(v)return v}
+  const sc=v=>(/premium|enhanced|mejorada|natural|neural/i.test(v.name)?100:0)+(/es[-_]MX/i.test(v.lang)?50:/es[-_]419/i.test(v.lang)?40:/es[-_]US/i.test(v.lang)?35:0)+(NOMBRES_BUENOS.test(v.name)?10:0)-(/compact|eloquence|grandma|grandpa|rocko|shelley|sandy|reed|flo|eddy/i.test(v.name)?60:0);
+  return vs.slice().sort((a,b)=>sc(b)-sc(a))[0]||null}
+function llenaVoces(){const sel=$("vSel");if(!sel)return;const vs=vocesES(),m=mejorVoz();
+  sel.innerHTML='<option value="">Automática (la mejor)</option>'+vs.map(v=>`<option value="${esc(v.name)}">${esc(v.name)} · ${esc(v.lang)}</option>`).join("");
+  let pref="";try{pref=localStorage.getItem("planos-voz-name")||""}catch(e){}sel.value=vs.some(v=>v.name===pref)?pref:"";}
+try{speechSynthesis.onvoiceschanged=llenaVoces}catch(e){}
+llenaVoces();
+try{$("vRate").value=localStorage.getItem("planos-voz-rate")||"0.95";$("vAud").checked=localStorage.getItem("planos-aud")==="1"}catch(e){}
+$("vRateT").textContent=$("vRate").value+"×";
+$("vSel").onchange=()=>{try{localStorage.setItem("planos-voz-name",$("vSel").value)}catch(e){}};
+$("vRate").oninput=()=>{$("vRateT").textContent=$("vRate").value+"×";try{localStorage.setItem("planos-voz-rate",$("vRate").value)}catch(e){}};
+$("vAud").onchange=()=>{try{localStorage.setItem("planos-aud",$("vAud").checked?"1":"0")}catch(e){}};
+$("vTest").onclick=()=>{try{speechSynthesis.cancel()}catch(e){};cvSay("Hola, soy el agente de El Patrón. ¿Qué dibujamos hoy?",true)};
+function cvState(st,txt){const m={esc:"Te escucho…",pen:"Pensando…",hab:"Hablando…"};$("cvSt").textContent=m[st]||st;if(txt!==undefined)$("cvTxt").textContent=txt;$("convBar").dataset.st=st}
+function cvIdle(){clearTimeout(CV.idle);CV.idle=setTimeout(()=>{if(CV.on){toast("🎧 Conversación en pausa por inactividad");stopConv()}},180000)}
+async function startConv(){
+  if(CV.on)return;
+  if(!(ses&&team)){toast("🔐 Entra primero en ⚙️ Más para usar el agente");go("mas");return}
+  if(!SR){toast("Este navegador no trae dictado por voz. En iPhone usa Safari; en Android, Chrome.");return}
+  closeSheets();go("plano");CV.on=true;CV.busy=false;document.body.classList.add("cv");$("fabAg").classList.add("live");$("convBar").hidden=false;
+  try{if(navigator.wakeLock)CV.wl=await navigator.wakeLock.request("screen")}catch(e){}
+  try{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+  cvIdle();cvState("hab","");
+  await cvSay(sel&&S.shapes.find(x=>x.id===sel)?"Te escucho. Dime qué hacemos con este cuarto.":"Te escucho. Dime qué dibujamos.");
+  if(CV.on)cvListen();
+}
+function stopConv(){
+  CV.on=false;CV.busy=false;clearTimeout(CV.idle);
+  try{if(CV.rec){CV.rec.onend=null;CV.rec.abort()}}catch(e){}CV.rec=null;
+  try{speechSynthesis.cancel()}catch(e){}if(CV.cancel)CV.cancel();
+  try{if(CV.wl)CV.wl.release()}catch(e){}CV.wl=null;
+  document.body.classList.remove("cv");$("fabAg").classList.remove("live");$("convBar").hidden=true;
+}
+function cvListen(){
+  if(!CV.on||CV.busy)return;cvState("esc","");
+  try{
+    const r=new SR();r.lang="es-MX";r.interimResults=true;r.continuous=false;CV.rec=r;let last="",fin="";
+    r.onresult=e=>{let t="",f=false;for(let i=e.resultIndex;i<e.results.length;i++){t+=e.results[i][0].transcript;if(e.results[i].isFinal)f=true}last=t;$("cvTxt").textContent=t;cvIdle();if(f)fin=t};
+    r.onerror=ev=>{if(ev.error==="not-allowed"||ev.error==="service-not-allowed"){toast("🎙️ Permite el micrófono en Safari para conversar");stopConv()}};
+    r.onend=()=>{CV.rec=null;if(!CV.on||CV.busy)return;const t=(fin||last).trim();if(t.length>1)cvHandle(t);else setTimeout(cvListen,250)};
+    r.start();
+  }catch(e){setTimeout(cvListen,600)}
+}
+async function cvHandle(t){
+  CV.busy=true;cvIdle();
+  if(/^\s*(termina|terminar|terminamos|adi[oó]s|hasta luego|det[eé]n|detente|c[aá]llate|ya no|salir)\b/i.test(t)){cvState("hab",t);await cvSay("Hasta luego.");stopConv();return}
+  cvState("pen",t);
+  try{
+    const r=await runAgent(t);
+    $("cvTxt").textContent=(r.log.join(" · ")||"Sin cambios");if(r.acc.length)toast("✅ "+(r.log[0]||"Listo"));
+    await cvSay(r.msg||(r.acc.length?"Listo.":"No hice cambios."));
+  }catch(err){$("cvTxt").textContent="⚠️ "+err.message;await cvSay("Tuve un problema. Intenta de nuevo.")}
+  CV.busy=false;
+  if(CV.on){if(CV.carry){const c=CV.carry;CV.carry="";cvHandle(c)}else cvListen()}
+}
+function cvSay(txt,solo){
+  return new Promise(res=>{
+    if(!window.speechSynthesis||!txt){res();return}
+    if(!solo)cvState("hab");
+    try{speechSynthesis.cancel()}catch(e){}
+    const partes=(String(txt).replace(/[*_#`]/g,"").match(/[^.!?\n]+[.!?]*/g)||[String(txt)]).map(x=>x.trim()).filter(Boolean);
+    let i=0,fin=false,barge=null;
+    const cierra=()=>{if(fin)return;fin=true;try{if(barge){barge.onend=null;barge.abort()}}catch(e){}CV.cancel=null;res()};
+    CV.cancel=()=>{try{speechSynthesis.cancel()}catch(e){}cierra()};
+    if(!solo&&$("vAud").checked&&CV.on&&SR){ // con audífonos: se puede interrumpir hablando
+      try{barge=new SR();barge.lang="es-MX";barge.interimResults=true;barge.continuous=false;let t="";
+        barge.onresult=e=>{t="";for(let k=0;k<e.results.length;k++)t+=e.results[k][0].transcript;if(t.trim().length>=3&&!fin){try{speechSynthesis.cancel()}catch(x){}CV.carry="";CV.barging=true;cierra()}};
+        barge.onend=()=>{if(CV.barging){CV.barging=false}};barge.start()}catch(e){barge=null}}
+    const dice=()=>{
+      if(fin)return;if(i>=partes.length){cierra();return}
+      const u=new SpeechSynthesisUtterance(partes[i++]);u.lang="es-MX";const v=mejorVoz();if(v){u.voice=v;u.lang=v.lang}
+      u.rate=parseFloat($("vRate").value)||0.95;u.pitch=1;u.onend=dice;u.onerror=dice;
+      try{speechSynthesis.speak(u)}catch(e){cierra()}};
+    dice();
+  });
+}
+$("fabAg").onclick=()=>{if(CV.on)stopConv();else startConv()};
+$("fabTxt").onclick=()=>openAgent();
+$("cvStop").onclick=stopConv;
+$("cvCfg").onclick=()=>{llenaVoces();openSheet("sheetAg")};
 /* tarjetas plegables */
 for(const el of[$("calco"),$("verCard"),$("invCard"),$("reglas"),$("mats").closest(".card")]){el.classList.add("fold","closed");const h=el.querySelector("h2");if(h)h.onclick=()=>el.classList.toggle("closed")}
 /* zoom/pan */
