@@ -609,7 +609,7 @@ function llenaVoces(){const sel=$("vSel");if(!sel)return;const vs=vocesES().sort
   let pref="";try{pref=localStorage.getItem(VK)||""}catch(e){}sel.value=vs.some(v=>vUri(v)===pref)?pref:"";}
 try{speechSynthesis.onvoiceschanged=llenaVoces}catch(e){}
 llenaVoces();
-try{$("vRate").value=localStorage.getItem("planos-voz-rate")||"0.95";$("vAud").checked=localStorage.getItem("planos-aud")!=="0";{const sv=localStorage.getItem("planos-sil");if(sv&&[...$("vSil").options].some(o=>o.value===sv))$("vSil").value=sv}}catch(e){}
+try{$("vRate").value=localStorage.getItem("planos-voz-rate")||"0.95";$("vAud").checked=localStorage.getItem("planos-aud")==="1";{const sv=localStorage.getItem("planos-sil");if(sv&&[...$("vSil").options].some(o=>o.value===sv))$("vSil").value=sv}}catch(e){}
 $("vRateT").textContent=$("vRate").value+"×";
 $("vSel").onchange=()=>{try{localStorage.setItem(VK,$("vSel").value)}catch(e){}};
 $("vRate").oninput=()=>{$("vRateT").textContent=$("vRate").value+"×";try{localStorage.setItem("planos-voz-rate",$("vRate").value)}catch(e){}};
@@ -651,17 +651,20 @@ function cvAdjunta(r,pre,heredada){ // pone a escuchar "r" (nueva o heredada de 
   r.onresult=e=>{let t="";for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;t=t.trim();if(!t)return;
     CV.cur=base+t;$("cvTxt").textContent=CV.cur;cvIdle();cvState("esc",CV.cur);
     clearTimeout(CV.silT);CV.silT=setTimeout(cvEnviar,silMs())};
-  r.onerror=ev=>{if(ev.error==="not-allowed"||ev.error==="service-not-allowed"){toast("🎙️ Permite el micrófono en Safari para conversar");stopConv()}};
+  r.onstart=()=>{if(!CV.cur)$("cvTxt").textContent="🎙️ micrófono abierto, habla…"};
+  r.onerror=ev=>{CV.lastErr=ev.error;
+    if(ev.error==="not-allowed"||ev.error==="service-not-allowed"){toast("🎙️ Permite el micrófono en Safari para conversar");stopConv()}
+    else if(ev.error!=="no-speech"&&ev.error!=="aborted"){$("cvTxt").textContent="⚠️ micrófono: "+ev.error}};
   r.onend=()=>{if(CV.rec!==r)return;CV.rec=null;if(!CV.on||CV.busy)return;
-    if((CV.cur||"").trim()){ // Safari cerró el micrófono antes de los 3 s: lo reabre sin perder lo dicho
-      try{const r2=new SR();r2.lang="es-MX";r2.interimResults=true;r2.continuous=true;cvAdjunta(r2,CV.cur);r2.start()}catch(e){cvEnviar()}}
-    else setTimeout(cvListen,250)}}
+    if((CV.cur||"").trim()){ // la escucha terminó antes de los 3 s: se reabre sin perder lo dicho
+      try{const r2=new SR();r2.lang="es-MX";r2.interimResults=true;r2.continuous=false;cvAdjunta(r2,CV.cur);r2.start()}catch(e){cvEnviar()}}
+    else setTimeout(cvListen,350)}}
 function cvListen(){
   if(!CV.on||CV.busy)return;cvState("esc","");
   try{
     if(CV.bargeRec){const r=CV.bargeRec;CV.bargeRec=null;cvAdjunta(r,CV.pre||"",true);CV.pre="";
       clearTimeout(CV.silT);CV.silT=setTimeout(cvEnviar,silMs());return}
-    const r=new SR();r.lang="es-MX";r.interimResults=true;r.continuous=true;cvAdjunta(r,"");r.start();
+    const r=new SR();r.lang="es-MX";r.interimResults=true;r.continuous=false;cvAdjunta(r,"");r.start();
   }catch(e){setTimeout(cvListen,600)}
 }
 async function cvHandle(t){
@@ -686,12 +689,13 @@ function cvSay(txt,solo){
     const cierra=()=>{if(fin&&!barge)return;fin=true;try{if(barge){barge.onend=null;barge.onresult=null;barge.abort()}}catch(e){}barge=null;CV.cancel=null;res()};
     CV.cancel=()=>{try{speechSynthesis.cancel()}catch(e){}if(window.VN)VN.stop();cierra()};
     if(!solo&&$("vAud").checked&&CV.on&&SR){ // se puede interrumpir hablando
-      try{barge=new SR();barge.lang="es-MX";barge.interimResults=true;barge.continuous=true;
-        barge.onresult=e=>{let t="";for(let k=0;k<e.results.length;k++)t+=e.results[k][0].transcript;t=t.trim();
-          if(!fin&&t.split(/\s+/).filter(Boolean).length>=2){ // 2 palabras o más = te está hablando
+      const armar=()=>{if(fin||!CV.on)return;try{const bg=new SR();bg.lang="es-MX";bg.interimResults=true;bg.continuous=false;barge=bg;
+        bg.onresult=e=>{let t="";for(let k=0;k<e.results.length;k++)t+=e.results[k][0].transcript;t=t.trim();
+          if(!fin&&t.split(/\s+/).filter(Boolean).length>=2){
             try{speechSynthesis.cancel()}catch(x){}if(window.VN)VN.stop();
-            CV.bargeRec=barge;CV.pre=t;barge=null;fin=true;CV.cancel=null;toast("🎙️ Te escucho");res()}};
-        barge.onerror=()=>{};barge.onend=()=>{};barge.start()}catch(e){barge=null}}
+            CV.bargeRec=bg;CV.pre=t;barge=null;fin=true;CV.cancel=null;toast("🎙️ Te escucho");res()}};
+        bg.onerror=()=>{};bg.onend=()=>{if(!fin&&barge===bg)setTimeout(armar,300)};bg.start()}catch(e){barge=null}};
+      armar();}
     const rate=parseFloat($("vRate").value)||0.95;
     const dispositivo=txt=>{const u=new SpeechSynthesisUtterance(txt);u.lang="es-MX";const v=mejorVoz();if(v){u.voice=v;u.lang=v.lang}
       u.rate=rate;u.pitch=1;u.onend=dice;u.onerror=dice;try{speechSynthesis.speak(u)}catch(e){cierra()}};
