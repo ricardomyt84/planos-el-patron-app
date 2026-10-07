@@ -1,0 +1,9 @@
+# App estática: no se compila nada, se publica la carpeta raíz.
+[build]
+  publish = "."
+  command = "echo sin compilacion"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "no-cache"

@@ -1,0 +1,1592 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Planos El Patrón</title>
+<meta name="theme-color" content="#0f766e">
+<meta name="app-version" content="2026-10-07-diseno-v2">
+<style>
+:root{--bg:#eef2f6;--card:#fff;--tx:#0f1b26;--mut:#64748b;--bd:#e2e8f0;--pri:#0f766e;--pri2:#14b8a6;--sh:0 1px 2px rgba(15,27,38,.06),0 6px 18px rgba(15,27,38,.06);
+--cuarto:#64748b;--muro:#ea580c;--lamina:#2563eb;--demo:#dc2626;--bad:#dc2626;--ok:#16a34a;--nav:64px}
+@media(prefers-color-scheme:dark){:root{--bg:#0b1118;--card:#131c26;--tx:#e8eef3;--mut:#8ea0b1;--bd:#223140;--pri:#14b8a6;--pri2:#2dd4bf;--sh:0 1px 2px rgba(0,0,0,.4),0 8px 22px rgba(0,0,0,.35)}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden}
+[hidden]{display:none!important}
+header{position:sticky;top:0;z-index:20;padding:calc(10px + env(safe-area-inset-top)) 14px 12px;background:linear-gradient(135deg,#0f766e,#0d9488 55%,#14b8a6);color:#fff;box-shadow:0 4px 18px rgba(13,148,136,.35)}
+.hrow{display:flex;align-items:center;gap:10px}
+h1{font-size:19px;margin:0;flex:none;line-height:1.15;letter-spacing:-.01em}
+h1 small{display:block;font-weight:500;font-size:11.5px;opacity:.85;margin-top:2px}
+header #pname{margin:0;flex:1;min-width:0;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);color:#fff;border-radius:12px;font-weight:600}
+header #pname::placeholder{color:rgba(255,255,255,.7)}
+.ghost{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.3);width:44px;padding:0;font-size:20px;box-shadow:none}
+.menu{margin-top:10px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.menu button{background:#fff;color:#0f3d3a;border:0;box-shadow:none;font-size:14px}
+button,select,input,textarea{font:inherit;color:inherit}
+button{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;border:0;border-radius:12px;padding:10px 14px;min-height:42px;cursor:pointer;font-weight:600;box-shadow:0 2px 8px rgba(13,148,136,.28);transition:transform .08s,opacity .15s}
+button:active{transform:scale(.97)}
+button.sec{background:var(--card);color:var(--tx);border:1px solid var(--bd);box-shadow:none}
+button.danger{background:var(--bad);box-shadow:none}
+input,select,textarea{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;width:100%;font-size:16px;min-height:42px}
+input[type=checkbox]{min-height:0;width:18px!important;height:18px}
+input[type=range]{padding:0;min-height:0;border:0;background:transparent}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--pri2);border-color:transparent}
+main{display:grid;grid-template-columns:400px minmax(0,1fr);gap:16px;padding:16px;max-width:1500px;margin:0 auto}
+main>section{min-width:0}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:var(--sh);overflow-x:auto}
+.card h2{font-size:13px;margin:0 0 10px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);font-weight:700}
+.row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.row>*{min-width:0;flex:1 1 auto}
+.row>button{flex:0 1 auto}
+.tag{display:inline-block;padding:2px 9px;border-radius:999px;color:#fff;font-size:12px}
+.list button{width:100%;text-align:left;margin-bottom:6px;background:var(--bg);color:var(--tx);border:1px solid var(--bd);box-shadow:none;font-weight:500}
+.list button.on{border-color:var(--pri2);outline:2px solid var(--pri2)}
+#cv{width:100%;height:68vh;background:var(--card);border:1px solid var(--bd);border-radius:18px;box-shadow:var(--sh);touch-action:none;display:block}
+.status{font-size:13.5px;margin:6px 0}.bad{color:var(--bad)}.ok{color:var(--ok)}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:6px 8px;border-bottom:1px solid var(--bd);text-align:left}
+.seg{display:grid;grid-template-columns:1fr 1.1fr auto;gap:6px;margin-bottom:6px}
+.cnt{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cnt label{font-size:12px;color:var(--mut)}
+.leg{display:flex;flex-wrap:wrap;gap:4px 12px;margin:4px 2px 12px}.leg span{font-size:12px;color:var(--mut)}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tabs button{white-space:nowrap;border-radius:999px;padding:8px 14px;min-height:38px;font-size:14px;flex:0 0 auto}
+.cvbar{display:flex;gap:8px;margin:10px 0 6px;overflow-x:auto;scrollbar-width:none}.cvbar::-webkit-scrollbar{display:none}
+.cvbar button{white-space:nowrap;flex:0 0 auto;min-height:40px}
+.sub{font-size:12px;color:var(--mut);margin:-2px 0 8px}.sub.ok{color:var(--ok)}
+.pn{display:block}
+#nav{display:none}
+#mats,#cuadro{overflow-x:auto}
+@media(max-width:820px){
+  h1{font-size:18px}
+  main{grid-template-columns:minmax(0,1fr);padding:12px 12px calc(var(--nav) + 28px + env(safe-area-inset-bottom));gap:0}
+  .pn{display:none}
+  body[data-p="plano"] .pn[data-p="plano"],body[data-p="agente"] .pn[data-p="agente"],body[data-p="cuartos"] .pn[data-p="cuartos"],body[data-p="cuadros"] .pn[data-p="cuadros"],body[data-p="mas"] .pn[data-p="mas"]{display:block}
+  #cv{height:calc(100dvh - 200px);min-height:320px}
+  h1 .t{display:none}
+  .menu{grid-template-columns:repeat(2,1fr)}
+  .card{padding:14px 13px;border-radius:16px}
+  .cnt{grid-template-columns:repeat(2,1fr)}
+  #nav{display:flex;position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:30;height:var(--nav);background:var(--card);border:1px solid var(--bd);border-radius:22px;box-shadow:0 10px 30px rgba(0,0,0,.22);padding:6px;gap:4px}
+  #nav button{flex:1;min-width:0;background:transparent;color:var(--mut);box-shadow:none;padding:2px 0;border-radius:16px;font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.1}
+  #nav button i{font-style:normal;font-size:21px}
+  #nav button.on{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;box-shadow:0 3px 10px rgba(13,148,136,.35)}
+}
+
+.stage{position:relative}
+.stage #cv{height:calc(100dvh - 200px);min-height:320px}
+.topchips{position:absolute;top:10px;left:10px;right:60px;z-index:5;display:flex;gap:8px;flex-wrap:wrap;pointer-events:none}
+.chip{pointer-events:auto;background:var(--card);color:var(--tx);border:1px solid var(--bd);box-shadow:var(--sh);min-height:38px;padding:7px 14px;font-size:14px;border-radius:999px}
+.zoomcol{position:absolute;right:10px;top:10px;z-index:5;display:flex;flex-direction:column;gap:8px}
+.zoomcol button{width:42px;height:42px;min-height:0;padding:0;font-size:19px;border-radius:14px;background:var(--card);color:var(--tx);border:1px solid var(--bd);box-shadow:var(--sh)}
+.fab{position:absolute;right:14px;bottom:14px;z-index:6;width:60px;height:60px;min-height:0;padding:0;border-radius:50%;font-size:26px;box-shadow:0 8px 22px rgba(13,148,136,.5)}
+.selbar{position:absolute;left:10px;right:86px;bottom:12px;z-index:6;background:var(--card);border:1px solid var(--bd);border-radius:18px;box-shadow:var(--sh);padding:10px 12px}
+.selbar #selTxt{display:flex;justify-content:space-between;gap:8px;margin-bottom:8px;font-size:15px}.selbar #selTxt span{color:var(--mut)}
+.selbar .row{margin:0;flex-wrap:nowrap}.selbar button{min-height:38px;padding:7px 12px;font-size:14px}
+.empty{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:24px 70px 24px 24px;pointer-events:none}
+.empty>*{pointer-events:auto}.empty .big{font-size:44px}.empty span{color:var(--mut);max-width:300px}
+#mkTools{position:absolute;top:58px;left:10px;right:62px;z-index:5;background:var(--card);border:1px solid var(--bd);border-radius:16px;box-shadow:var(--sh);padding:8px;flex-wrap:wrap;overflow:visible}
+.sheet{position:fixed;left:10px;right:10px;bottom:calc(var(--nav) + 22px + env(safe-area-inset-bottom));z-index:40;background:var(--card);border:1px solid var(--bd);border-radius:22px;box-shadow:0 -10px 40px rgba(0,0,0,.3);padding:14px;max-height:64dvh;overflow:auto}
+.sheet h3{margin:0 0 10px;font-size:16px}
+#tabs.sheet{display:flex;flex-direction:column;gap:6px}
+#tabs.sheet button{width:100%;text-align:left;border-radius:14px;min-height:44px;font-size:15px}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+#scrim{position:fixed;inset:0;z-index:35;background:rgba(10,20,30,.4)}
+#toast{position:fixed;left:50%;top:calc(76px + env(safe-area-inset-top));transform:translateX(-50%);z-index:60;background:#0f1b26;color:#fff;padding:10px 16px;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35);max-width:90vw;font-size:14px;text-align:center}
+.presx{display:none;position:absolute;left:50%;transform:translateX(-50%);top:10px;z-index:8;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.card.fold>h2{cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin:0}
+.card.fold>h2::after{content:"▾";transition:transform .2s;font-size:16px}
+.card.fold.closed>h2::after{transform:rotate(-90deg)}
+.card.fold.closed>*:not(h2){display:none}
+.card.fold:not(.closed)>h2{margin-bottom:10px}
+@media(min-width:821px){.sheet{left:50%;right:auto;transform:translateX(-50%);width:min(520px,92vw);bottom:28px}.stage #cv{height:76vh}.selbar{right:auto;width:360px}}
+body.pres main{grid-template-columns:minmax(0,1fr)}
+body.pres main>section:first-child,body.pres .pn:not([data-p="plano"]),body.pres .topchips,body.pres .fab,body.pres .selbar,body.pres .empty,body.pres #nav,body.pres #pname,body.pres #menuBtn,body.pres #menu,body.pres #mkTools{display:none!important}
+body.pres .pn[data-p="plano"]{display:block!important}
+body.pres .presx{display:block}
+body.pres header{padding-bottom:8px}
+body.pres .stage #cv{height:calc(100dvh - 110px)}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow"><h1>📐<span class="t"> Planos El Patrón<small>Plano de referencia · medidas aproximadas</small></span></h1><input id="pname" aria-label="Nombre del proyecto" placeholder="Nombre del proyecto"><button class="ghost" id="menuBtn" aria-label="Menú">☰</button></div>
+  <div class="menu" id="menu" hidden>
+    <button id="bNew">🆕 Nuevo</button>
+    <button id="bOpen">📂 Abrir</button>
+    <button id="bJson">💾 Guardar JSON</button>
+    <button id="bCsv">📊 Materiales CSV</button>
+    <button id="bSvg">🖼️ Exportar lámina</button>
+    <button id="bSvgAll">🗂️ Todas las láminas</button>
+  </div>
+  <input type="file" id="file" accept=".json" hidden>
+</header>
+<main>
+<section>
+<div class="pn" data-p="agente">
+  <div class="card" id="agLogin">
+    <h2>🔐 Entra primero</h2>
+    <div class="status">Para usar el agente y la cámara entra con tu correo en la pestaña <b>⚙️ Más</b> y únete a tu equipo.</div>
+    <div class="row"><button data-go="mas">⚙️ Ir a Más</button></div>
+  </div>
+  <div class="card" id="agent" hidden>
+    <h2>🤖 Agente</h2>
+    <div class="status" style="color:var(--mut)">Dicta o escribe lo que quieres dibujar. Ej: “dibuja un baño de 2 por 2.5, la regadera de 90 en la esquina de arriba a la izquierda, la puerta de 80 en la pared de abajo a 30 cm de la esquina”.</div>
+    <textarea id="agText" rows="4" placeholder="Qué quieres dibujar o agregar…"></textarea>
+    <div class="row"><button class="sec" id="bMic">🎤 Hablar</button><button id="bAg">Enviar</button><button class="sec" id="bUndo">↩️ Deshacer</button><button class="sec" data-go="plano">🗺️ Ver plano</button></div>
+    <div class="status" id="agOut"></div>
+  </div>
+  <div class="card" id="camCard" hidden>
+    <h2>🎥 Cámara en vivo</h2>
+    <div class="status" style="color:var(--mut)">Abre la cámara, habla y la app manda un fotograma junto con lo que dices. El agente mira la foto, decide y contesta (de 3 a 8 segundos). No mide con la imagen: las medidas las das tú.</div>
+    <video id="camVid" playsinline muted autoplay style="width:100%;max-height:46vh;border-radius:10px;background:#000;display:none"></video>
+    <div class="row"><button id="camOpen">📷 Abrir cámara</button><button class="sec" id="camFlip" hidden>🔄 Cambiar cámara</button></div>
+    <textarea id="camTxt" rows="2" placeholder="Habla o escribe lo que ves y lo que decides. Ej: este patio lo dividimos en tres y ese árbol lo cortamos"></textarea>
+    <div class="row"><button class="sec" id="camMic">🎤 Hablar</button><button id="camSend">📸 Mirar y enviar</button></div>
+    <label class="status"><input type="checkbox" id="camAuto" checked style="width:auto"> Enviar solo al dejar de hablar</label>
+    <label class="status"><input type="checkbox" id="camVoz" checked style="width:auto"> 🔊 Contestar con voz</label>
+    <label class="status"><input type="checkbox" id="camBit" checked style="width:auto"> 📒 Guardar la foto en la bitácora</label>
+    <div class="status" id="camOut"></div>
+    <div id="bitList"></div>
+  </div>
+</div>
+<div class="pn" data-p="cuartos">
+  <div class="card">
+    <h2>Elementos</h2>
+    <div class="row">
+      <select id="addType">
+        <option value="cuarto">Cuarto (existente)</option>
+        <option value="muro">Muro nuevo tabla roca</option>
+        <option value="lamina">Techo nuevo lámina</option>
+        <option value="demo">Demolición</option>
+      </select>
+      <button id="bAdd">+ Agregar</button>
+    </div>
+    <div class="list" id="list"></div>
+  </div>
+  <div class="card" id="editor" hidden>
+    <h2>Editar</h2>
+    <div class="row"><input id="name" placeholder="Nombre (ej. 5)"><button class="danger" id="bDel">Borrar</button></div>
+    <div class="row" id="obraRow"><label style="flex:1">Muros de este cuarto<select id="obra"><option value="existente">Existentes (levantamiento)</option><option value="nuevo">Nuevos (tabla roca / Duroc)</option></select></label></div>
+    <div class="row" id="nivelRow"><label style="flex:1">Nivel de piso (cm: + sube · − baja)<input id="nivel" type="number" step="1" value="0"></label></div>
+    <div class="row"><label style="flex:1" class="status">Inicio X (m)<input id="sx" type="number" step="0.01" placeholder="0"></label><label style="flex:1" class="status">Inicio Y (m)<input id="sy" type="number" step="0.01" placeholder="0"></label></div>
+    <div class="status" id="hintPos" style="color:var(--mut)">Posición del primer punto en metros. Cuartos vecinos se acoplan usando los mismos puntos.</div>
+    <h2 style="margin-top:10px">Medidas (láser)</h2>
+    <textarea id="quick" rows="2" placeholder="Escribe: 3.30 der 5.30 abajo 3.30 izq 5.30 arriba"></textarea>
+    <div class="row"><button id="bQuick">Aplicar texto</button><button class="sec" id="bSeg">+ Pared</button></div>
+    <div id="segs"></div>
+    <div class="status" id="close"></div>
+    <div class="row"><button class="sec" id="bAdj" hidden>🔧 Cerrar ajustando paredes sin confirmar</button></div>
+    <div id="roomExtra"></div>
+  </div>
+  <div class="card" id="calco">
+    <h2>📷 Calco del escaneo</h2>
+    <div class="status" style="color:var(--mut)">Carga una captura del plano de Magicplan, calibra la escala con una medida del láser y traza encima. Después corrige las paredes con el láser.</div>
+    <div class="row"><input id="bgFile" type="file" accept="image/*"></div>
+    <div class="row"><button class="sec" id="bCal">1. Calibrar escala</button><button class="sec" id="bTrace">2. Trazar</button></div>
+    <div class="row"><button class="sec" id="bEnd">Terminar traza</button><button class="sec" id="bBgDel">Quitar fondo</button></div>
+    <label class="status">Transparencia del fondo<input id="bgOp" type="range" min="10" max="100" value="60"></label>
+    <div class="status" id="bgMsg"></div>
+  </div>
+  <div class="card" id="verCard">
+    <h2>🎯 Verificación de medidas</h2>
+    <div id="verBody"></div>
+  </div>
+</div>
+<div class="pn" data-p="mas">
+  <div class="card" id="cloud">
+    <h2>☁️ Equipo y nube</h2>
+    <div id="cloudBody"></div>
+  </div>
+  <div class="card" id="reglas">
+    <h2>⚙️ Reglas de instalación</h2>
+    <label class="status">La calle está…<select id="calle"><option value="">(sin definir)</option><option value="abajo">Abajo del plano</option><option value="arriba">Arriba del plano</option><option value="izquierda">A la izquierda</option><option value="derecha">A la derecha</option></select></label>
+    <div class="row"><label style="flex:1">Cable de uso general (luces, contactos y AC)<input id="cC" type="number" step="2" value="12"></label></div>
+    <div class="row"><label style="flex:1">Cable caja → tablero<input id="cR" type="number" step="2" value="10"></label><label style="flex:1">Usar #6 hasta (m)<input id="umbral" type="number" step="1" value="20"></label></div>
+    <div class="row"><label style="flex:1">Pendiente Ø4" (%)<input id="pend" type="number" step="0.1" value="1.5"></label><label style="flex:1">Pendiente Ø2" (%)<input id="pend2" type="number" step="0.1" value="2"></label><label style="flex:1">Cuartos por llave de paso<input id="grupo" type="number" step="1" min="1" value="4"></label></div>
+    <div class="status" style="color:var(--mut)">Del tablero al medidor se usa #6 hasta esa distancia y #4 después. Los números de cable son los de tu práctica; confírmalos con tu electricista.</div>
+  </div>
+</div>
+</section>
+<section>
+<div class="pn" data-p="plano">
+  <div class="stage">
+    <div class="topchips"><button class="chip" id="labBtn">📄 Distribución ▾</button><button class="chip" id="toolBtn" aria-label="Herramientas">🛠️</button></div>
+    <div class="tabs" id="mkTools" hidden></div>
+    <svg id="cv" role="img" aria-label="Plano"></svg>
+    <div class="zoomcol"><button id="zi" aria-label="Acercar">＋</button><button id="zo" aria-label="Alejar">－</button><button id="zf" aria-label="Ajustar">⤢</button></div>
+    <div class="empty" id="empty" hidden><div class="big">👋</div><b>Empecemos tu plano</b><span>Toca el micrófono y di, por ejemplo: <i>“crea un cuarto de 3 por 4”</i></span><div class="row" style="justify-content:center"><button data-act="agent">🎤 Hablar con el agente</button><button class="sec" data-go="cuartos">🏠 Agregar a mano</button></div></div>
+    <div class="selbar" id="selbar" hidden><div id="selTxt"></div><div class="row"><button class="sec" data-act="edit">✏️ Editar</button><button data-act="agent">🎤 Decir</button><button class="sec" data-act="desel" aria-label="Quitar selección">✕</button></div></div>
+    <button class="fab" id="fabAg" aria-label="Hablar con el agente">🎤</button>
+    <button class="presx" id="presExit">↩️ Salir de presentación</button>
+  </div>
+  <div class="sheet" id="tabs" hidden></div>
+  <div class="sheet" id="sheetTools" hidden>
+    <h3>🛠️ Herramientas</h3>
+    <div class="tgrid">
+      <button class="sec" id="mkToggle">✏️ Marcar sobre el plano</button>
+      <button class="sec" id="bCotas">📏 Cotas: sí</button>
+      <button class="sec" id="bPres">🖼️ Presentación</button>
+      <button class="sec" data-act="fit">⤢ Ajustar vista</button>
+    </div>
+    <div class="leg"><span><b style="color:var(--cuarto)">▬</b> existente</span><span><b style="color:var(--muro)">▬</b> tabla roca</span><span><b style="color:var(--lamina)">▬</b> lámina</span><span><b style="color:var(--demo)">▬</b> demolición</span></div>
+  </div>
+  <div class="sheet" id="sheetAg" hidden>
+    <h3>🤖 Dile al agente qué dibujar</h3>
+    <textarea id="agText2" rows="3" placeholder="Ej: baño de 2 por 2.5 con regadera en la esquina y puerta abajo"></textarea>
+    <div class="row"><button class="sec" id="bMic2">🎤 Hablar</button><button id="bAg2">Enviar</button><button class="sec" id="bUndo2">↩️</button></div>
+    <div class="status" id="agOut2"></div>
+  </div>
+</div>
+<div class="pn" data-p="cuadros">
+  <div class="card" id="invCard">
+    <h2>🪟 Inventario de ventanas y puertas retiradas</h2>
+    <div class="status" style="color:var(--mut)">Lo que retiras, tapas o demueles en el plano entra solo. Aquí agregas piezas que ya tienes guardadas.</div>
+    <div class="row"><select id="iTipo"><option value="ventana">Ventana</option><option value="puerta">Puerta</option></select><input id="iAncho" type="number" step="0.01" inputmode="decimal" placeholder="Ancho (m)"><input id="iAlto" type="number" step="0.01" inputmode="decimal" placeholder="Alto (m)"></div>
+    <div class="row"><input id="iCant" type="number" min="1" value="1" style="max-width:80px" aria-label="Cantidad"><select id="iEst"><option value="buena">Buena</option><option value="regular">Regular</option><option value="mala">Mala (no reutilizar)</option></select><input id="iDet" placeholder="Detalle (corrediza, aluminio…)"></div>
+    <div class="row"><label class="status" style="flex:1">📷 Foto de la pieza (opcional)<input id="iFoto" type="file" accept="image/*" capture="environment"></label></div>
+    <input id="iFotoRow" type="file" accept="image/*" capture="environment" hidden>
+    <div class="row"><input id="iOri" placeholder="Origen (casa, cuarto…)"><button id="iAdd">Agregar</button></div>
+    <div class="row"><button class="sec" id="iAjustar">🪟 Ajustar claros nuevos a las piezas</button></div>
+    <div id="invList" style="overflow-x:auto"></div>
+    <div class="row"><label style="flex:1">Medida “igual” si difiere hasta (cm)<input id="tolEx" type="number" step="1" value="3"></label><label style="flex:1">Se puede ajustar si difiere hasta (cm)<input id="tolNear" type="number" step="1" value="10"></label></div>
+  </div>
+  <div class="card" id="cuadro"></div>
+  <div class="card">
+    <h2>Materiales y cuadro de áreas (referencia)</h2>
+    <div class="row"><label style="flex:1">Altura de muro (m)<input id="alt" type="number" step="0.05" value="2.4"></label><label style="flex:1">Caras de tabla roca<select id="caras"><option value="2">2 caras</option><option value="1">1 cara</option></select></label></div>
+    <div class="row"><label style="flex:1">Espesor de muro a demoler (cm)<input id="esp" type="number" step="1" value="12"></label><label style="flex:1">Separación de postes (cm)<select id="sepp"><option value="40.6">40.6</option><option value="61">61</option></select></label></div>
+    <label class="status">Cuartos con Duroc en todas sus paredes interiores (opcional; vacío = solo base de 10 cm y zona de regadera)<input id="hum" value=""></label>
+    <div id="mats"></div>
+  </div>
+</div>
+</section>
+</main>
+<div id="scrim" hidden></div><div id="toast" hidden></div>
+<nav id="nav" aria-label="Secciones">
+  <button data-go="plano" class="on"><i>🗺️</i>Plano</button>
+  <button data-go="agente"><i>🤖</i>Agente</button>
+  <button data-go="cuartos"><i>🏠</i>Cuartos</button>
+  <button data-go="cuadros"><i>📊</i>Cuadros</button>
+  <button data-go="mas"><i>⚙️</i>Más</button>
+</nav>
+<script>
+"use strict";
+const KEY="planos-el-patron-v1";
+const TYPES={cuarto:{c:"var(--cuarto)",closed:true,l:"Cuarto"},muro:{c:"var(--muro)",closed:false,l:"Muro tabla roca"},lamina:{c:"var(--lamina)",closed:true,l:"Techo lámina"},demo:{c:"var(--demo)",closed:false,l:"Demolición"}};
+const DIRS={der:0,derecha:0,d:0,r:0,abajo:90,aba:90,b:90,dn:90,izq:180,izquierda:180,i:180,arriba:270,arr:270,a:270,up:270};
+const ITEMS=[["focos","Focos"],["contactos","Contactos"],["apagadores","Apagadores"],["ventiladores","Ventiladores"],["tv","TV"],["camas","Camas"]];
+const $=id=>document.getElementById(id);
+let S=load();let sel=null;let view={x:-1,y:-1,w:10,h:10};
+let BG=null,noBG=false,mode="pan",traceId=null,tracePts=[],calPts=[],down=null;
+
+function blank(){return{name:"Proyecto nuevo",alt:2.4,caras:2,shapes:[],objs:[],aberts:[]}}
+function ensure(){S.objs=S.objs||[];S.aberts=S.aberts||[];S.inv=S.inv||[];S.invOv=S.invOv||{};S.marcas=S.marcas||[];S.bitacora=S.bitacora||[];S.mkSeq=Math.max(S.mkSeq||0,...S.marcas.map(m=>m.num||0))}
+function load(){try{const t=localStorage.getItem(KEY);if(t)return JSON.parse(t)}catch(e){}return blank()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function uid(){return Math.random().toString(36).slice(2,9)}
+const f2=n=>(Math.round(n*100)/100).toFixed(2);
+
+function points(sh){const p=[{x:sh.x||0,y:sh.y||0}];for(const s of sh.segs){const a=(s.ang||0)*Math.PI/180,q=p[p.length-1];p.push({x:q.x+s.len*Math.cos(a),y:q.y+s.len*Math.sin(a)})}return p}
+function closure(sh){const p=points(sh),a=p[0],b=p[p.length-1];return{dx:b.x-a.x,dy:b.y-a.y,e:Math.hypot(b.x-a.x,b.y-a.y)}}
+function area(sh){const p=points(sh);const c=closure(sh);const q=c.e<0.005?p.slice(0,-1):p;let s=0;for(let i=0;i<q.length;i++){const a=q[i],b=q[(i+1)%q.length];s+=a.x*b.y-b.x*a.y}return Math.abs(s)/2}
+function perim(sh){return sh.segs.reduce((t,s)=>t+s.len,0)}
+
+function parseQuick(t){
+  const toks=t.toLowerCase().replace(/,/g," ").replace(/°/g,"").split(/\s+/).filter(Boolean);const out=[];
+  for(let i=0;i<toks.length;i++){
+    const n=parseFloat(toks[i].replace(",","."));if(isNaN(n))continue;
+    const m=toks[i].match(/^[\d.]+([a-z]+)$/);let nx=toks[i+1],ang=null;
+    if(m&&DIRS[m[1]]!==undefined)ang=DIRS[m[1]];
+    else if(nx!==undefined&&DIRS[nx]!==undefined){ang=DIRS[nx];i++}
+    if(ang===null){const prev=out[out.length-1];ang=prev?prev.ang:0}
+    out.push({len:n,ang});
+  }
+  return out;
+}
+
+function render(){
+  ensure();save();$("pname").value=S.name;$("alt").value=S.alt;$("caras").value=S.caras;
+  $("list").innerHTML=S.shapes.map(sh=>`<button data-id="${sh.id}" class="${sh.id===sel?"on":""}"><span class="tag" style="background:${TYPES[sh.type].c}">${TYPES[sh.type].l}</span> ${esc(sh.name||"s/n")} ${TYPES[sh.type].closed?" · "+f2(area(sh))+" m²":" · "+f2(perim(sh))+" m"}</button>`).join("")||'<div class="status">Agrega tu primer cuarto con “+ Agregar”.</div>';
+  const sh=S.shapes.find(x=>x.id===sel);$("editor").hidden=!sh;
+  if(sh){editorFill(sh)}
+  {const c=cfg();$("calle").value=c.calle;$("cC").value=c.cC;$("cR").value=c.cR;$("umbral").value=c.umbral;$("pend").value=c.pend;$("pend2").value=c.pend2;$("grupo").value=c.grupo}
+  $("esp").value=S.espesor||12;$("sepp").value=String(S.sepPostes||61);$("hum").value=S.humedos??"";
+  cotasBtn();selUpdate();draw();mats();renderCuadro();renderInv();mkRender();renderBit();renderVer();
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+function editorFill(sh){
+  $("obraRow").hidden=sh.type!=="cuarto";$("obra").value=sh.obra||"existente";
+  $("nivelRow").hidden=sh.type!=="cuarto";if(document.activeElement!==$("nivel"))$("nivel").value=sh.nivel||0;
+  if(document.activeElement!==$("name"))$("name").value=sh.name||"";
+  if(document.activeElement!==$("sx"))$("sx").value=sh.x||0;
+  if(document.activeElement!==$("sy"))$("sy").value=sh.y||0;
+  const keep=document.activeElement&&document.activeElement.closest&&document.activeElement.closest("#segs");
+  if(!keep){$("segs").innerHTML=sh.segs.map((s,i)=>`<div class="seg"><input data-i="${i}" data-k="len" type="number" inputmode="decimal" step="0.01" value="${s.len}"><select data-i="${i}" data-k="ang">${[[0,"→ derecha"],[90,"↓ abajo"],[180,"← izquierda"],[270,"↑ arriba"]].map(([a,l])=>`<option value="${a}" ${+s.ang===a?"selected":""}>${l}</option>`).join("")}${[0,90,180,270].includes(+s.ang)?"":`<option value="${s.ang}" selected>${s.ang}°</option>`}<option value="custom">Otro ángulo…</option></select><button class="sec" data-del="${i}">✕</button></div>${segNote(s)}`).join("")}
+  const c=closure(sh);const cl=$("close");
+  if(TYPES[sh.type].closed&&sh.segs.length>2){cl.className="status "+(c.e<0.02?"ok":"bad");cl.textContent=c.e<0.005?"✅ Cierra perfecto":(c.e<0.02?`✅ Cierra (error ${f2(c.e*100)} cm)`:`⚠️ No cierra: faltan ${f2(c.e*100)} cm (Δx ${f2(c.dx*100)} cm, Δy ${f2(c.dy*100)} cm). Revisa o mide diagonales.`)}
+  else cl.textContent=sh.segs.length?`Longitud total ${f2(perim(sh))} m`:"";
+  $("bAdj").hidden=!(TYPES[sh.type].closed&&sh.segs.length>2&&c.e>=0.005);
+  if(sh.type==="cuarto"){sh.items=sh.items||{};$("roomExtra").innerHTML=`<h2 style="margin-top:10px">Contenido del cuarto</h2><div class="cnt">${ITEMS.map(([k,l])=>`<div><label>${l}</label><input data-item="${k}" type="number" min="0" value="${sh.items[k]||0}"></div>`).join("")}</div>`}
+  else $("roomExtra").innerHTML="";
+}
+
+/* canvas */
+function bounds(){let xs=[],ys=[];for(const sh of S.shapes)for(const p of points(sh)){xs.push(p.x);ys.push(p.y)}if(BG&&!noBG){xs.push(BG.x,BG.x+BG.w*BG.mpp);ys.push(BG.y,BG.y+BG.h*BG.mpp)}if(S.calle&&xs.length&&!noBG){const a=Math.min(...xs),b=Math.max(...xs),c=Math.min(...ys),d=Math.max(...ys);if(S.calle==="abajo"){xs.push(a);ys.push(d+1.8)}else if(S.calle==="arriba"){xs.push(a);ys.push(c-1.8)}else if(S.calle==="izquierda"){xs.push(a-1.8);ys.push(c)}else{xs.push(b+1.8);ys.push(c)}}
+  if(!xs.length)return{x:-1,y:-1,w:10,h:10};const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);const m=Math.max(0.6,(x1-x0+y1-y0)*0.05);return{x:x0-m,y:y0-m,w:Math.max(x1-x0+2*m,2),h:Math.max(y1-y0+2*m,2)}}
+function fit(){view=bounds()}
+function draw(){
+  const cv=$("cv");cv.setAttribute("viewBox",`${view.x} ${view.y} ${view.w} ${view.h}`);
+  const k=Math.max(view.w,view.h)/700;const fs=14*k;
+  let g=`<defs><pattern id="rayas" width="${8*k}" height="${8*k}" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="${3*k}" height="${8*k}" fill="#2563eb" opacity=".35"/></pattern></defs>`;
+  if(BG&&!noBG)g+=`<image href="${BG.url}" x="${BG.x}" y="${BG.y}" width="${BG.w*BG.mpp}" height="${BG.h*BG.mpp}" opacity="${BG.op}" preserveAspectRatio="none"/>`;
+  g+=grid(k);
+  for(const sh of S.shapes){
+    if(!showShape(sh))continue;
+    const muted=sh.type==="cuarto"&&!["general","demolicion","muros"].includes(VISTA);
+    const p=points(sh),t=TYPES[sh.type],on=sh.id===sel;
+    const pts=p.map(q=>q.x+","+q.y).join(" ");
+    const col=({cuarto:"#64748b",muro:"#ea580c",lamina:"#2563eb",demo:"#dc2626"})[sh.type];
+    if(t.closed){g+=`<polygon points="${pts}" fill="${sh.type==="lamina"?"url(#rayas)":"#64748b22"}" stroke="${col}" stroke-width="${(sh.type==="cuarto"?5:3)*k}" stroke-linejoin="round" ${muted?'opacity=".5"':""} ${sh.type==="lamina"?`stroke-dasharray="${8*k} ${5*k}"`:""}/>`}
+    else g+=`<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="${(sh.type==="muro"?6:3)*k}" ${sh.type==="demo"?`stroke-dasharray="${6*k} ${4*k}"`:""} stroke-linecap="round"/>`;
+    if(on&&!noBG)g+=`<polyline points="${pts}" fill="none" stroke="#f59e0b" stroke-width="${2*k}" opacity=".9"/>`;
+    if(!muted&&S.cotas!==false)for(let i=0;i<sh.segs.length;i++){const a=p[i],b=p[i+1],mx=(a.x+b.x)/2,my=(a.y+b.y)/2,ang=Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI;let r=ang;if(r>90||r<-90)r+=180;
+      g+=`<text x="${mx}" y="${my}" font-size="${fs*0.8}" fill="currentColor" text-anchor="middle" transform="rotate(${r} ${mx} ${my}) translate(0 ${-6*k})">${f2(sh.segs[i].len)}</text>`}
+    if(on&&t.closed&&VISTA==="general"&&!noBG)for(let i=0;i<sh.segs.length;i++){const wg=wallGeo(sh,i);if(!wg.L)continue;const q={x:wg.o.x+wg.u.x*wg.L/2+wg.n.x*14*k,y:wg.o.y+wg.u.y*wg.L/2+wg.n.y*14*k};g+=`<circle cx="${q.x}" cy="${q.y}" r="${8*k}" fill="#f59e0b"/><text x="${q.x}" y="${q.y+3.5*k}" font-size="${10*k}" font-weight="700" fill="#fff" text-anchor="middle">${i+1}</text>`}
+    if(t.closed&&p.length>2){const c=centroid(p);g+=`<text x="${c.x}" y="${c.y}" font-size="${fs*1.9}" font-weight="700" fill="currentColor" text-anchor="middle">${esc(sh.name||"")}</text><text x="${c.x}" y="${c.y+fs*1.5}" font-size="${fs}" fill="currentColor" text-anchor="middle" opacity=".7">${f2(area(sh))} m²</text>`}
+  }
+  if(hiWall){const hs=S.shapes.find(x=>x.id===hiWall.id);if(hs&&hs.segs[hiWall.i]){const hp=points(hs);g+=`<line x1="${hp[hiWall.i].x}" y1="${hp[hiWall.i].y}" x2="${hp[hiWall.i+1].x}" y2="${hp[hiWall.i+1].y}" stroke="#f59e0b" stroke-width="${9*k}" stroke-linecap="round" opacity=".55"/>`}}
+  g+=drawCalle(k);
+  g+=drawExtras(k);
+  const mk=mode==="calib"?calPts:(mode==="trace"?tracePts:[]);
+  mk.forEach((q,i)=>{g+=`<circle cx="${q.x}" cy="${q.y}" r="${(i?5:8)*k}" fill="#f59e0b" stroke="#fff" stroke-width="${k}"/>`});
+  cv.innerHTML=g;
+}
+function grid(k){const x0=Math.floor(view.x),y0=Math.floor(view.y);let s="";for(let x=x0;x<view.x+view.w;x++)s+=`<line x1="${x}" y1="${view.y}" x2="${x}" y2="${view.y+view.h}" stroke="currentColor" opacity=".07" stroke-width="${k}"/>`;for(let y=y0;y<view.y+view.h;y++)s+=`<line x1="${view.x}" y1="${y}" x2="${view.x+view.w}" y2="${y}" stroke="currentColor" opacity=".07" stroke-width="${k}"/>`;return s}
+function centroid(p){let x=0,y=0;const n=p.length-(closureEq(p)?1:0);for(let i=0;i<n;i++){x+=p[i].x;y+=p[i].y}return{x:x/n,y:y/n}}
+function closureEq(p){return Math.hypot(p[0].x-p[p.length-1].x,p[0].y-p[p.length-1].y)<0.05}
+
+/* materiales */
+function mats(){
+  S.alt=parseFloat($("alt").value)||2.4;S.caras=+$("caras").value||2;
+  const rooms=S.shapes.filter(s=>s.type==="cuarto"),muros=S.shapes.filter(s=>s.type==="muro"),lam=S.shapes.filter(s=>s.type==="lamina"),demo=S.shapes.filter(s=>s.type==="demo");
+  const tot={};for(const [k] of ITEMS)tot[k]=rooms.reduce((t,r)=>t+((r.items||{})[k]||0),0);
+  const ml=muros.reduce((t,s)=>t+perim(s),0),trm2=ml*S.alt*S.caras,lm2=lam.reduce((t,s)=>t+area(s),0),dml=demo.reduce((t,s)=>t+perim(s),0);
+  let h=`<table><tr><th>Cuarto</th><th>m²</th><th>Focos</th><th>Cont.</th><th>Apag.</th><th>Vent.</th><th>TV</th><th>Camas</th></tr>`;
+  for(const r of rooms){const i=r.items||{};h+=`<tr><td>${esc(r.name||"s/n")}</td><td>${f2(area(r))}</td>${ITEMS.map(([k])=>`<td>${i[k]||0}</td>`).join("")}</tr>`}
+  h+=`<tr><th>Total</th><th>${f2(rooms.reduce((t,r)=>t+area(r),0))}</th>${ITEMS.map(([k])=>`<th>${tot[k]}</th>`).join("")}</tr></table>`;
+  h+=`<table style="margin-top:10px"><tr><td>Muros tabla roca</td><td>${f2(ml)} ml → ${f2(trm2)} m² de placa</td></tr><tr><td>Techo lámina</td><td>${f2(lm2)} m²</td></tr><tr><td>Demolición</td><td>${f2(dml)} ml</td></tr></table>`;
+  const ab=S.aberts||[],doors=ab.filter(a=>a.kind==="puerta").length,wins=ab.filter(a=>a.kind==="ventana").length;
+  const det=[];for(const r of rooms){const c={};for(const o of(S.objs||[]).filter(o=>o.room===r.id&&!POINT[o.kind]))c[o.kind]=(c[o.kind]||0)+1;const txt=Object.entries(c).map(([k,n])=>`${n} ${OBJ[k][2].toLowerCase()}`).join(", ");const pw=ab.filter(a=>a.room===r.id);if(txt||pw.length)det.push([r.name||"s/n",[txt,pw.length?`${pw.filter(a=>a.kind==="puerta").length} puerta(s), ${pw.filter(a=>a.kind==="ventana").length} ventana(s)`:""].filter(Boolean).join(" · ")])}
+  if(doors||wins||det.length)h+=`<table style="margin-top:10px"><tr><th colspan="2">Puertas y ventanas: ${doors} puertas · ${wins} ventanas</th></tr>${det.map(([n,t])=>`<tr><td>Cuarto ${esc(n)}</td><td>${esc(t)}</td></tr>`).join("")}</table>`;
+  $("mats").innerHTML=h;
+  return{rooms,tot,ml,trm2,lm2,dml,doors,wins,det};
+}
+
+/* eventos */
+$("list").onclick=e=>{const b=e.target.closest("button");if(b){sel=b.dataset.id;render()}};
+$("bAdd").onclick=()=>{const t=$("addType").value;const n=S.shapes.filter(s=>s.type===t).length+1;const sh={id:uid(),type:t,name:t==="cuarto"?String(S.shapes.filter(s=>s.type==="cuarto").length+1):"",x:0,y:0,segs:[],items:{}};S.shapes.push(sh);sel=sh.id;render()};
+$("bDel").onclick=()=>{if(confirm("¿Borrar este elemento?")){S.shapes=S.shapes.filter(s=>s.id!==sel);S.objs=(S.objs||[]).filter(o=>o.room!==sel);S.aberts=(S.aberts||[]).filter(a=>a.room!==sel);sel=null;render()}};
+function cur(){return S.shapes.find(s=>s.id===sel)}
+$("name").oninput=e=>{cur().name=e.target.value;save();draw();mats();$("list").innerHTML=$("list").innerHTML}
+$("name").onchange=()=>{render()};
+for(const id of["sx","sy"])$(id).onchange=e=>{cur()[id==="sx"?"x":"y"]=parseFloat(e.target.value)||0;render()};
+$("bSeg").onclick=()=>{const sh=cur(),p=sh.segs[sh.segs.length-1];sh.segs.push({len:0,ang:p?(p.ang+90)%360:0});render();const i=$("segs").querySelectorAll("input");if(i.length)i[i.length-1].focus()};
+$("bQuick").onclick=()=>{const sh=cur(),a=parseQuick($("quick").value);if(a.length){sh.segs=a;$("quick").value=""}render()};
+$("segs").onchange=e=>{const t=e.target,sh=cur();if(t.dataset.del!==undefined)return;const i=+t.dataset.i,k=t.dataset.k;if(k==="len"){const sg=sh.segs[i];if(sg.orig===undefined&&sg.est===undefined)sg.est=sg.len;sg.len=parseFloat(t.value)||0;sg.conf=true;delete sg.auto}if(k==="ang"){if(t.value==="custom"){const v=parseFloat(prompt("Ángulo en grados (0=derecha, 90=abajo, 180=izquierda, 270=arriba)","45"));sh.segs[i].ang=isNaN(v)?sh.segs[i].ang:((v%360)+360)%360}else sh.segs[i].ang=+t.value}render()};
+$("segs").onclick=e=>{const b=e.target.closest("button[data-del]");if(b){cur().segs.splice(+b.dataset.del,1);render()}};
+$("roomExtra").onchange=e=>{const k=e.target.dataset.item;if(k){const sh=cur();sh.items=sh.items||{};sh.items[k]=Math.max(0,parseInt(e.target.value)||0);render()}};
+$("alt").onchange=$("caras").onchange=()=>{mats();save()};
+$("pname").onchange=e=>{S.name=e.target.value;save()};
+$("bNew").onclick=()=>{if(confirm("¿Empezar un proyecto nuevo? Guarda antes el JSON si quieres conservar el actual.")){S=blank();sel=null;fit();render()}};
+$("bOpen").onclick=()=>$("file").click();
+$("file").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(!Array.isArray(j.shapes))throw 0;S=j;sel=null;fit();render()}catch(_){alert("Archivo no válido")}e.target.value=""};
+function download(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
+$("bJson").onclick=()=>download((S.name||"plano")+".json",JSON.stringify(S,null,1),"application/json");
+$("bCsv").onclick=()=>{const m=mats();const rows=[["Cuarto","m2",...ITEMS.map(x=>x[1])]];for(const r of m.rooms)rows.push([r.name,f2(area(r)),...ITEMS.map(([k])=>(r.items||{})[k]||0)]);rows.push([]);rows.push(["Muro tabla roca ml",f2(m.ml)]);rows.push(["Tabla roca m2",f2(m.trm2)]);rows.push(["Lamina m2",f2(m.lm2)]);rows.push(["Demolicion ml",f2(m.dml)]);rows.push(["Puertas",m.doors]);rows.push(["Ventanas",m.wins]);for(const[n,t]of m.det)rows.push(["Cuarto "+n,t]);{const c=cuadro(VISTA);rows.push([]);rows.push([c.title]);rows.push(c.head);for(const r of c.rows)rows.push(r);for(const r of c.foot)rows.push(r);for(const e of c.extra||[]){rows.push([]);rows.push([e.title]);rows.push(e.head);for(const r of e.rows)rows.push(r);for(const r of e.foot)rows.push(r)}}download((S.name||"plano")+"-materiales.csv","﻿"+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n"),"text/csv")};
+function sheetSvg(v){
+  const old=VISTA;VISTA=v;noBG=true;const b=bounds(),o=view;view=b;draw();
+  const inner=$("cv").innerHTML,vb=$("cv").getAttribute("viewBox");noBG=false;view=o;VISTA=old;draw();
+  const W=1000,ph=Math.round(W*b.h/b.w),c=cuadro(v),LH=20;
+  let y=70+ph+26,tb="";
+  for(const sc of[c,...(c.extra||[])]){
+    tb+=`<text x="20" y="${y}" font-size="15" font-weight="700" fill="#14202b">${esc(sc.title)}</text>`;y+=LH*1.2;
+    const cw=(W-40)/Math.max(1,sc.head.length);
+    [sc.head,...sc.rows,...sc.foot].forEach((r,ri)=>{r.forEach((cell,ci)=>{tb+=`<text x="${20+ci*cw}" y="${y}" font-size="12" ${ri===0||ri>sc.rows.length?'font-weight="700"':""} fill="#14202b">${esc(cell)}</text>`});if(ri===0)tb+=`<line x1="20" x2="${W-20}" y1="${y+5}" y2="${y+5}" stroke="#94a3b8"/>`;y+=LH});
+    y+=LH*0.8;
+  }
+  for(const a of c.avisos||[]){tb+=`<text x="20" y="${y}" font-size="11" fill="#b91c1c">${esc(a)}</text>`;y+=LH*0.9}
+  const H=Math.round(y+10),fecha=new Date().toLocaleDateString("es-MX");
+  const head=`<rect x="10" y="8" width="${W-20}" height="52" fill="none" stroke="#14202b"/><text x="20" y="30" font-size="18" font-weight="700" fill="#14202b">${esc(S.name||"Proyecto")}</text><text x="20" y="50" font-size="13" fill="#14202b">${esc((VISTAS.find(x=>x[0]===v)||[0,""])[1])} · Medidas en metros · Altura de muro ${f2(S.alt||2.4)} m</text><text x="${W-20}" y="30" font-size="12" text-anchor="end" fill="#14202b">${fecha}</text><text x="${W-20}" y="50" font-size="12" text-anchor="end" fill="#14202b">Referencia · medidas aproximadas</text>`;
+  const svg=`<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Arial,Helvetica,sans-serif"><rect width="${W}" height="${H}" fill="#ffffff"/>${head}<svg x="0" y="70" width="${W}" height="${ph}" viewBox="${vb}">${inner}</svg>${tb}</svg>`;
+  return svg.replace(/currentColor/g,"#14202b").replace(/var\(--card\)/g,"#ffffff");
+}
+function cotasBtn(){$("bCotas").textContent=S.cotas===false?"📏 Cotas: no":"📏 Cotas: sí"}
+$("bCotas").onclick=()=>{S.cotas=S.cotas===false;cotasBtn();save();draw()};
+$("bPres").onclick=()=>{closeSheets();const on=document.body.classList.toggle("pres");$("bPres").textContent=on?"↩️ Salir de presentación":"🖼️ Presentación";if(on)fit();selUpdate();draw()};
+$("presExit").onclick=()=>$("bPres").click();
+$("bSvg").onclick=()=>download((S.name||"plano")+"-"+VISTA+".svg",sheetSvg(VISTA),"image/svg+xml");
+$("bSvgAll").onclick=()=>{VISTAS.forEach(([k],i)=>setTimeout(()=>download((S.name||"plano")+"-"+k+".svg",sheetSvg(k),"image/svg+xml"),i*600))};
+/* navegación y menú */
+function go(p){document.body.dataset.p=p;document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.go===p));try{localStorage.setItem("planos-panel",p)}catch(e){}window.scrollTo(0,0);if(p==="plano")try{draw()}catch(e){}closeSheetsSafe()}
+function closeSheetsSafe(){try{closeSheets()}catch(e){}}
+document.addEventListener("click",e=>{const g=e.target.closest("[data-go]");if(g){go(g.dataset.go);return}
+  const m=$("menu");if(e.target.closest("#menuBtn")){m.hidden=!m.hidden;return}
+  if(!m.hidden&&(e.target.closest("#menu button")||!e.target.closest("header")))m.hidden=true});
+{let p="plano";try{p=localStorage.getItem("planos-panel")||"plano"}catch(e){}if(!["plano","agente","cuartos","cuadros","mas"].includes(p))p="plano";go(p)}
+/* hojas, selección y agente rápido */
+function closeSheets(){document.querySelectorAll(".sheet").forEach(x=>x.hidden=true);$("scrim").hidden=true}
+function openSheet(id){const was=!$(id).hidden;closeSheets();if(!was){$(id).hidden=false;$("scrim").hidden=false}}
+let toastT=null;function toast(t){const o=$("toast");o.textContent=t;o.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>o.hidden=true,3200)}
+$("scrim").onclick=closeSheets;
+$("labBtn").onclick=()=>openSheet("tabs");$("toolBtn").onclick=()=>openSheet("sheetTools");
+function selUpdate(){const sh=S.shapes.find(x=>x.id===sel),b=$("selbar"),pres=document.body.classList.contains("pres");
+  $("empty").hidden=pres||S.shapes.length>0;
+  if(!sh||pres){b.hidden=true;return}
+  b.hidden=false;$("selTxt").innerHTML=`<b>${esc(sh.name?(sh.type==="cuarto"?"Cuarto "+sh.name:sh.name):TYPES[sh.type].l)}</b><span>${TYPES[sh.type].closed?f2(area(sh))+" m²":f2(perim(sh))+" m"}</span>`}
+function openAgent(pre){if(!(ses&&team)){toast("🔐 Entra primero en ⚙️ Más para usar el agente");go("mas");return}
+  const sh=S.shapes.find(x=>x.id===sel);$("agText2").value=pre!==undefined?pre:(sh&&sh.type==="cuarto"?`En el cuarto ${sh.name||""}: `:"");$("agOut2").textContent="";openSheet("sheetAg");setTimeout(()=>$("agText2").focus(),50)}
+$("fabAg").onclick=()=>openAgent();
+document.addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
+  if(a==="agent")openAgent();else if(a==="edit")go("cuartos");else if(a==="desel"){sel=null;render()}else if(a==="fit"){closeSheets();fit();draw()}});
+$("bAg2").onclick=async()=>{const t=$("agText2").value.trim();if(!t)return;const out=$("agOut2");out.className="status";out.textContent="⏳ Pensando…";
+  try{const r=await runAgent(t);out.className="status ok";out.innerHTML=r.log.map(esc).join("<br>")||"Sin cambios";if(r.acc.length){$("agText2").value="";toast("✅ "+(r.log[0]||"Listo"));setTimeout(closeSheets,900)}}
+  catch(err){out.className="status bad";out.textContent="⚠️ "+err.message}};
+$("bMic2").onclick=()=>dictar($("agText2"),$("bMic2"),$("agOut2"),null);
+$("bUndo2").onclick=()=>{$("bUndo").click();$("agOut2").textContent=$("agOut").textContent};
+/* tarjetas plegables */
+for(const el of[$("calco"),$("verCard"),$("invCard"),$("reglas"),$("mats").closest(".card")]){el.classList.add("fold","closed");const h=el.querySelector("h2");if(h)h.onclick=()=>el.classList.toggle("closed")}
+/* zoom/pan */
+function zoom(f,cx,cy){cx=cx??view.x+view.w/2;cy=cy??view.y+view.h/2;view={x:cx-(cx-view.x)*f,y:cy-(cy-view.y)*f,w:view.w*f,h:view.h*f};draw()}
+$("zi").onclick=()=>zoom(.8);$("zo").onclick=()=>zoom(1.25);$("zf").onclick=()=>{fit();draw()};
+const cv=$("cv");const ptrs=new Map();let last=null;
+function toWorld(e){const r=cv.getBoundingClientRect(),s=Math.max(view.w/r.width,view.h/r.height);const ox=(r.width-view.w/s)/2,oy=(r.height-view.h/s)/2;return{x:view.x+(e.clientX-r.left-ox)*s,y:view.y+(e.clientY-r.top-oy)*s,s}}
+cv.addEventListener("wheel",e=>{e.preventDefault();const w=toWorld(e);zoom(e.deltaY>0?1.12:.89,w.x,w.y)},{passive:false});
+cv.addEventListener("pointerdown",e=>{cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});last=null;down=ptrs.size===1?{x:e.clientX,y:e.clientY}:null;
+  if(mode==="mark"){if(ptrs.size===1)markStart(toWorld(e));else markCancel()}});
+cv.addEventListener("pointermove",e=>{if(!ptrs.has(e.pointerId))return;const prev=ptrs.get(e.pointerId);
+  if(ptrs.size===1&&mode==="mark"){ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});markMove(toWorld(e));return}
+  if(ptrs.size===1){const r=cv.getBoundingClientRect(),s=Math.max(view.w/r.width,view.h/r.height);view.x-=(e.clientX-prev.x)*s;view.y-=(e.clientY-prev.y)*s;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});draw()}
+  else if(ptrs.size===2){const o=[...ptrs.entries()].find(([id])=>id!==e.pointerId)[1];const d0=Math.hypot(prev.x-o.x,prev.y-o.y);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});const d1=Math.hypot(e.clientX-o.x,e.clientY-o.y);if(d0>0&&d1>0){const w=toWorld({clientX:(e.clientX+o.x)/2,clientY:(e.clientY+o.y)/2});zoom(d0/d1,w.x,w.y)}}});
+const up=e=>{
+  const moved=down?Math.hypot(e.clientX-down.x,e.clientY-down.y):99;
+  if(e.type==="pointerup"&&ptrs.size===1&&mode==="mark")markEnd(toWorld(e),moved<8);
+  else if(e.type==="pointerup"&&down&&ptrs.size===1&&mode!=="pan"&&mode!=="mark"&&moved<8)tap(toWorld(e));
+  else if(e.type==="pointerup"&&down&&ptrs.size===1&&mode==="pan"&&moved<8&&!document.body.classList.contains("pres")){const r=roomAt(toWorld(e));sel=r?r.id:null;render()}
+  if(e.type==="pointercancel")markCancel();
+  ptrs.delete(e.pointerId);down=null;
+};cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);
+/* ---------- nube (Supabase) y agente ---------- */
+const SB="https://ldgsmzplpdnxdqqphgtm.supabase.co",SBKEY="sb_publishable_vQkO_JZaEnO311i_9SrsYw_jYD_jE_4",SESS="planos-sesion-v1";
+let ses=null,team=null,cloudList=[],cloudMsg="";
+try{ses=JSON.parse(localStorage.getItem(SESS)||"null")}catch(e){}
+function setSes(s){ses=s;try{s?localStorage.setItem(SESS,JSON.stringify(s)):localStorage.removeItem(SESS)}catch(e){}}
+async function sb(path,{method="GET",body,auth=true,headers={}}={}){
+  if(auth&&ses&&ses.expires_at*1000<Date.now()+30000)await refresh();
+  const h={apikey:SBKEY,"Content-Type":"application/json",...headers};
+  if(auth&&ses)h.Authorization="Bearer "+ses.access_token;
+  const r=await fetch(SB+path,{method,headers:h,body:body===undefined?undefined:JSON.stringify(body)});
+  const t=await r.text();let j=null;try{j=t?JSON.parse(t):null}catch(e){}
+  if(!r.ok)throw new Error((j&&(j.msg||j.message||j.error_description||j.error))||("Error "+r.status));
+  return j;
+}
+async function refresh(){try{const j=await sb("/auth/v1/token?grant_type=refresh_token",{method:"POST",auth:false,body:{refresh_token:ses.refresh_token}});setSes(j)}catch(e){setSes(null);team=null}}
+async function loadTeam(){
+  const m=await sb("/rest/v1/team_members?select=team_id,role,teams(name,invite_code)&limit=1");
+  team=m&&m[0]?{id:m[0].team_id,name:m[0].teams.name,code:m[0].teams.invite_code}:null;
+  if(team)await loadCloudList();
+}
+async function loadCloudList(){cloudList=await sb("/rest/v1/projects?select=id,name,updated_at&order=updated_at.desc&limit=50")||[]}
+async function cloudRefresh(){if(!ses)return cloudDraw();try{await loadTeam()}catch(e){cloudMsg="⚠️ "+e.message}cloudDraw()}
+function cloudDraw(){
+  const el=$("cloudBody");let h="";
+  $("agent").hidden=!(ses&&team);$("agLogin").hidden=!!(ses&&team);$("camCard").hidden=!(ses&&team);
+  if(!ses){
+    h=`<div class="status" style="color:var(--mut)">Entra para compartir planos con tu equipo y usar el agente. La app también funciona sin cuenta.</div>
+    <input id="cEmail" type="email" placeholder="Correo" autocomplete="email" style="margin-bottom:6px">
+    <input id="cPass" type="password" placeholder="Contraseña (mín. 6)" autocomplete="current-password" style="margin-bottom:6px">
+    <div class="row"><button id="cLogin">Entrar</button><button class="sec" id="cSignup">Crear cuenta</button></div>`;
+  }else if(!team){
+    h=`<div class="status ok">✅ Sesión iniciada</div>
+    <div class="row"><input id="cTeamName" placeholder="Nombre del equipo nuevo"><button id="cCreate">Crear</button></div>
+    <div class="row"><input id="cCode" placeholder="Código de invitación"><button class="sec" id="cJoin">Unirme</button></div>
+    <button class="sec" id="cOut">Salir</button>`;
+  }else{
+    h=`<div class="status ok">👥 ${esc(team.name)}</div>
+    <div class="status" style="color:var(--mut)">Código para invitar: <b>${esc(team.code)}</b></div>
+    <div class="row"><button id="cSave">${S.cloudId?"Actualizar en la nube":"Subir proyecto"}</button><button class="sec" id="cOut">Salir</button></div>
+    <div class="list">${cloudList.map(p=>`<button data-open="${p.id}" class="${p.id===S.cloudId?"on":""}">📁 ${esc(p.name)} <span style="color:var(--mut);font-size:12px">· ${new Date(p.updated_at).toLocaleString("es-MX",{dateStyle:"short",timeStyle:"short"})}</span></button>`).join("")||'<div class="status">Aún no hay proyectos en la nube.</div>'}</div>`;
+  }
+  if(cloudMsg)h+=`<div class="status">${esc(cloudMsg)}</div>`;
+  el.innerHTML=h;
+}
+$("cloudBody").onclick=async e=>{
+  const b=e.target.closest("button");if(!b)return;cloudMsg="";
+  try{
+    if(b.id==="cLogin"||b.id==="cSignup"){
+      const body={email:$("cEmail").value.trim(),password:$("cPass").value};
+      if(!body.email||!body.password)throw new Error("Escribe tu correo y tu contraseña antes de continuar");
+      if(b.id==="cSignup"&&body.password.length<6)throw new Error("La contraseña necesita al menos 6 caracteres");
+      const j=await sb(b.id==="cLogin"?"/auth/v1/token?grant_type=password":"/auth/v1/signup",{method:"POST",auth:false,body});
+      if(j&&j.access_token){setSes(j);await loadTeam()}else cloudMsg="📧 Revisa tu correo para confirmar la cuenta y luego pulsa Entrar.";
+    }else if(b.id==="cOut"){setSes(null);team=null;cloudList=[]}
+    else if(b.id==="cCreate"){const n=$("cTeamName").value.trim();if(!n)throw new Error("Escribe el nombre del equipo");await sb("/rest/v1/rpc/create_team",{method:"POST",body:{team_name:n}});await loadTeam()}
+    else if(b.id==="cJoin"){await sb("/rest/v1/rpc/join_team",{method:"POST",body:{code:$("cCode").value}});await loadTeam()}
+    else if(b.id==="cSave"){
+      if(S.cloudId){await sb("/rest/v1/projects?id=eq."+S.cloudId,{method:"PATCH",body:{name:S.name,data:S}});cloudMsg="✅ Actualizado"}
+      else{const r=await sb("/rest/v1/projects",{method:"POST",headers:{Prefer:"return=representation"},body:{team_id:team.id,name:S.name,data:S}});S.cloudId=r[0].id;save();cloudMsg="✅ Subido"}
+      await loadCloudList();
+    }else if(b.dataset.open){
+      const r=await sb("/rest/v1/projects?select=id,name,data&id=eq."+b.dataset.open);
+      if(r&&r[0]){S=r[0].data;S.name=r[0].name;S.cloudId=r[0].id;sel=null;fit();render();cloudMsg="✅ Proyecto abierto"}
+    }
+  }catch(err){cloudMsg="⚠️ "+err.message}
+  cloudDraw();
+};
+/* ---------- agente: geometría, símbolos y acciones ---------- */
+const norm=s=>String(s??"").toLowerCase().replace(/^(cuarto|habitaci[oó]n|hab\.?)\s*/,"").trim();
+const r2=n=>Math.round(n*100)/100;
+function polyOf(sh){const p=points(sh);return closure(sh).e<0.05?p.slice(0,-1):p}
+function bbox(pts){const xs=pts.map(p=>p.x),ys=pts.map(p=>p.y);return{x0:Math.min(...xs),y0:Math.min(...ys),x1:Math.max(...xs),y1:Math.max(...ys)}}
+function wallGeo(sh,i){
+  const p=points(sh),a=p[i],b=p[i+1],dx=b.x-a.x,dy=b.y-a.y,L=Math.hypot(dx,dy);
+  if(L<1e-6)return{o:a,u:{x:1,y:0},n:{x:0,y:1},L:0,side:"?",i};
+  const horiz=Math.abs(dx)>=Math.abs(dy);let o=a,e=b;
+  if(horiz?a.x>b.x:a.y>b.y){o=b;e=a}
+  const u={x:(e.x-o.x)/L,y:(e.y-o.y)/L},m={x:(a.x+b.x)/2,y:(a.y+b.y)/2},c=centroid(polyOf(sh));
+  let n={x:-u.y,y:u.x};if((c.x-m.x)*n.x+(c.y-m.y)*n.y<0)n={x:-n.x,y:-n.y};
+  return{o,u,n,L,i,side:horiz?(m.y<c.y?"arriba":"abajo"):(m.x<c.x?"izquierda":"derecha")};
+}
+function findWall(sh,key){
+  const k=String(key??"").toLowerCase().trim();
+  if(/^\d+$/.test(k)){const i=+k-1;return i>=0&&i<sh.segs.length?wallGeo(sh,i):null}
+  let best=null;for(let i=0;i<sh.segs.length;i++){const w=wallGeo(sh,i);if(w.side===k&&(!best||w.L>best.L))best=w}
+  return best;
+}
+function findRoom(name){
+  if(name!==undefined&&name!==null&&String(name).trim()!==""){const n=norm(name);return S.shapes.find(s=>TYPES[s.type].closed&&norm(s.name)===n)||null}
+  const c=cur();return c&&TYPES[c.type].closed?c:null;
+}
+function rayLen(poly,s,d){
+  let best=Infinity;
+  for(let i=0;i<poly.length;i++){const a=poly[i],b=poly[(i+1)%poly.length],ex=b.x-a.x,ey=b.y-a.y,den=d.x*ey-d.y*ex;if(Math.abs(den)<1e-9)continue;
+    const t=((a.x-s.x)*ey-(a.y-s.y)*ex)/den,v=((a.x-s.x)*d.y-(a.y-s.y)*d.x)/den;if(t>0.01&&v>=-1e-6&&v<=1+1e-6&&t<best)best=t}
+  return best===Infinity?0:best;
+}
+const SRC={tablero:1,toma_agua:1,calentador:1,registro:1,caja_breakers:1,caja_ac:1,medidor:1,minisplit:1};
+const POINT={foco:1,ventilador:1,contacto:1,apagador:1,coladera:1,tablero:1,toma_agua:1,calentador:1,registro:1,caja_breakers:1,medidor:1,minisplit:1};
+const OBJ={cama:[1.4,1.9,"Cama","camas"],inodoro:[.4,.7,"Inodoro"],lavabo:[.5,.4,"Lavabo"],regadera:[.9,.9,"Regadera"],tina:[1.7,.75,"Tina"],fregadero:[.8,.5,"Fregadero"],meseta:[2,.6,"Meseta"],estufa:[.6,.6,"Estufa"],refrigerador:[.7,.7,"Refri"],lavadora:[.6,.6,"Lavadora"],closet:[1.2,.6,"Closet"],escritorio:[1.2,.6,"Escritorio"],tv:[.9,.1,"TV","tv"],foco:[.25,.25,"Foco","focos"],ventilador:[.9,.9,"Ventilador","ventiladores"],contacto:[.1,.1,"Contacto","contactos"],apagador:[.1,.1,"Apagador","apagadores"],coladera:[.15,.15,"Coladera"],tablero:[.4,.15,"Tablero general"],toma_agua:[.25,.25,"Toma de agua"],calentador:[.4,.4,"Calentador"],registro:[.4,.4,"Registro"],caja_breakers:[.3,.12,"Tablero del cuarto"],caja_ac:[.3,.12,"Caja aire acond."],medidor:[.3,.4,"Medidor"],minisplit:[.9,.25,"Minisplit"],arbol:[1.5,1.5,"Árbol"]};
+function symbol(kind,w,h,k){
+  const sw=1.4*k,st=`fill="none" stroke="#0f766e" stroke-width="${sw}"`,fl=`fill="#0f766e26" stroke="#0f766e" stroke-width="${sw}"`,x=-w/2,y=-h/2;
+  const R=(a,b,c,d,r)=>`<rect x="${a}" y="${b}" width="${c}" height="${d}" ${r?`rx="${r}"`:""} ${fl}/>`;
+  switch(kind){
+    case"foco":return`<circle r="${w/2}" ${fl}/><path d="M${-w/2} 0H${w/2}M0 ${-w/2}V${w/2}" ${st}/>`;
+    case"ventilador":return`<circle r="${w/2}" ${fl}/>`+[0,90,180,270].map(a=>`<ellipse cx="${w*.25}" rx="${w*.2}" ry="${w*.07}" transform="rotate(${a})" ${fl}/>`).join("");
+    case"contacto":return`<circle r="${w*.7}" ${fl}/><path d="M${-w*.25} ${-w*.2}V${w*.2}M${w*.25} ${-w*.2}V${w*.2}" ${st}/>`;
+    case"apagador":return`<circle r="${w*.7}" ${fl}/><path d="M${-w*.3} ${w*.2}L${w*.3} ${-w*.2}" ${st}/>`;
+    case"arbol":return`<circle r="${w/2}" fill="#16a34a2e" stroke="#16a34a" stroke-width="${sw}" stroke-dasharray="${6*k} ${3*k}"/><circle r="${Math.max(w*.08,0.06)}" fill="#92400e"/>`;
+    case"caja_ac":case"caja_breakers":return R(x,y,w,h)+R(x+w*.12,y+h*.2,w*.3,h*.6,0)+R(x+w*.58,y+h*.2,w*.3,h*.6,0);
+    case"medidor":return`<circle r="${Math.min(w,h)*.45}" fill="#11182714" stroke="#111827" stroke-width="${sw}"/><circle r="${Math.min(w,h)*.22}" fill="none" stroke="#111827" stroke-width="${sw}"/>`;
+    case"minisplit":return R(x,y,w,h,h*.3)+[.3,.5,.7].map(f=>`<path d="M${x+w*.08} ${y+h*f}H${x+w*.92}" ${st}/>`).join("");
+    case"tablero":return R(x,y,w,h)+`<path d="M${x+w*.35} ${y+h*.15}L${x+w*.55} ${y+h*.5}L${x+w*.45} ${y+h*.5}L${x+w*.65} ${y+h*.85}" ${st}/>`;
+    case"toma_agua":return`<circle r="${w/2}" fill="#2563eb33" stroke="#2563eb" stroke-width="${sw}"/><circle r="${w*.22}" fill="#2563eb" />`;
+    case"calentador":return`<circle r="${w/2}" fill="#dc262633" stroke="#dc2626" stroke-width="${sw}"/><path d="M0 ${-w*.25}Q${w*.2} 0 0 ${w*.25}Q${-w*.2} 0 0 ${-w*.25}" fill="#dc2626"/>`;
+    case"registro":return R(x,y,w,h)+`<path d="M${x} ${y}L${x+w} ${y+h}M${x+w} ${y}L${x} ${y+h}" stroke="#92400e" fill="none" stroke-width="${sw}"/><circle r="${Math.min(w,h)*.18}" fill="#92400e"/>`;
+    case"coladera":return`<circle r="${w*.5}" ${fl}/><path d="M${-w*.5} 0H${w*.5}M0 ${-w*.5}V${w*.5}" ${st}/>`;
+    case"inodoro":return R(x+w*.1,y,w*.8,h*.3,0)+`<ellipse cx="0" cy="${y+h*.3+h*.35}" rx="${w*.45}" ry="${h*.35}" ${fl}/>`;
+    case"regadera":return R(x,y,w,h)+`<path d="M${x} ${y}L${x+w} ${y+h}M${x+w} ${y}L${x} ${y+h}" ${st}/><circle cx="${x+w*.18}" cy="${y+h*.18}" r="${Math.min(w,h)*.07}" ${fl}/>`;
+    case"tina":return R(x,y,w,h,Math.min(w,h)*.25)+R(x+w*.06,y+h*.1,w*.88,h*.8,Math.min(w,h)*.3);
+    case"lavabo":return R(x,y,w,h)+`<ellipse cx="0" cy="${y+h*.55}" rx="${w*.3}" ry="${h*.28}" ${fl}/>`;
+    case"fregadero":return R(x,y,w,h)+R(x+w*.06,y+h*.15,w*.4,h*.7,0)+R(x+w*.54,y+h*.15,w*.4,h*.7,0);
+    case"estufa":return R(x,y,w,h)+[[.28,.28],[.72,.28],[.28,.72],[.72,.72]].map(([a,b])=>`<circle cx="${x+w*a}" cy="${y+h*b}" r="${Math.min(w,h)*.14}" ${st}/>`).join("");
+    case"cama":return R(x,y,w,h)+R(x+w*.06,y+h*.04,w*.4,h*.16,w*.04)+R(x+w*.54,y+h*.04,w*.4,h*.16,w*.04);
+    case"closet":return R(x,y,w,h)+`<path d="M${x} ${y}L${x+w} ${y+h}" ${st}/>`;
+    default:return R(x,y,w,h);
+  }
+}
+function drawObj(o,k){
+  const def=OBJ[o.kind];if(!def)return"";
+  const tr=`matrix(${o.u.x} ${o.u.y} ${o.n.x} ${o.n.y} ${o.cx} ${o.cy})`;
+  let s=`<g transform="${tr}">${symbol(o.kind,o.w,o.h,k)}</g>`;
+  if(o.kind==="arbol"&&o.talar){const r=o.w/2*.7;s+=`<path d="M${o.cx-r} ${o.cy-r}L${o.cx+r} ${o.cy+r}M${o.cx+r} ${o.cy-r}L${o.cx-r} ${o.cy+r}" stroke="#dc2626" stroke-width="${2.6*k}" stroke-linecap="round"/>`}
+  if((!POINT[o.kind]||SRC[o.kind])&&(o.w*o.h>0.12||SRC[o.kind]))s+=`<text x="${o.cx}" y="${o.cy+3*k}" font-size="${9*k}" ${o.talar?'fill="#dc2626" font-weight="700"':'fill="#0f766e"'} text-anchor="middle">${def[2]}${o.talar?" · TALAR":""}</text>`;
+  return s;
+}
+function drawAb(ab,k){
+  const sh=S.shapes.find(s=>s.id===ab.room);if(!sh||ab.seg>=sh.segs.length)return"";
+  const wg=wallGeo(sh,ab.seg);if(!wg.L)return"";
+  const A={x:wg.o.x+wg.u.x*ab.pos,y:wg.o.y+wg.u.y*ab.pos},B={x:A.x+wg.u.x*ab.ancho,y:A.y+wg.u.y*ab.ancho};
+  const est=ab.estado||"nueva";
+  if(est==="tapar"){
+    if(VISTA!=="demolicion"&&VISTA!=="inventario")return"";
+    const q=5*k,pts=[[A.x+wg.n.x*q,A.y+wg.n.y*q],[B.x+wg.n.x*q,B.y+wg.n.y*q],[B.x-wg.n.x*q,B.y-wg.n.y*q],[A.x-wg.n.x*q,A.y-wg.n.y*q]].map(z=>z.join(",")).join(" ");
+    return`<polygon points="${pts}" fill="url(#rayas)" stroke="#dc2626" stroke-width="${1.5*k}"/><text x="${(A.x+B.x)/2+wg.n.x*16*k}" y="${(A.y+B.y)/2+wg.n.y*16*k}" font-size="${9*k}" font-weight="700" fill="#dc2626" text-anchor="middle">TAPAR ${f2(ab.ancho)}×${f2(ab.alto)}${VISTA==="inventario"?" → inventario":""}</text>`;
+  }
+  if(est==="retirada"){
+    const gap=`<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" style="stroke:var(--card)" stroke-width="${8*k}"/>`;
+    if(VISTA!=="demolicion"&&VISTA!=="inventario")return gap;
+    return gap+`<text x="${(A.x+B.x)/2+wg.n.x*17*k}" y="${(A.y+B.y)/2+wg.n.y*17*k+3*k}" font-size="${9*k}" font-weight="700" fill="#0369a1" text-anchor="middle">RETIRAR ${f2(ab.ancho)}×${f2(ab.alto)}</text>`;
+  }
+  let s=`<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" style="stroke:var(--card)" stroke-width="${8*k}"/>`;
+  if(ab.kind==="ventana"){
+    for(const d of[-3,0,3])s+=`<line x1="${A.x+wg.n.x*d*k}" y1="${A.y+wg.n.y*d*k}" x2="${B.x+wg.n.x*d*k}" y2="${B.y+wg.n.y*d*k}" stroke="#2563eb" stroke-width="${1.2*k}"/>`;
+  }else{
+    const sg=ab.abre==="afuera"?-1:1,left=ab.bisagra!=="derecha",H=left?A:B,e=left?wg.u:{x:-wg.u.x,y:-wg.u.y},d={x:wg.n.x*sg,y:wg.n.y*sg};
+    const T={x:H.x+d.x*ab.ancho,y:H.y+d.y*ab.ancho},P={x:H.x+e.x*ab.ancho,y:H.y+e.y*ab.ancho},sw=(d.x*e.y-d.y*e.x)>0?1:0;
+    s+=`<line x1="${H.x}" y1="${H.y}" x2="${T.x}" y2="${T.y}" stroke="#0f766e" stroke-width="${2*k}"/><path d="M${T.x} ${T.y}A${ab.ancho} ${ab.ancho} 0 0 ${sw} ${P.x} ${P.y}" fill="none" stroke="#0f766e" stroke-width="${1*k}"/>`;
+  }
+  const mid={x:(A.x+B.x)/2,y:(A.y+B.y)/2};
+  if(VISTA==="puertas"&&curTags.m[ab.id])s+=`<text x="${mid.x+wg.n.x*17*k}" y="${mid.y+wg.n.y*17*k+3*k}" font-size="${11*k}" font-weight="700" fill="${ab.kind==="ventana"?"#2563eb":"#0f766e"}" text-anchor="middle">${curTags.m[ab.id]}</text>`;
+  if(VISTA==="inventario"){
+    if(est==="nueva"&&(ab.kind==="ventana"||ab.kind==="puerta")){const m=curInv.res.get(ab.id),st=m?(m.t==="exacta"?"REUSAR":(m.t==="claro"?"REUSAR (claro a medida)":"AJUSTAR")):"COMPRAR",col=m?(m.t==="ajuste"?"#d97706":"#16a34a"):"#dc2626";
+      s+=`<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="${col}" stroke-width="${3.5*k}" stroke-linecap="round"/><text x="${mid.x+wg.n.x*19*k}" y="${mid.y+wg.n.y*19*k+3*k}" font-size="${9*k}" font-weight="700" fill="${col}" text-anchor="middle">${st} ${curTags.m[ab.id]||""}</text>`}
+    else if(est==="existente"&&curDem.has(ab.id))s+=`<text x="${mid.x+wg.n.x*19*k}" y="${mid.y+wg.n.y*19*k+3*k}" font-size="${9*k}" font-weight="700" fill="#0369a1" text-anchor="middle">RETIRAR ${f2(ab.ancho)}×${f2(ab.alto)}</text>`;
+  }
+  if(VISTA==="demolicion"&&est==="nueva"&&sh.obra!=="nuevo")s+=`<text x="${mid.x+wg.n.x*17*k}" y="${mid.y+wg.n.y*17*k+3*k}" font-size="${9*k}" font-weight="700" fill="#ea580c" text-anchor="middle">ABRIR VANO ${f2(ab.ancho)}×${f2(ab.alto)}</text>`;
+  return s;
+}
+
+/* ---------- láminas (vistas) y cuadros ---------- */
+const VISTAS=[["general","Distribución"],["croquis","Croquis"],["demolicion","Demolición"],["muros","Muros y acabados"],["puertas","Puertas y ventanas"],["inventario","Inventario"],["electrico","Eléctrico"],["hidraulico","Hidráulico"],["sanitario","Sanitario"]];
+const KINDS={demolicion:["arbol"],electrico:["foco","ventilador","contacto","apagador","tv","caja_breakers","caja_ac","medidor","minisplit"],hidraulico:["regadera","tina","lavabo","fregadero","lavadora","inodoro","toma_agua","calentador"],sanitario:["inodoro","regadera","tina","lavabo","fregadero","lavadora","coladera","registro"]};
+let VISTA="general",curTags={m:{},g:[]},curInv={res:new Map(),supply:[],demand:[]},curDem=new Set();
+const MATC={tablaroca:"#d97706",duroc:"#16a34a",existente:"#94a3b8",ninguno:"#94a3b8"},MATL={tablaroca:"Tabla roca",duroc:"Duroc",existente:"Existente",ninguno:"Sin acabado"};
+const fold=s=>String(s??"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+function showShape(sh){if(VISTA==="general")return true;if(VISTA==="demolicion"||VISTA==="inventario"||VISTA==="croquis")return sh.type!=="lamina";if(VISTA==="muros")return sh.type==="cuarto"||sh.type==="muro";return sh.type==="cuarto"}
+function cfg(){return{calle:S.calle||"",cC:+S.cC||12,cR:+S.cR||10,umbral:S.umbral!=null&&S.umbral!==""?+S.umbral:20,grupo:Math.max(1,Math.round(+S.grupo||4)),hilos:3,pend:S.pend!=null&&S.pend!==""?+S.pend:1.5,pend2:S.pend2!=null&&S.pend2!==""?+S.pend2:2}}
+function isExt(name){const w=fold(S.exteriores??"patio, jardin, azotea, terraza, cochera, exterior").split(",").map(x=>x.trim()).filter(Boolean),n=fold(name);return w.some(x=>n.includes(x))}
+function isWet(name){const w=fold(S.humedos??"").split(",").map(x=>x.trim()).filter(Boolean),n=fold(name);return w.some(x=>n.includes(x))}
+function inPoly(p,poly){let c=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const a=poly[i],b=poly[j];if((a.y>p.y)!==(b.y>p.y)&&p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x)c=!c}return c}
+function roomAt(p){let best=null,ba=Infinity;for(const s of S.shapes){if(s.type!=="cuarto"||!inPoly(p,polyOf(s)))continue;const a=area(s);if(a<ba){ba=a;best=s}}return best}
+function wallRecs(){
+  const recs=[],alto=S.alt||2.4;
+  for(const sh of S.shapes){
+    if(sh.type!=="cuarto"&&sh.type!=="muro")continue;
+    const nuevo=sh.type==="muro"||sh.obra==="nuevo",p=points(sh);
+    sh.segs.forEach((s,i)=>{
+      const a=p[i],b=p[i+1],L=Math.hypot(b.x-a.x,b.y-a.y);if(L<0.01)return;
+      const d={x:(b.x-a.x)/L,y:(b.y-a.y)/L},nr={x:-d.y,y:d.x},m={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+      const ra=roomAt({x:m.x+nr.x*.15,y:m.y+nr.y*.15}),rb=roomAt({x:m.x-nr.x*.15,y:m.y-nr.y*.15}),ov=s.mat||{};
+      const auto=r=>r?((isWet(r.name)||isExt(r.name))?"duroc":"tablaroca"):"duroc";
+      const ma=ov.a||(nuevo?auto(ra):"existente"),mb=ov.b||(nuevo?auto(rb):"existente");
+      let ca=true,cb=true;
+      if(sh.type==="cuarto"){ca=ra===sh||ra===null||ra.obra!=="nuevo";cb=rb===sh||rb===null||rb.obra!=="nuevo"}
+      const real=x=>x==="tablaroca"||x==="duroc";
+      const open=(S.aberts||[]).filter(x=>x.room===sh.id&&x.seg===i&&x.estado!=="tapar").reduce((t,x)=>t+x.ancho*x.alto,0);
+      let struct=nuevo;
+      if(struct)for(const r of recs){if(!r.struct)continue;const dx=r.b.x-r.a.x,dy=r.b.y-r.a.y,Lr=Math.hypot(dx,dy),cr=Math.abs((m.x-r.a.x)*dy-(m.y-r.a.y)*dx)/Lr,pr=((m.x-r.a.x)*dx+(m.y-r.a.y)*dy)/Lr;if(cr<0.03&&pr>=-0.02&&pr<=Lr+0.02){struct=false;break}}
+      recs.push({sh,i,a,b,L,d,nr,m,ma,mb,ra,rb,ca:ca&&real(ma),cb:cb&&real(mb),open,struct,nuevo,alto});
+    });
+  }
+  addZones(recs);
+  return recs;
+}
+function addZones(recs){
+  const sh=(S.objs||[]).filter(o=>o.kind==="regadera");
+  for(const r of recs){r.zA=0;r.zB=0;r.zones=[]}
+  for(const o of sh){
+    const hx=Math.abs(o.u.x)*o.w/2+Math.abs(o.n.x)*o.h/2,hy=Math.abs(o.u.y)*o.w/2+Math.abs(o.n.y)*o.h/2,mg=0.1;
+    for(const r of recs){
+      const horiz=Math.abs(r.b.y-r.a.y)<0.01,vert=Math.abs(r.b.x-r.a.x)<0.01;if(!horiz&&!vert)continue;
+      let p0,p1,near;
+      if(horiz){near=Math.abs(r.a.y-o.cy)<=hy+0.15;const x0=Math.max(Math.min(r.a.x,r.b.x),o.cx-hx-mg),x1=Math.min(Math.max(r.a.x,r.b.x),o.cx+hx+mg);p0={x:x0,y:r.a.y};p1={x:Math.max(x0,x1),y:r.a.y}}
+      else{near=Math.abs(r.a.x-o.cx)<=hx+0.15;const y0=Math.max(Math.min(r.a.y,r.b.y),o.cy-hy-mg),y1=Math.min(Math.max(r.a.y,r.b.y),o.cy+hy+mg);p0={x:r.a.x,y:y0};p1={x:r.a.x,y:Math.max(y0,y1)}}
+      const lz=Math.hypot(p1.x-p0.x,p1.y-p0.y);if(!near||lz<0.05)continue;
+      const side=((o.cx-r.m.x)*r.nr.x+(o.cy-r.m.y)*r.nr.y)>0?"A":"B";r["z"+side]+=lz;r.zones.push({side,p0,p1});
+    }
+  }
+}
+function qty(recs){
+  const sep=(S.sepPostes||61)/100,BASE=0.10;let tr=0,duBase=0,duZona=0,duExt=0,postes=0,canal=0,zonaM=0;
+  for(const r of recs){
+    const full=Math.max(0,r.L*r.alto-r.open);
+    for(const[cnt,mat,z]of[[r.ca,r.ma,r.zA||0],[r.cb,r.mb,r.zB||0]]){
+      if(!cnt)continue;
+      if(mat==="duroc"){duExt+=full;continue}
+      const base=Math.min(BASE,r.alto)*r.L,zz=Math.min(z,r.L)*Math.max(0,r.alto-BASE);
+      duBase+=base;duZona+=zz;zonaM+=Math.min(z,r.L);tr+=Math.max(0,full-base-zz);
+    }
+    if(r.struct){postes+=Math.ceil(r.L/sep)+1;canal+=2*r.L}
+  }
+  const du=duBase+duZona+duExt;
+  return{tr,du,duBase,duZona,duExt,zonaM,postes,canal,hTr:Math.ceil(tr*1.1/2.98),hDu:Math.ceil(du*1.1/2.98),cPz:Math.ceil(canal/3.05)};
+}
+function tagsAb(){
+  const list=(S.aberts||[]).filter(a=>a.estado!=="tapar"&&a.estado!=="retirada"),m={},g=[];
+  const key=a=>[a.ancho,a.alto,a.antepecho||0].map(r2).join("x");
+  for(const kind of["puerta","ventana"]){
+    const keys=[...new Set(list.filter(a=>a.kind===kind).map(key))].sort((x,y)=>{const[a1,b1]=x.split("x").map(Number),[a2,b2]=y.split("x").map(Number);return a1-a2||b1-b2});
+    keys.forEach((kk,i)=>g.push({kind,key:kk,tag:(kind==="puerta"?"P":"V")+(i+1)}));
+  }
+  for(const a of list)m[a.id]=g.find(x=>x.kind===a.kind&&x.key===key(a)).tag;
+  return{m,g};
+}
+function drawMuros(k){
+  let g="";const sep=(S.sepPostes||61)/100;
+  for(const r of wallRecs()){
+    for(const[side,mat]of[[1,r.ma],[-1,r.mb]]){
+      if(mat==="existente"||mat==="ninguno")continue;
+      const off=7.5*k*side,c=MATC[mat];
+      g+=`<line x1="${r.a.x+r.nr.x*off}" y1="${r.a.y+r.nr.y*off}" x2="${r.b.x+r.nr.x*off}" y2="${r.b.y+r.nr.y*off}" stroke="${c}" stroke-width="${2.6*k}"/>`;
+      g+=`<text x="${r.m.x+r.nr.x*21*k*side}" y="${r.m.y+r.nr.y*21*k*side+3*k}" font-size="${9*k}" font-weight="700" fill="${c}" text-anchor="middle">${mat==="duroc"?"DUROC":"T.R."}</text>`;
+      if(mat==="tablaroca"){const o2=off+side*3.6*k;g+=`<line x1="${r.a.x+r.nr.x*o2}" y1="${r.a.y+r.nr.y*o2}" x2="${r.b.x+r.nr.x*o2}" y2="${r.b.y+r.nr.y*o2}" stroke="${MATC.duroc}" stroke-width="${1.3*k}" stroke-dasharray="${4*k} ${2*k}"/>`}
+    }
+    for(const z of r.zones||[]){const side=z.side==="A"?1:-1,o3=7.5*k*side;g+=`<line x1="${z.p0.x+r.nr.x*o3}" y1="${z.p0.y+r.nr.y*o3}" x2="${z.p1.x+r.nr.x*o3}" y2="${z.p1.y+r.nr.y*o3}" stroke="${MATC.duroc}" stroke-width="${5*k}" stroke-linecap="round"/>`}
+    if(r.struct){const n=Math.floor(r.L/sep+1e-6),ts=[];for(let j=0;j<=n;j++)ts.push(j*sep);if(r.L-ts[ts.length-1]>0.05)ts.push(r.L);
+      for(const t of ts)g+=`<rect x="${r.a.x+r.d.x*t-2*k}" y="${r.a.y+r.d.y*t-2*k}" width="${4*k}" height="${4*k}" fill="#475569"/>`}
+  }
+  const lx=view.x+8*k,ly=view.y+view.h-44*k;
+  g+=`<g font-size="${10*k}" fill="currentColor"><line x1="${lx}" y1="${ly}" x2="${lx+22*k}" y2="${ly}" stroke="${MATC.tablaroca}" stroke-width="${2.6*k}"/><text x="${lx+28*k}" y="${ly+3*k}">Tabla roca</text><line x1="${lx}" y1="${ly+14*k}" x2="${lx+22*k}" y2="${ly+14*k}" stroke="${MATC.duroc}" stroke-width="${2.6*k}"/><text x="${lx+28*k}" y="${ly+17*k}">Duroc (exterior y zona de regadera)</text><rect x="${lx+8*k}" y="${ly+26*k}" width="${4*k}" height="${4*k}" fill="#475569"/><text x="${lx+28*k}" y="${ly+31*k}">Poste (a cada ${f2(sep)} m)</text></g>`;
+  return g;
+}
+function drawCalle(k){
+  if(!S.calle||!S.shapes.length)return"";
+  const all=S.shapes.flatMap(points),bb=bbox(all),m=1.0;let x1,y1,x2,y2,tx,ty,rot=0;
+  if(S.calle==="abajo"){y1=y2=bb.y1+m;x1=bb.x0;x2=bb.x1;tx=(x1+x2)/2;ty=y1+14*k}
+  else if(S.calle==="arriba"){y1=y2=bb.y0-m;x1=bb.x0;x2=bb.x1;tx=(x1+x2)/2;ty=y1-8*k}
+  else if(S.calle==="izquierda"){x1=x2=bb.x0-m;y1=bb.y0;y2=bb.y1;tx=x1-8*k;ty=(y1+y2)/2;rot=-90}
+  else{x1=x2=bb.x1+m;y1=bb.y0;y2=bb.y1;tx=x1+14*k;ty=(y1+y2)/2;rot=90}
+  return`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#64748b" stroke-width="${6*k}" stroke-linecap="round" opacity=".55"/><text x="${tx}" y="${ty}" font-size="${12*k}" font-weight="700" fill="#64748b" text-anchor="middle" transform="rotate(${rot} ${tx} ${ty})">CALLE</text>`;
+}
+/* ---------- croquis: marcas a mano sobre el plano ---------- */
+const MKT=[["pan","✋ Mover"],["lapiz","✏️ Lápiz"],["pared","🧱 Pared"],["cuarto","🏠 Cuarto"],["techo","☂️ Techo"],["flecha","➡️ Flecha"],["texto","🔤 Texto"],["borrar","🧽 Borrar"]];
+let MT="pan",MK_ON=false,curMark=null;
+function mkRender(){
+  $("mkTools").hidden=!MK_ON;$("mkToggle").textContent=MK_ON?"✔️ Terminar de marcar":"✏️ Marcar sobre el plano";
+  $("mkTools").innerHTML=MKT.map(([k,l])=>`<button data-mk="${k}" class="${k===MT?"":"sec"}">${l}</button>`).join("")+'<button class="sec" data-mk="_undo">↩️ Marca</button><button class="sec" data-mk="_clear">🗑️ Todo</button>';
+}
+$("mkToggle").onclick=()=>{MK_ON=!MK_ON;if(MK_ON&&!["general","croquis"].includes(VISTA))VISTA="croquis";setMode(MK_ON&&MT!=="pan"?"mark":"pan");mkRender();render()};
+$("mkTools").onclick=e=>{const b=e.target.closest("button");if(!b)return;const k=b.dataset.mk;
+  if(k==="_undo")S.marcas.pop();else if(k==="_clear"){if(confirm("¿Borrar todas las marcas?"))S.marcas=[]}else{MT=k;setMode(k==="pan"?"pan":"mark")}
+  mkRender();render()};
+const sn=v=>Math.round(v/0.05)*0.05;
+function ortho(a,b){const dx=b.x-a.x,dy=b.y-a.y,ang=Math.abs(Math.atan2(dy,dx)*180/Math.PI);if(ang<6||ang>174)return{x:b.x,y:a.y};if(Math.abs(ang-90)<6)return{x:a.x,y:b.y};return b}
+function markStart(w){curMark=(MT==="texto"||MT==="borrar")?{tool:MT,pts:[{x:w.x,y:w.y}],tap:true}:{tool:MT,pts:[{x:(MT==="lapiz"?w.x:sn(w.x)),y:(MT==="lapiz"?w.y:sn(w.y))}]};draw()}
+function markMove(w){
+  if(!curMark||curMark.tap)return;const t=curMark.tool,p=curMark.pts;
+  if(t==="lapiz"){const l=p[p.length-1];if(Math.hypot(w.x-l.x,w.y-l.y)>3*w.s)p.push({x:w.x,y:w.y})}
+  else{let q={x:sn(w.x),y:sn(w.y)};if(t==="pared"||t==="flecha")q=ortho(p[0],q);p[1]=q}
+  draw();
+}
+function markCancel(){if(curMark){curMark=null;draw()}}
+function mkDist(m,p){ // distancia de un punto a una marca
+  const seg=(a,b)=>{const dx=b.x-a.x,dy=b.y-a.y,L2=dx*dx+dy*dy;let t=L2?((p.x-a.x)*dx+(p.y-a.y)*dy)/L2:0;t=Math.max(0,Math.min(1,t));return Math.hypot(p.x-(a.x+t*dx),p.y-(a.y+t*dy))};
+  const P=m.pts;if(m.tipo==="texto")return Math.hypot(p.x-P[0].x,p.y-P[0].y);
+  if(m.tipo==="cuarto"||m.tipo==="techo"){const bb=bbox(P);return p.x>=bb.x0&&p.x<=bb.x1&&p.y>=bb.y0&&p.y<=bb.y1?0:Math.min(seg({x:bb.x0,y:bb.y0},{x:bb.x1,y:bb.y0}),seg({x:bb.x1,y:bb.y0},{x:bb.x1,y:bb.y1}),seg({x:bb.x1,y:bb.y1},{x:bb.x0,y:bb.y1}),seg({x:bb.x0,y:bb.y1},{x:bb.x0,y:bb.y0}))}
+  let d=Infinity;for(let i=1;i<P.length;i++)d=Math.min(d,seg(P[i-1],P[i]));return d;
+}
+function markEnd(w,wasTap){
+  if(!curMark)return;const mk=curMark;curMark=null;
+  if(mk.tool==="borrar"){let bi=-1,bd=12*w.s;S.marcas.forEach((m,i)=>{const d=mkDist(m,w);if(d<bd){bd=d;bi=i}});if(bi>=0)S.marcas.splice(bi,1);render();return}
+  if(mk.tool==="texto"){if(wasTap){const t=prompt("Texto de la nota:","");if(t&&t.trim())S.marcas.push({id:uid(),num:++S.mkSeq,tipo:"texto",pts:mk.pts,texto:t.trim()})}render();return}
+  const p=mk.pts;
+  if(mk.tool==="lapiz"){if(p.length>=3)S.marcas.push({id:uid(),num:++S.mkSeq,tipo:"lapiz",pts:p.map(q=>({x:r2(q.x),y:r2(q.y)})),texto:""})}
+  else if(p.length===2&&Math.hypot(p[1].x-p[0].x,p[1].y-p[0].y)>0.15){
+    const ask={cuarto:"¿Qué va aquí? Ej: Baño, Cocina",techo:"Etiqueta del techo (opcional). Ej: Lámina patio",pared:"Nota de la pared (opcional). Ej: Tabla roca",flecha:"Texto de la flecha (opcional)"}[mk.tool];
+    const t=prompt(ask,"");S.marcas.push({id:uid(),num:++S.mkSeq,tipo:mk.tool,pts:p.map(q=>({x:r2(q.x),y:r2(q.y)})),texto:(t||"").trim()});
+  }
+  render();
+}
+function markSvg(m,k,prov){
+  const P=m.pts,txt=(x,y,s,fs,col,w)=>`<text x="${x}" y="${y}" font-size="${fs*k}" ${w?`font-weight="${w}"`:""} fill="${col}" text-anchor="middle" stroke="#fff" stroke-width="${3*k}" paint-order="stroke" stroke-linejoin="round">${esc(s)}</text>`;
+  if(m.tipo==="lapiz")return`<polyline points="${P.map(q=>q.x+","+q.y).join(" ")}" fill="none" stroke="#7c3aed" stroke-width="${2.2*k}" stroke-linecap="round" stroke-linejoin="round" ${prov?'opacity=".7"':""}/>`;
+  if(m.tipo==="texto")return txt(P[0].x,P[0].y,m.texto,14,"#111827",700);
+  if(P.length<2)return"";
+  const a=P[0],b=P[1],bb=bbox(P),w=bb.x1-bb.x0,h=bb.y1-bb.y0,cx=(bb.x0+bb.x1)/2,cy=(bb.y0+bb.y1)/2;
+  if(m.tipo==="cuarto")return`<rect x="${bb.x0}" y="${bb.y0}" width="${w}" height="${h}" fill="#16a34a26" stroke="#16a34a" stroke-width="${2.4*k}" stroke-dasharray="${8*k} ${5*k}"/>`+txt(cx,cy,m.texto||"Cuarto",17,"#166534",700)+txt(cx,cy+16*k,`≈ ${f2(w)} × ${f2(h)} m`,11,"#166534");
+  if(m.tipo==="techo")return`<rect x="${bb.x0}" y="${bb.y0}" width="${w}" height="${h}" fill="url(#rayas)" stroke="#2563eb" stroke-width="${2.4*k}" stroke-dasharray="${8*k} ${5*k}"/>`+txt(cx,cy,m.texto||"Techo de lámina",15,"#1d4ed8",700)+txt(cx,cy+15*k,`≈ ${f2(w*h)} m²`,11,"#1d4ed8");
+  const L=Math.hypot(b.x-a.x,b.y-a.y);
+  if(m.tipo==="pared")return`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#ea580c" stroke-width="${6*k}" stroke-linecap="round" stroke-dasharray="${10*k} ${6*k}" opacity=".9"/>`+txt((a.x+b.x)/2,(a.y+b.y)/2-10*k,`${m.texto?m.texto+" · ":""}≈ ${f2(L)} m`,11,"#c2410c",700);
+  if(m.tipo==="flecha"){const ang=Math.atan2(b.y-a.y,b.x-a.x),hl=12*k,h1={x:b.x-hl*Math.cos(ang-.45),y:b.y-hl*Math.sin(ang-.45)},h2={x:b.x-hl*Math.cos(ang+.45),y:b.y-hl*Math.sin(ang+.45)};
+    return`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#111827" stroke-width="${2.6*k}" stroke-linecap="round"/><polygon points="${b.x},${b.y} ${h1.x},${h1.y} ${h2.x},${h2.y}" fill="#111827"/>`+(m.texto?txt(a.x,a.y-8*k,m.texto,12,"#111827",700):"")}
+  return"";
+}
+function drawMarcas(k){return(S.marcas||[]).map(m=>markSvg(m,k)).join("")+(curMark&&!curMark.tap&&curMark.pts.length>=1?markSvg({tipo:curMark.tool,pts:curMark.pts,texto:""},k,true):"")}
+function marksInfo(){
+  return(S.marcas||[]).map((m,i)=>{const bb=bbox(m.pts),w=bb.x1-bb.x0,h=bb.y1-bb.y0,c=roomAt({x:(bb.x0+bb.x1)/2,y:(bb.y0+bb.y1)/2});
+    return{n:m.num||(i+1),m,w,h,L:m.tipo==="pared"||m.tipo==="flecha"?Math.hypot(m.pts[1].x-m.pts[0].x,m.pts[1].y-m.pts[0].y):0,cae:c?c.name||"s/n":""}});
+}
+/* ---------- verificación guiada y recálculo por proporción ---------- */
+let qN=6,hiWall=null,lastRecalc=[];
+const axisOf=sg=>{const a=((sg.ang%180)+180)%180;return a<1||a>179?"h":(Math.abs(a-90)<1?"v":null)};
+const baseLen=sg=>sg.orig!==undefined?sg.orig:(sg.est!==undefined?sg.est:sg.len);
+function preguntas(n){
+  const map=new Map(wallRecs().map(r=>[r.sh.id+":"+r.i,r])),cands=[];
+  for(const sh of S.shapes){
+    if(sh.type!=="cuarto"||sh.obra==="nuevo")continue;
+    sh.segs.forEach((sg,i)=>{
+      if(sg.conf||sg.len<1.0)return;
+      if(sh.segs.length===4&&sh.segs[(i+2)%4].conf)return;
+      const r=map.get(sh.id+":"+i),shared=!!(r&&r.ra&&r.rb&&r.ra!==r.rb),open=(S.aberts||[]).filter(a=>a.room===sh.id&&a.seg===i).length;
+      cands.push({sh,i,sg,ax:axisOf(sg),shared,open,score:sg.len*(1+(shared?0.6:0))*(1+0.2*open)});
+    });
+  }
+  cands.sort((a,b)=>b.score-a.score);
+  const keyOf=c=>c.sh.segs.length===4&&c.ax?c.sh.id+c.ax:c.sh.id+":"+c.i,used=new Set(),uniq=[];
+  for(const c of cands){const k=keyOf(c);if(used.has(k))continue;used.add(k);uniq.push(c)}
+  cands.length=0;cands.push(...uniq);
+  const out=[],rooms=new Set();
+  for(const c of cands){if(out.length>=n)break;if(!rooms.has(c.sh.id)){out.push(c);rooms.add(c.sh.id)}}
+  for(const ax of["h","v"])if(!out.some(c=>c.ax===ax)){const c=cands.find(x=>x.ax===ax&&!out.includes(x));if(c)out.push(c)}
+  for(const c of cands){if(out.length>=n)break;if(!out.includes(c))out.push(c)}
+  return out.slice(0,Math.max(n,2));
+}
+function motivo(c){const m=[];if(c.sg.len>=4)m.push("pared larga: ahí se acumula más error");else m.push("define el tamaño del cuarto");if(c.shared)m.push("la comparte con otro cuarto");if(c.open)m.push("tiene puerta o ventana");return m.join(" · ")}
+const median=a=>{if(!a.length)return 1;const q=a.slice().sort((x,y)=>x-y);return q[Math.floor(q.length/2)]};
+function confirmWall(sh,i,v){const sg=sh.segs[i];if(sg.orig===undefined&&sg.est===undefined)sg.est=sg.len;sg.len=Math.round(v*100)/100;sg.conf=true;delete sg.auto}
+function adjustClosure(sh){
+  const c=closure(sh),un=sh.segs.filter(x=>!x.conf);if(c.e<0.005||!un.length)return;
+  const u=un.map(x=>[Math.cos(x.ang*Math.PI/180),Math.sin(x.ang*Math.PI/180)]);let m00=0,m01=0,m11=0;for(const[x,y]of u){m00+=x*x;m01+=x*y;m11+=y*y}
+  const det=m00*m11-m01*m01,ex=-c.dx,ey=-c.dy;let d;
+  if(Math.abs(det)>1e-6){const lx=(m11*ex-m01*ey)/det,ly=(-m01*ex+m00*ey)/det;d=u.map(([x,y])=>lx*x+ly*y)}
+  else{const[ux,uy]=u[0],k=u.reduce((t,[x,y])=>t+(x*ux+y*uy)**2,0),l=(ex*ux+ey*uy)/k;d=u.map(([x,y])=>l*(x*ux+y*uy))}
+  un.forEach((x,i)=>{x.len=Math.max(0.01,Math.round((x.len+d[i])*1000)/1000)});
+}
+function recalcular(){
+  const rooms=S.shapes.filter(x=>x.type==="cuarto"&&x.obra!=="nuevo");
+  for(const sh of rooms)for(const sg of sh.segs)if(sg.orig===undefined&&sg.est===undefined)sg.est=sg.len;
+  const ratios={h:[],v:[]};
+  for(const sh of rooms)for(const sg of sh.segs){if(!sg.conf)continue;const ax=axisOf(sg),b=baseLen(sg);if(!ax||!(b>0.5))continue;const r=sg.len/b;if(r>0.8&&r<1.2)ratios[ax].push(r)}
+  const sx=Math.max(0.9,Math.min(1.1,median(ratios.h))),sy=Math.max(0.9,Math.min(1.1,median(ratios.v))),ch=[];
+  for(const sh of rooms){
+    sh.segs.forEach((sg,i)=>{
+      if(sg.conf)return;const ax=axisOf(sg);if(!ax)return;const b=baseLen(sg);let nl=b*(ax==="h"?sx:sy),why="proporción";
+      if(sh.segs.length===4){const o=sh.segs[(i+2)%4];if(o.conf&&Math.abs(baseLen(o)-b)/Math.max(baseLen(o),0.01)<0.12){nl=o.len;why="igual a la pared de enfrente"}}
+      nl=Math.round(nl*100)/100;
+      if(Math.abs(nl-sg.len)>0.004){ch.push({sh,i,from:sg.len,to:nl,why});sg.len=nl}
+      sg.auto=true;
+    });
+    adjustClosure(sh);
+  }
+  const big=ch.slice().sort((a,b)=>Math.abs(b.to-b.from)-Math.abs(a.to-a.from)).slice(0,5);
+  lastRecalc=ch.length?[`Se ajustaron ${ch.length} pared(es). Escala aplicada: horizontal ${(sx*100).toFixed(1)}% · vertical ${(sy*100).toFixed(1)}%.`,...big.map(c=>`Cuarto ${c.sh.name||"s/n"} · pared ${c.i+1}: ${f2(c.from)} → ${f2(c.to)} m (${c.to>=c.from?"+":""}${Math.round((c.to-c.from)*100)} cm, ${c.why})`)]:["Las demás paredes ya coinciden con tus medidas."];
+  return{n:ch.length,sx,sy,resumen:ch.length?`Ajusté ${ch.length} pared(es) por proporción (horizontal ${(sx*100).toFixed(1)}%, vertical ${(sy*100).toFixed(1)}%).`:"Las demás paredes ya coinciden."};
+}
+function focusRoom(sh){const bb=bbox(points(sh)),m=Math.max(0.8,(bb.x1-bb.x0+bb.y1-bb.y0)*0.15);view={x:bb.x0-m,y:bb.y0-m,w:Math.max(bb.x1-bb.x0+2*m,2),h:Math.max(bb.y1-bb.y0+2*m,2)}}
+function renderVer(){
+  const el=$("verBody"),q=preguntas(qN),rooms=S.shapes.filter(x=>x.type==="cuarto"&&x.obra!=="nuevo"),conf=rooms.reduce((t,r)=>t+r.segs.filter(g=>g.conf).length,0);
+  if(!rooms.length){el.innerHTML='<div class="status" style="color:var(--mut)">Cuando levantes o calques tus cuartos, aquí te digo qué paredes conviene confirmar con el láser.</div>';return}
+  let h=`<div class="status" style="color:var(--mut)">No tiene que quedar exacto: es un plano de referencia. Confirma estas pocas paredes con el láser y la app corrige las demás por proporción.</div>`;
+  if(!q.length)h+='<div class="status ok">✅ Ya confirmaste las paredes clave. Si quieres, agrega más medidas desde “Editar”.</div>';
+  else h+=q.map((c,k)=>`<div class="ver" data-sh="${c.sh.id}" data-i="${c.i}" style="border-top:1px solid var(--bd);padding:8px 0"><div><b>Cuarto ${esc(c.sh.name||"s/n")} · pared ${c.i+1}</b> <span style="color:var(--mut)">(${c.ax==="h"?"horizontal":(c.ax==="v"?"vertical":"inclinada")}) · el plano dice <b>${f2(baseLen(c.sg))} m</b></span></div><div class="status" style="color:var(--mut)">${esc(motivo(c))}</div><div class="row"><input data-vin type="number" step="0.01" inputmode="decimal" placeholder="Medida con láser (m)" aria-label="Medida con láser"><button class="sec" data-vok>✔ Está bien</button><button class="sec" data-vsee>📍 Ver</button></div></div>`).join("")+`<div class="row"><button id="vApply">Recalcular con mis medidas</button><button class="sec" id="vMore">Preguntar por más</button></div>`;
+  h+=`<div class="status" style="color:var(--mut)">Medidas confirmadas: ${conf}</div>`;
+  if(lastRecalc.length)h+=`<div class="status ok">${lastRecalc.map(esc).join("<br>")}</div>`;
+  el.innerHTML=h;
+}
+$("verBody").onclick=e=>{
+  const row=e.target.closest(".ver"),b=e.target.closest("button");
+  if(b&&b.id==="vMore"){qN+=5;renderVer();return}
+  if(b&&b.id==="vApply"){let n=0;for(const r of $("verBody").querySelectorAll(".ver")){const v=parseFloat(r.querySelector("[data-vin]").value);const sh=S.shapes.find(x=>x.id===r.dataset.sh);if(sh&&v>0.2&&v<60){confirmWall(sh,+r.dataset.i,v);n++}}if(n){recalcular();render()}return}
+  if(!row||!b)return;const sh=S.shapes.find(x=>x.id===row.dataset.sh),i=+row.dataset.i;if(!sh)return;
+  if(b.hasAttribute("data-vok")){confirmWall(sh,i,sh.segs[i].len);recalcular();render()}
+  else if(b.hasAttribute("data-vsee")){sel=sh.id;hiWall={id:sh.id,i};focusRoom(sh);render()}
+};
+$("verBody").onfocusin=e=>{const row=e.target.closest&&e.target.closest(".ver");if(row&&e.target.hasAttribute("data-vin")){hiWall={id:row.dataset.sh,i:+row.dataset.i};draw()}};
+function drawExtras(k){
+  let g="";curTags=tagsAb();if(VISTA==="inventario"){curInv=calcInv();curDem=removedByDemo()}
+  for(const ab of S.aberts||[])g+=drawAb(ab,k);
+  const kinds=KINDS[VISTA];
+  if(VISTA==="general"||kinds)for(const o of S.objs||[])if(!kinds||kinds.includes(o.kind))g+=drawObj(o,k);
+  if(VISTA==="muros")g+=drawMuros(k);
+  g+=drawInst(k);
+  if(VISTA==="general"||VISTA==="croquis")g+=drawMarcas(k);
+  g+=`<text x="${view.x+8*k}" y="${view.y+18*k}" font-size="${14*k}" font-weight="700" fill="currentColor">${esc((VISTAS.find(v=>v[0]===VISTA)||[0,""])[1])}</text>`;
+  return g;
+}
+function removedByDemo(){
+  const demos=S.shapes.filter(x=>x.type==="demo"),out=new Set();
+  for(const a of S.aberts||[]){
+    if(a.estado!=="existente")continue;const sh=S.shapes.find(x=>x.id===a.room);if(!sh||a.seg>=sh.segs.length)continue;
+    const wg=wallGeo(sh,a.seg),c=a.pos+a.ancho/2,m={x:wg.o.x+wg.u.x*c,y:wg.o.y+wg.u.y*c};
+    for(const d of demos){const p=points(d);for(let i=0;i<d.segs.length;i++){const A=p[i],B=p[i+1],L=Math.hypot(B.x-A.x,B.y-A.y);if(L<0.01)continue;
+      const cr=Math.abs((m.x-A.x)*(B.y-A.y)-(m.y-A.y)*(B.x-A.x))/L,pr=((m.x-A.x)*(B.x-A.x)+(m.y-A.y)*(B.y-A.y))/L;if(cr<0.08&&pr>=-0.02&&pr<=L+0.02)out.add(a.id)}}
+  }
+  return out;
+}
+function calcInv(){
+  const dem=removedByDemo(),ov=S.invOv||{},ex=(S.tolEx!=null&&S.tolEx!==""?+S.tolEx:3)/100,near=(S.tolNear!=null&&S.tolNear!==""?+S.tolNear:10)/100,supply=[];
+  for(const it of S.inv||[]){const n=Math.max(1,it.cantidad|0);for(let i=0;i<n;i++)supply.push({key:it.id+"#"+i,src:"manual",itemId:it.id,foto:it.foto,tipo:it.tipo,ancho:it.ancho,alto:it.alto,detalle:it.detalle||"",estadoF:it.estadoF||"buena",origen:it.origen||"(registrada a mano)",ok:(it.estadoF||"buena")!=="mala"})}
+  for(const a of S.aberts||[]){
+    if(a.kind!=="ventana"&&a.kind!=="puerta")continue;
+    const removed=a.estado==="tapar"||a.estado==="retirada"||dem.has(a.id);if(!removed)continue;
+    const o=ov[a.id]||{},rm=S.shapes.find(x=>x.id===a.room);
+    supply.push({key:a.id,src:"plano",abId:a.id,foto:o.foto,tipo:a.kind,ancho:a.ancho,alto:a.alto,detalle:o.detalle||"",estadoF:o.estadoF||"buena",origen:`Cuarto ${rm?rm.name||"s/n":"?"}${dem.has(a.id)?" (por demolición)":(a.estado==="tapar"?" (se tapa el vano)":" (se retira)")}`,ok:(o.estadoF||"buena")!=="mala"});
+  }
+  const T=tagsAb(),demand=(S.aberts||[]).filter(a=>(a.estado||"nueva")==="nueva"&&(a.kind==="ventana"||a.kind==="puerta")).map(a=>({a,tag:T.m[a.id]||"?",kind:a.kind,ancho:a.ancho,alto:a.alto,room:S.shapes.find(x=>x.id===a.room)}));
+  const pairs=[];
+  for(const d of demand)for(const s of supply){if(!s.ok||s.tipo!==d.kind)continue;const dw=s.ancho-d.ancho,dh=s.alto-d.alto,c=Math.abs(dw)+Math.abs(dh);
+    const nuevo=d.room&&d.room.obra==="nuevo";
+    if(Math.abs(dw)<=ex+1e-9&&Math.abs(dh)<=ex+1e-9)pairs.push({d,s,c,t:"exacta",dw,dh});
+    else if(nuevo&&Math.abs(dw)<=0.5&&Math.abs(dh)<=0.5)pairs.push({d,s,c,t:"claro",dw,dh});
+    else if(Math.abs(dw)<=near+1e-9&&Math.abs(dh)<=near+1e-9)pairs.push({d,s,c,t:"ajuste",dw,dh})}
+  const ord={exacta:0,claro:1,ajuste:2};
+  pairs.sort((x,y)=>(ord[x.t]-ord[y.t])||x.c-y.c);
+  const used=new Set(),res=new Map();
+  for(const p of pairs){if(res.has(p.d.a.id)||used.has(p.s.key))continue;res.set(p.d.a.id,p);used.add(p.s.key)}
+  return{supply,demand,res,used};
+}
+function desniveles(){
+  const out=[],T=tagsAb();
+  for(const a of S.aberts||[]){
+    if(a.kind!=="puerta"||a.estado==="tapar"||a.estado==="retirada")continue;
+    const sh=S.shapes.find(x=>x.id===a.room);if(!sh||a.seg>=sh.segs.length)continue;
+    const wg=wallGeo(sh,a.seg),c={x:wg.o.x+wg.u.x*(a.pos+a.ancho/2),y:wg.o.y+wg.u.y*(a.pos+a.ancho/2)};
+    const dentro=roomAt({x:c.x+wg.n.x*.2,y:c.y+wg.n.y*.2}),fuera=roomAt({x:c.x-wg.n.x*.2,y:c.y-wg.n.y*.2});
+    if(dentro===fuera)continue;const d=((dentro&&dentro.nivel)||0)-((fuera&&fuera.nivel)||0);
+    if(Math.abs(d)>0.5)out.push({tag:T.m[a.id]||"P",dentro,fuera,d});
+  }
+  return out;
+}
+function ajustarClaros(){
+  const I=calcInv();let n=0;
+  for(const m of I.res.values()){
+    if(m.t==="exacta")continue;const a=m.d.a,sh=S.shapes.find(x=>x.id===a.room);if(!sh||a.seg>=sh.segs.length)continue;
+    if(m.t==="claro"||(m.t==="ajuste"&&sh.obra==="nuevo")){
+      const wg=wallGeo(sh,a.seg);if(m.s.ancho>wg.L-0.05)continue;
+      a.ancho=m.s.ancho;a.alto=m.s.alto;if(a.pos+a.ancho>wg.L)a.pos=Math.max(0,r2(wg.L-a.ancho));n++;
+    }
+  }
+  return n;
+}
+function ajusteTxt(p){
+  const f=(v,a,b)=>Math.abs(v)<0.005?"":(v>0?`${Math.round(v*100)} cm más ${a}`:`${Math.round(-v*100)} cm más ${b}`);
+  const parts=[f(p.dw,"ancha","angosta"),f(p.dh,"alta","baja")].filter(Boolean).join(" y ");
+  const need=(p.dw>0.005||p.dh>0.005)?"ampliar el vano":"";const fill=(p.dw<-0.005||p.dh<-0.005)?"rellenar la diferencia":"";
+  return `La pieza es ${parts}: ${[need,fill].filter(Boolean).join(" y ")}`;
+}
+function cuadro(v){
+  const rooms=S.shapes.filter(s=>s.type==="cuarto"),alto=S.alt||2.4,esp=(S.espesor||12)/100,objs=S.objs||[],ab=S.aberts||[];
+  const nom=r=>r?(r.name||"s/n"):"?";let title=(VISTAS.find(x=>x[0]===v)||[0,""])[1],head=[],rows=[],foot=[],extra=[],avisos=[];
+  if(v==="general"){
+    head=["Cuarto","m²","Muros","Contenido"];
+    rows=rooms.map(r=>{const c={};for(const o of objs.filter(o=>o.room===r.id&&!POINT[o.kind]))c[o.kind]=(c[o.kind]||0)+1;return[nom(r),f2(area(r)),r.obra==="nuevo"?"Nuevos":"Existentes",Object.entries(c).map(([k,n])=>`${n} ${OBJ[k][2].toLowerCase()}`).join(", ")]});
+    foot=[["Total",f2(rooms.reduce((t,r)=>t+area(r),0)),"",""]];
+  }else if(v==="croquis"){
+    head=["Marca","Qué es","Medida aproximada","Dónde cae"];
+    const info=marksInfo().filter(x=>["cuarto","techo","pared"].includes(x.m.tipo));let ml=0,ma=0,mt=0;
+    rows=info.map(x=>{const t=x.m.tipo;if(t==="pared"){ml+=x.L}else if(t==="techo"){mt+=x.w*x.h}else{ma+=x.w*x.h}
+      return[`M${x.n}`,t==="cuarto"?`Cuarto: ${x.m.texto||"s/n"}`:(t==="techo"?`Techo de lámina${x.m.texto?": "+x.m.texto:""}`:`Pared nueva${x.m.texto?": "+x.m.texto:""}`),t==="pared"?`≈ ${f2(x.L)} m`:`≈ ${f2(x.w)} × ${f2(x.h)} m (${f2(x.w*x.h)} m²)`,x.cae||"fuera de los cuartos dibujados"]});
+    foot=[[`Paredes: ≈ ${f2(ml)} m`,`Cuartos: ≈ ${f2(ma)} m²`,`Techos: ≈ ${f2(mt)} m²`,""]];
+    avisos=["Medidas aproximadas, tomadas del dibujo a mano. Si quieres darles medida, dile al agente: “convierte el baño que marqué en un cuarto de 1.8 por 2.5”."];
+  }else if(v==="inventario"){
+    const I=calcInv(),nom2=r=>r?(r.name||"s/n"):"?";
+    head=["Clave","Tipo","Medida pedida (m)","Cuarto","Qué hacer","Pieza del inventario"];
+    const label=s=>`${s.tipo==="ventana"?"Ventana":"Puerta"} ${f2(s.ancho)} × ${f2(s.alto)} · ${s.origen}`;
+    const dm=I.demand.slice().sort((a,b)=>String(a.tag).localeCompare(String(b.tag),"es",{numeric:true}));
+    let nR=0,nA=0,nC=0;
+    rows=dm.map(d=>{const m=I.res.get(d.a.id);let acc="Comprar",pz="—";if(m){pz=label(m.s);if(m.t==="exacta"){acc="Reutilizar";nR++}else if(m.t==="claro"){acc=`Reutilizar: dejar el claro de ${f2(m.s.ancho)} × ${f2(m.s.alto)} (hoy pide ${f2(d.ancho)} × ${f2(d.alto)})`;nR++}else{acc="Ajustar: "+ajusteTxt(m);nA++}}else nC++;return[d.tag,d.kind==="puerta"?"Puerta":"Ventana",`${f2(d.ancho)} × ${f2(d.alto)}`,nom2(d.room),acc,pz]});
+    foot=[[`${dm.length} claros nuevos`,"","","",`${nR} se reutilizan · ${nA} con ajuste · ${nC} por comprar`,""]];
+    const sup=I.supply.map(s=>{const asg=[...I.res.values()].find(m=>m.s.key===s.key);return[s.tipo==="ventana"?"Ventana":"Puerta",`${f2(s.ancho)} × ${f2(s.alto)}`,s.origen,s.estadoF,s.detalle||"",!s.ok?"No reutilizable":(asg?`Se usa en ${asg.d.tag} (${nom2(asg.d.room)})`:"Sobrante")]});
+    extra.push({title:"Inventario de piezas retiradas",head:["Tipo","Medida (m)","Origen","Estado","Detalle","Destino"],rows:sup,foot:[[`${I.supply.length} piezas`,"","","","",`${I.supply.filter(s=>I.used.has(s.key)).length} se usan · ${I.supply.filter(s=>s.ok&&!I.used.has(s.key)).length} sobrantes`]]});
+    const buy={};for(const d of dm){if(!I.res.get(d.a.id)){const k=`${d.kind}|${f2(d.ancho)} × ${f2(d.alto)}`;buy[k]=(buy[k]||0)+1}}
+    extra.push({title:"Por comprar (agrupado por medida)",head:["Tipo","Medida (m)","Piezas"],rows:Object.entries(buy).map(([k,n])=>{const[t,m]=k.split("|");return[t==="puerta"?"Puerta":"Ventana",m,n]}),foot:[]});
+    const ex=(S.tolEx!=null&&S.tolEx!==""?+S.tolEx:3),nr=(S.tolNear!=null&&S.tolNear!==""?+S.tolNear:10);
+    avisos=[`En muros nuevos el claro se deja a la medida de la pieza que tienes (botón “Ajustar claros a las piezas”). En muros existentes, “Reutilizar” = diferencia de hasta ${ex} cm y “Ajustar” = hasta ${nr} cm.`,"Una pieza marcada como mala no se asigna a ningún claro."];
+  }else if(v==="puertas"){
+    const T=tagsAb();head=["Clave","Tipo","Medida (m)","Antepecho (m)","Cant.","Ubicación"];
+    rows=T.g.map(g=>{const its=ab.filter(a=>a.estado!=="tapar"&&T.m[a.id]===g.tag),[w,h,sp]=g.key.split("x"),loc={};for(const a of its){const n=nom(S.shapes.find(s=>s.id===a.room));loc[n]=(loc[n]||0)+1}
+      return[g.tag,g.kind==="puerta"?"Puerta":"Ventana",`${w} × ${h}`,g.kind==="ventana"?sp:"—",its.length,Object.entries(loc).map(([n,c])=>c>1?`${n} (${c})`:n).join(", ")]});
+    const nd=ab.filter(a=>a.estado!=="tapar"&&a.kind==="puerta").length,nv=ab.filter(a=>a.estado!=="tapar"&&a.kind==="ventana").length;
+    foot=[[`Total: ${nd} puertas · ${nv} ventanas`,"","","","",""]];
+  }else if(v==="demolicion"){
+    head=["Concepto","Detalle","Largo (m)","Área (m²)","Volumen (m³)"];
+    let tl=0,ta=0,tv=0;
+    S.shapes.filter(s=>s.type==="demo").forEach(s=>{const L=perim(s),A=L*alto,V=A*esp;tl+=L;ta+=A;tv+=V;rows.push([s.name||"Demolición","Muro",f2(L),f2(A),f2(V)])});
+    ab.filter(a=>a.estado==="tapar").forEach(a=>{rows.push(["Tapar vano",`${a.kind} ${f2(a.ancho)} × ${f2(a.alto)} en cuarto ${nom(S.shapes.find(s=>s.id===a.room))}`,f2(a.ancho),f2(a.ancho*a.alto),"—"])});
+    ab.filter(a=>(a.estado||"nueva")==="nueva"&&(S.shapes.find(s=>s.id===a.room)||{}).obra!=="nuevo").forEach(a=>{const A=a.ancho*a.alto;ta+=A;tv+=A*esp;rows.push(["Abrir vano",`${a.kind} ${f2(a.ancho)} × ${f2(a.alto)} en cuarto ${nom(S.shapes.find(s=>s.id===a.room))}`,f2(a.ancho),f2(A),f2(A*esp)])});
+    foot=[["Total a demoler","",f2(tl),f2(ta),f2(tv)],[`Espesor de muro: ${Math.round(esp*100)} cm · Altura: ${f2(alto)} m`,"","","",""]];
+    const trees=objs.filter(o=>o.kind==="arbol");
+    if(trees.length)extra.push({title:"Árboles",head:["Árbol","Cuarto / zona","Copa (m)","Acción"],rows:trees.map((o,i)=>[`Árbol ${i+1}`,nom(S.shapes.find(x=>x.id===o.room)),f2(o.w),o.talar?"Talar":"Conservar"]),foot:[[`${trees.filter(o=>o.talar).length} por talar`,"","",""]]});
+    const nvr=rooms.filter(r=>r.nivel);
+    if(nvr.length){let rel=0,exc=0;const rws=nvr.map(r=>{const A=area(r),V=A*Math.abs(r.nivel)/100;if(r.nivel>0)rel+=V;else exc+=V;return[nom(r),`${r.nivel>0?"+":""}${r.nivel}`,f2(A),f2(V),r.nivel>0?"Relleno y compactación":"Excavación"]});
+      extra.push({title:"Niveles de piso",head:["Cuarto","Nivel (cm)","Área (m²)","Volumen (m³)","Qué implica"],rows:rws,foot:[["Total relleno","","",f2(rel),""],["Total excavación","","",f2(exc),""]]})}
+    const dsn=desniveles();
+    if(dsn.length)extra.push({title:"Desniveles en puertas",head:["Puerta","Entre","Desnivel (cm)","Qué implica"],rows:dsn.map(x=>[x.tag,`${nom(x.dentro)} y ${x.fuera?nom(x.fuera):"exterior"}`,f2(Math.abs(x.d)),Math.abs(x.d)<=2?"Umbral":(Math.abs(x.d)<=18?"Escalón":"Escalera o rampa")]),foot:[]});
+    if(trees.length||nvr.length)avisos=["Volúmenes de referencia (área por nivel), sin compactación ni desperdicio."];
+  }else if(v==="muros"){
+    head=["Muro","Cara A","Cara B","Largo (m)","Postes"];
+    const recs=wallRecs(),sep=(S.sepPostes||61)/100;
+    for(const r of recs){if(!r.ca&&!r.cb&&!r.struct)continue;const f=(m,rm,z)=>`${MATL[m]}${m==="tablaroca"?" + base Duroc 10 cm":""}${z>0.04?" · zona de regadera Duroc "+f2(z)+" m":""} → ${rm?nom(rm):"exterior"}`;
+      rows.push([`${r.sh.type==="muro"?r.sh.name:"Cuarto "+nom(r.sh)} · pared ${r.i+1}`,f(r.ma,r.ra,r.zA),f(r.mb,r.rb,r.zB),f2(r.L),r.struct?Math.ceil(r.L/sep)+1:"(compartido)"])}
+    const q=qty(recs);
+    foot=[["Tabla roca",`${f2(q.tr)} m²`,`${q.hTr} hojas de 1.22×2.44 (+10%)`,"",""],["Duroc",`${f2(q.du)} m²`,`${q.hDu} hojas (+10%) · base 10 cm ${f2(q.duBase)} + zona de regadera ${f2(q.duZona)} + exterior ${f2(q.duExt)}`,"",""],["Postes",`${q.postes} pzas`,`a cada ${Math.round(sep*100)} cm, altura ${f2(alto)} m`,"",""],["Canal",`${f2(q.canal)} ml`,`${q.cPz} piezas de 3.05 m (piso y techo)`,"",""]];
+  }else{
+    const cols=v==="electrico"?[["focos","Focos"],["ventiladores","Ventil."],["contactos","Contactos"],["apagadores","Apag."],["tv","TV"]]:(v==="hidraulico"?["regadera","tina","lavabo","fregadero","lavadora","inodoro"]:["inodoro","regadera","tina","lavabo","fregadero","lavadora","coladera"]).map(k=>[k,OBJ[k][2]]);
+    head=["Cuarto",...cols.map(c=>c[1]),"Total"];
+    const val=(r,k)=>v==="electrico"?((r.items||{})[k]||0):objs.filter(o=>o.room===r.id&&o.kind===k).length;
+    const tot=cols.map(()=>0);
+    rows=rooms.map(r=>{const vs=cols.map(([k],i)=>{const n=val(r,k);tot[i]+=n;return n});return[nom(r),...vs,vs.reduce((a,b)=>a+b,0)]});
+    foot=[["Total",...tot,tot.reduce((a,b)=>a+b,0)]];
+    if(v==="electrico"){const cs=objs.filter(o=>o.kind==="contacto"&&o.alt).map(o=>o.alt);if(cs.length)foot.push([`Contactos dibujados a ${[...new Set(cs.map(f2))].join(", ")} m de altura`,...cols.map(()=>""),""])}
+  }
+  if(v==="electrico"||v==="hidraulico"||v==="sanitario"){const ie=instExtra(v);extra=ie.ex;avisos=ie.avisos}
+  return{title,head,rows,foot,extra,avisos};
+}
+function imgThumb(file,cb,max){
+  const im=new Image(),u=URL.createObjectURL(file);
+  im.onload=()=>{const k=Math.min(1,(max||320)/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);cb(c.toDataURL("image/jpeg",.6))};
+  im.onerror=()=>{URL.revokeObjectURL(u);cb(null)};im.src=u;
+}
+function renderInv(){
+  const I=calcInv(),el=$("invList"),rows=[];
+  const ph=(foto,attr)=>`${foto?`<img src="${foto}" alt="Foto de la pieza" style="width:44px;height:44px;object-fit:cover;border-radius:6px;vertical-align:middle">`:""} <button class="sec" ${attr} aria-label="Foto de la pieza">📷</button>`;
+  for(const it of S.inv||[])rows.push(`<tr><td>${ph(it.foto,`data-ifoto="m:${it.id}"`)}</td><td>${it.tipo==="ventana"?"Ventana":"Puerta"}</td><td>${f2(it.ancho)} × ${f2(it.alto)}</td><td>${it.cantidad}</td><td>${esc(it.estadoF)}</td><td>${esc(it.origen||"")}${it.detalle?" · "+esc(it.detalle):""}</td><td><button class="sec" data-idel="${it.id}" aria-label="Quitar">✕</button></td></tr>`);
+  for(const s of I.supply.filter(x=>x.src==="plano"))rows.push(`<tr><td>${ph(s.foto,`data-ifoto="p:${s.abId}"`)}</td><td>${s.tipo==="ventana"?"Ventana":"Puerta"}</td><td>${f2(s.ancho)} × ${f2(s.alto)}</td><td>1</td><td><select data-iov="${s.abId}" aria-label="Estado"><option value="buena" ${s.estadoF==="buena"?"selected":""}>buena</option><option value="regular" ${s.estadoF==="regular"?"selected":""}>regular</option><option value="mala" ${s.estadoF==="mala"?"selected":""}>mala</option></select></td><td>${esc(s.origen)}</td><td></td></tr>`);
+  const tot=(I.supply.filter(x=>x.tipo==="ventana").length),tp=(I.supply.filter(x=>x.tipo==="puerta").length);
+  el.innerHTML=rows.length?`<table><tr><th>Foto</th><th>Tipo</th><th>Medida (m)</th><th>Cant.</th><th>Estado</th><th>Origen</th><th></th></tr>${rows.join("")}</table><div class="status">Total: ${tot} ventana(s) · ${tp} puerta(s) retiradas</div>`:'<div class="status">Aún no hay piezas. Cuando retires, tapes o demuelas una ventana en el plano, aparece aquí.</div>';
+  $("tolEx").value=S.tolEx??3;$("tolNear").value=S.tolNear??10;
+}
+$("iAdd").onclick=()=>{
+  const ancho=parseFloat($("iAncho").value),alto=parseFloat($("iAlto").value);if(!(ancho>0&&alto>0))return;
+  const base={id:uid(),tipo:$("iTipo").value,ancho,alto,cantidad:Math.max(1,parseInt($("iCant").value)||1),estadoF:$("iEst").value,detalle:$("iDet").value.trim(),origen:$("iOri").value.trim()},f=$("iFoto").files&&$("iFoto").files[0];
+  const done=foto=>{if(foto)base.foto=foto;S.inv.push(base);for(const id of["iAncho","iAlto","iDet"])$(id).value="";$("iCant").value=1;$("iFoto").value="";render()};
+  if(f)imgThumb(f,done);else done(null);
+};
+let fotoTarget=null;
+$("invList").onclick=e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.idel){S.inv=S.inv.filter(x=>x.id!==b.dataset.idel);render()}
+  else if(b.dataset.ifoto){fotoTarget=b.dataset.ifoto;$("iFotoRow").click()}
+};
+$("iFotoRow").onchange=e=>{const f=e.target.files[0],t=fotoTarget;e.target.value="";if(!f||!t)return;imgThumb(f,foto=>{if(!foto)return;const[k,id]=[t.slice(0,1),t.slice(2)];if(k==="m"){const it=S.inv.find(x=>x.id===id);if(it)it.foto=foto}else S.invOv[id]=Object.assign(S.invOv[id]||{},{foto});render()})};
+$("iAjustar").onclick=()=>{const n=ajustarClaros();render();$("invList").insertAdjacentHTML("beforeend",`<div class="status ${n?"ok":""}">${n?`✅ ${n} claro(s) nuevo(s) quedaron a la medida de las piezas.`:"No hay claros nuevos que ajustar."}</div>`)};
+$("invList").onchange=e=>{const id=e.target.dataset.iov;if(id){S.invOv[id]=Object.assign(S.invOv[id]||{},{estadoF:e.target.value});render()}};
+$("tolEx").onchange=e=>{S.tolEx=parseFloat(e.target.value);render()};
+$("tolNear").onchange=e=>{S.tolNear=parseFloat(e.target.value);render()};
+function tableHtml(sc){return sc.rows.length||sc.foot.length?`<div style="overflow-x:auto"><table><tr>${sc.head.map(h=>`<th>${esc(h)}</th>`).join("")}</tr>${sc.rows.map(r=>`<tr>${r.map(x=>`<td>${esc(x)}</td>`).join("")}</tr>`).join("")}${sc.foot.map(r=>`<tr>${r.map(x=>`<th>${esc(x)}</th>`).join("")}</tr>`).join("")}</table></div>`:'<div class="status">Todavía no hay nada que mostrar en esta lámina.</div>'}
+function renderCuadro(){
+  const c=cuadro(VISTA);
+  $("cuadro").innerHTML=`<h2>📋 Cuadro: ${esc(c.title)}</h2>`+tableHtml(c)+(c.extra||[]).map(e=>`<h2 style="margin-top:14px">${esc(e.title)}</h2>`+tableHtml(e)).join("")+(c.avisos||[]).map(a=>`<div class="status bad">⚠️ ${esc(a)}</div>`).join("");
+  $("tabs").innerHTML="<h3>📄 Elige la lámina</h3>"+VISTAS.map(([k,l])=>`<button data-v="${k}" class="${k===VISTA?"":"sec"}">${l}</button>`).join("");
+  $("labBtn").textContent="📄 "+((VISTAS.find(x=>x[0]===VISTA)||[0,""])[1])+" ▾";
+}
+$("tabs").onclick=e=>{const b=e.target.closest("button");if(b){VISTA=b.dataset.v;closeSheets();render()}};
+for(const[id,key]of[["calle","calle"],["cC","cC"],["cR","cR"],["umbral","umbral"],["pend","pend"],["pend2","pend2"],["grupo","grupo"]])$(id).onchange=e=>{S[key]=e.target.value===""?"":(key==="calle"?e.target.value:parseFloat(e.target.value));render()};
+$("nivel").onchange=e=>{const sh=cur();if(sh){sh.nivel=parseFloat(e.target.value)||0;render()}};
+$("obra").onchange=e=>{const sh=cur();if(sh){sh.obra=e.target.value;render()}};
+$("esp").onchange=e=>{S.espesor=parseFloat(e.target.value)||12;render()};
+$("sepp").onchange=e=>{S.sepPostes=parseFloat(e.target.value)||61;render()};
+$("hum").onchange=e=>{S.humedos=e.target.value;render()};
+/* ---------- instalaciones: rutas esquemáticas de agua, drenaje y electricidad ---------- */
+const G=0.05,lat=p=>({x:Math.round(p.x/G),y:Math.round(p.y/G)}),wld=l=>({x:l.x*G,y:l.y*G});
+function tapPoint(o){const k=(POINT[o.kind]&&!SRC[o.kind])?0:o.h/2;return{x:o.cx-o.n.x*k,y:o.cy-o.n.y*k}}
+function segCells(P,Q){const ks=[];if(P.y===Q.y){for(let x=Math.min(P.x,Q.x);x<Math.max(P.x,Q.x);x++)ks.push(`h${x},${P.y}`)}else if(P.x===Q.x){for(let y=Math.min(P.y,Q.y);y<Math.max(P.y,Q.y);y++)ks.push(`v${P.x},${y}`)}return ks}
+function vertsCells(v){let ks=[];for(let i=1;i<v.length;i++)ks=ks.concat(segCells(v[i-1],v[i]));return ks}
+function chooseRoute(A,B,used){
+  const mk=c=>[A,c,B].filter((q,i,arr)=>i===0||q.x!==arr[i-1].x||q.y!==arr[i-1].y);
+  const v1=mk({x:B.x,y:A.y}),v2=mk({x:A.x,y:B.y}),sc=v=>vertsCells(v).filter(k=>used.has(k)).length;
+  return sc(v2)>sc(v1)?v2:v1;
+}
+function addCells(used,v,d){for(const k of vertsCells(v)){const u=used.get(k)||{n:0,d:0};u.n++;u.d=Math.max(u.d,d);used.set(k,u)}}
+function graphStats(used){
+  const nodes=new Map(),add=(x,y,d)=>{const key=x+","+y;if(!nodes.has(key))nodes.set(key,new Set());nodes.get(key).add(d)};
+  for(const k of used.keys()){const[c,xy]=[k[0],k.slice(1)],[x,y]=xy.split(",").map(Number);if(c==="h"){add(x,y,"E");add(x+1,y,"W")}else{add(x,y,"S");add(x,y+1,"N")}}
+  let codos=0,tees=0,cruces=0;
+  for(const d of nodes.values()){if(d.size===3)tees++;else if(d.size===4)cruces++;else if(d.size===2&&!((d.has("E")&&d.has("W"))||(d.has("N")&&d.has("S"))))codos++}
+  return{codos,tees,cruces};
+}
+const manh=(a,b)=>Math.abs(a.x-b.x)+Math.abs(a.y-b.y);
+function nearest(list,p){let b=null,bd=Infinity;for(const o of list){const d=manh(lat(tapPoint(o)),lat(p));if(d<bd){bd=d;b=o}}return b}
+function stepPts(v){const out=[];for(let i=1;i<v.length;i++){const a=v[i-1],b=v[i],dx=Math.sign(b.x-a.x),dy=Math.sign(b.y-a.y);let x=a.x,y=a.y;while(x!==b.x||y!==b.y){x+=dx;y+=dy;out.push({x,y})}}return out}
+const nk=p=>p.x+","+p.y;
+function cellBetween(a,b){return a.y===b.y?`h${Math.min(a.x,b.x)},${a.y}`:`v${a.x},${Math.min(a.y,b.y)}`}
+function routeTree(src,targets,dOf,wOf){
+  const S0=lat(tapPoint(src)),used=new Map(),paths=[],parent=new Map([[nk(S0),null]]),pos=new Map([[nk(S0),S0]]),rest=targets.slice();
+  while(rest.length){
+    let bi=0,bn=S0,bd=Infinity;
+    rest.forEach((t,i)=>{const T=lat(tapPoint(t));for(const nd of pos.values()){const d=manh(nd,T);if(d<bd){bd=d;bi=i;bn=nd}}});
+    const t=rest.splice(bi,1)[0],T=lat(tapPoint(t)),v=chooseRoute(bn,T,used);
+    let prev=bn;for(const q of stepPts(v)){const kk=nk(q);if(!parent.has(kk)){parent.set(kk,prev);pos.set(kk,q)}prev=q}
+    const d=dOf?dOf(t):0,w=wOf?wOf(t):1;let cur=T,full=0;
+    while(parent.get(nk(cur))){const par=parent.get(nk(cur)),k=cellBetween(cur,par),u=used.get(k)||{n:0,d:0};u.n+=w;u.d=Math.max(u.d,d);used.set(k,u);cur=par;full++}
+    paths.push({verts:v.map(wld),obj:t,full:full*G});
+  }
+  return{used,paths,parent,root:S0};
+}
+function optOrder(start,list){
+  const pts=list.map(o=>({o,p:lat(tapPoint(o))}));let order=[],cur=start,rest=pts.slice();
+  while(rest.length){let bi=0,bd=Infinity;rest.forEach((q,i)=>{const d=manh(q.p,cur);if(d<bd){bd=d;bi=i}});const q=rest.splice(bi,1)[0];order.push(q);cur=q.p}
+  const cost=ord=>{let c=0,p=start;for(const q of ord){c+=manh(p,q.p);p=q.p}return c};
+  let imp=true,guard=0;
+  while(imp&&guard++<40){imp=false;for(let i=0;i<order.length-1;i++)for(let j=i+1;j<order.length;j++){const cand=order.slice(0,i).concat(order.slice(i,j+1).reverse(),order.slice(j+1));if(cost(cand)<cost(order)-1e-9){order=cand;imp=true}}}
+  return order.map(q=>q.o);
+}
+function mergeUsed(into,from){for(const[k,u]of from){const x=into.get(k)||{n:0,d:0};x.n=Math.max(x.n,u.n);x.d=Math.max(x.d,u.d);into.set(k,x)}}
+function lenByDiam(used,fin){const m={};for(const u of used.values()){const d=fin(u);m[d]=(m[d]||0)+G}return m}
+const dLab=d=>d===0.5?'½"':(d===0.75?'¾"':d+'"');
+function calcInst(){
+  const O=S.objs||[],alto=S.alt||2.4,avisos={electrico:[],hidraulico:[],sanitario:[]},R={avisos};
+  // --- agua: toma → llaves de paso (una por grupo de cuartos) → muebles ---
+  const WF=["regadera","tina","lavabo","fregadero","lavadora","inodoro"],HOT=["regadera","tina","lavabo","fregadero"],cf0=cfg();
+  const wf=O.filter(o=>WF.includes(o.kind)),tomas=O.filter(o=>o.kind==="toma_agua"),cal=O.filter(o=>o.kind==="calentador");
+  R.fria={paths:[],used:new Map()};R.caliente={paths:[],used:new Map()};R.valvulas=[];R.fria0=0;R.cf=cf0;
+  R.fFin=u=>u.n>=10?1:(u.n>=4?0.75:0.5);
+  if(!tomas.length)avisos.hidraulico.push("Falta colocar la toma de agua (dile al agente: “pon la toma de agua en la pared de abajo del cuarto 1”).");
+  else if(wf.length){
+    const t=tomas[0],tp=lat(tapPoint(t)),roomsW=[...new Set(wf.map(o=>o.room))].map(id=>S.shapes.find(x=>x.id===id)).filter(Boolean);
+    const mean=fx=>{const ps=fx.map(o=>tapPoint(o));return{x:ps.reduce((a,q)=>a+q.x,0)/ps.length,y:ps.reduce((a,q)=>a+q.y,0)/ps.length}};
+    let rem=roomsW.map(r=>({r,fx:wf.filter(o=>o.room===r.id)}));const groups=[];
+    while(rem.length){
+      rem.sort((a,b)=>manh(lat(mean(a.fx)),tp)-manh(lat(mean(b.fx)),tp));
+      const g=[rem.shift()];
+      while(g.length<cf0.grupo&&rem.length){const c=lat(mean(g.flatMap(x=>x.fx)));let bi=0,bd=Infinity;rem.forEach((x,i)=>{const d=manh(lat(mean(x.fx)),c);if(d<bd){bd=d;bi=i}});g.push(rem.splice(bi,1)[0])}
+      groups.push(g);
+    }
+    const med=a=>{const q=a.slice().sort((x,y)=>x-y);return q[Math.floor(q.length/2)]};
+    const hubs=groups.map(g=>{const fx=g.flatMap(x=>x.fx),ts=fx.map(o=>lat(tapPoint(o))),h={x:med(ts.map(q=>q.x)),y:med(ts.map(q=>q.y))};return{g,fx,obj:{kind:"valvula",cx:h.x*G,cy:h.y*G,h:0,n:{x:0,y:0},w:fx.length}}});
+    const main=routeTree(t,hubs.map(h=>h.obj),()=>0.5,o=>o.w),all={used:new Map(main.used),paths:[...main.paths]};
+    for(const h of hubs){const loc=routeTree(h.obj,h.fx,()=>0.5);mergeUsed(all.used,loc.used);all.paths.push(...loc.paths);R.valvulas.push({x:h.obj.cx,y:h.obj.cy,rooms:h.g.map(x=>x.r.name||"s/n"),n:h.fx.length})}
+    R.fria=all;R.fria0=routeTree(t,wf,()=>0.5).used.size*G;
+  }
+  if(cal.length){const hot=wf.filter(o=>HOT.includes(o.kind));if(hot.length)R.caliente=routeTree(cal[0],hot,()=>0.5)}
+  else if(wf.some(o=>HOT.includes(o.kind)))avisos.hidraulico.push("No hay calentador: solo se traza agua fría.");
+  // --- drenaje ---
+  const df=O.filter(o=>["inodoro","regadera","tina","lavabo","fregadero","lavadora","coladera"].includes(o.kind)),regs=O.filter(o=>o.kind==="registro");
+  R.drena={paths:[],used:new Map(),largo:0};
+  if(!regs.length)avisos.sanitario.push("Falta colocar el registro (dile al agente: “pon un registro en la pared de abajo del cuarto 1”).");
+  else if(df.length){const used=new Map(),paths=[];for(const reg of regs){const mine=df.filter(o=>nearest(regs,{x:tapPoint(o).x,y:tapPoint(o).y})===reg);if(!mine.length)continue;const rt=routeTree(reg,mine,o=>o.kind==="inodoro"?4:2);for(const[k,u]of rt.used){const x=used.get(k)||{n:0,d:0};x.n+=u.n;x.d=Math.max(x.d,u.d);used.set(k,x)}paths.push(...rt.paths.map(pp=>({...pp,reg})))}
+    R.drena={paths,used,largo:Math.max(0,...paths.map(pp=>pp.full))}}
+  R.dFin=u=>Math.max(u.d,u.n>=4?4:0)||2;
+  // --- eléctrico: cada cuarto con su tablero (luces + contactos/AC); ramal principal óptimo hasta el medidor ---
+  const cf=cfg();R.cfg=cf;R.elec={cuartos:[],feeders:[],trunk:null};R.eUsed=new Map();
+  const med=O.find(o=>o.kind==="medidor"),kLC=["foco","ventilador","apagador","contacto","tv"],kAC=["minisplit"];
+  for(const r of S.shapes.filter(x=>x.type==="cuarto")){
+    const circ=[],boxes=[];
+    for(const[id,name,kinds,boxKind,color]of[["LC","Luces y contactos",kLC,"caja_breakers","#dc2626"],["AC","Aire acondicionado",kAC,"caja_ac","#0ea5e9"]]){
+      const pts=O.filter(o=>o.room===r.id&&kinds.includes(o.kind));if(!pts.length)continue;
+      const caja=O.find(o=>o.room===r.id&&o.kind===boxKind);
+      if(!caja){avisos.electrico.push(`Cuarto ${r.name||"s/n"}: falta ${boxKind==="caja_ac"?"la caja del aire acondicionado":"su tablero"} (dile al agente “pon los tableros de los cuartos”).`);continue}
+      const C0=lat(tapPoint(caja)),chain=optOrder(C0,pts);let prev=C0,len=0,drops=0;const paths=[];
+      for(const o of chain){const L=lat(tapPoint(o)),v=chooseRoute(prev,L,R.eUsed);addCells(R.eUsed,v,0);len+=vertsCells(v).length*G;paths.push(v.map(wld));prev=L;
+        if(o.kind==="contacto"||o.kind==="tv")drops+=Math.max(0,alto-(o.alt||(o.kind==="tv"?1.5:0.3)));else if(o.kind==="minisplit")drops+=Math.max(0,alto-(o.alt||2.1));else if(o.kind==="apagador")drops+=Math.max(0,alto-(o.alt||1.2))}
+      circ.push({id:(r.name||"s/n")+"-"+id,room:r.name||"s/n",name,gauge:cf.cC,color,pts:chain.length,ruta:len,drops,paths});boxes.push(caja);
+    }
+    if(circ.length)R.elec.cuartos.push({room:r,cajas:boxes,circ});
+  }
+  const cajas=R.elec.cuartos.flatMap(c=>c.cajas);
+  if(cajas.length&&!med)avisos.electrico.push("Falta colocar el medidor (la toma de la calle). Dile al agente de qué lado queda.");
+  if(med&&cajas.length){
+    const tree=routeTree(med,cajas,()=>0,()=>1),single=cajas.length===1;let trunkCells=0;
+    for(const u of tree.used.values())if(single||u.n>=2)trunkCells++;
+    const trunkLen=trunkCells*G,tg=trunkLen<=cf.umbral?6:4;
+    for(const c of R.elec.cuartos)for(const cj of c.cajas){
+      let cur=lat(tapPoint(cj)),len=0;
+      while(tree.parent.get(nk(cur))){const par=tree.parent.get(nk(cur)),u=tree.used.get(cellBetween(cur,par));if(single||(u&&u.n>=2))break;len+=G;cur=par}
+      R.elec.feeders.push({room:(c.room.name||"s/n")+(cj.kind==="caja_ac"?" · aire acondicionado":""),len,gauge:cf.cR});
+    }
+    const star=cajas.reduce((t,c)=>t+manh(lat(tapPoint(c)),lat(tapPoint(med)))*G,0);
+    R.elec.trunk={len:trunkLen,gauge:tg,tree,paths:tree.paths.map(pp=>pp.verts),conduit:tree.used.size*G,star};
+  }
+  if(!cf.calle)avisos.electrico.push("No has dicho dónde está la calle (en “Reglas de instalación”).");
+  return R;
+}
+function drawInst(k){
+  if(!["electrico","hidraulico","sanitario"].includes(VISTA))return"";
+  const R=calcInst();let g="";
+  const poly=(vs,c,w,dash)=>`<polyline points="${vs.map(q=>q.x+","+q.y).join(" ")}" fill="none" stroke="${c}" stroke-width="${w*k}" stroke-linejoin="round" stroke-linecap="round" ${dash?`stroke-dasharray="${dash*k} ${3*k}"`:""} opacity=".9"/>`;
+  if(VISTA==="hidraulico"){
+    for(const p of R.fria.paths)g+=poly(p.verts,"#2563eb",2.2);
+    for(const p of R.caliente.paths)g+=poly(p.verts.map(q=>({x:q.x+0.04,y:q.y+0.04})),"#dc2626",2.2);
+    R.valvulas.forEach((v,i)=>{const r=7*k;g+=`<polygon points="${v.x},${v.y-r} ${v.x+r},${v.y} ${v.x},${v.y+r} ${v.x-r},${v.y}" fill="#1e3a8a" stroke="#fff" stroke-width="${k}"/><text x="${v.x}" y="${v.y-r-3*k}" font-size="${8*k}" font-weight="700" fill="#1e3a8a" text-anchor="middle">LP${i+1}</text>`});
+    g+=`<g font-size="${9*k}" font-weight="700"><text x="${view.x+8*k}" y="${view.y+34*k}" fill="#2563eb">━ agua fría</text><text x="${view.x+78*k}" y="${view.y+34*k}" fill="#dc2626">━ agua caliente</text><text x="${view.x+170*k}" y="${view.y+34*k}" fill="#1e3a8a">◆ llave de paso</text></g>`;
+  }else if(VISTA==="sanitario"){
+    for(const p of R.drena.paths){g+=poly(p.verts,"#92400e",2.6);const f=p.verts[p.verts.length-1];g+=`<text x="${f.x}" y="${f.y-6*k}" font-size="${8*k}" fill="#92400e" text-anchor="middle">${p.obj.kind==="inodoro"?'Ø4"':'Ø2"'}</text>`}
+    g+=`<text x="${view.x+8*k}" y="${view.y+34*k}" font-size="${9*k}" font-weight="700" fill="#92400e">━ drenaje (pendiente 2%)</text>`;
+  }else{
+    for(const c of R.elec.cuartos)for(const ci of c.circ){for(const p of ci.paths)g+=poly(p,ci.color,2,6);const f=ci.paths[0]&&ci.paths[0][ci.paths[0].length-1];if(f)g+=`<text x="${f.x}" y="${f.y-6*k}" font-size="${8*k}" font-weight="700" fill="${ci.color}" text-anchor="middle">${esc(ci.id)}</text>`}
+    const tr=R.elec.trunk;
+    if(tr){for(const pv of tr.paths)g+=poly(pv,"#7c3aed",2.4);
+      for(const[kk,u]of tr.tree.used){if(R.elec.cuartos.length>1&&u.n<2)continue;const[x,y]=kk.slice(1).split(",").map(Number),h=kk[0]==="h";g+=`<line x1="${x*G}" y1="${y*G}" x2="${(x+(h?1:0))*G}" y2="${(y+(h?0:1))*G}" stroke="#111827" stroke-width="${3.4*k}" stroke-linecap="round"/>`}}
+    g+=`<g font-size="${9*k}" font-weight="700" fill="#111827"><text x="${view.x+8*k}" y="${view.y+34*k}">rojo luces y contactos #${R.cfg.cC} · azul aire acondicionado #${R.cfg.cC}</text><text x="${view.x+8*k}" y="${view.y+46*k}">morado tablero→ramal #${R.cfg.cR} · negro ramal principal→medidor #6/#4</text></g>`;
+  }
+  (R.avisos[VISTA]||[]).forEach((a,i)=>{g+=`<text x="${view.x+8*k}" y="${view.y+(60+i*13)*k}" font-size="${9*k}" fill="#b91c1c">⚠ ${esc(a)}</text>`});
+  return g;
+}
+function instExtra(v){
+  const R=calcInst(),ex=[],avisos=[...(R.avisos[v]||[])],f2s=n=>f2(n);
+  if(v==="electrico"){
+    const cf=R.cfg,h=cf.hilos,rows=[],byG={},tr=R.elec.trunk;let dr=0;
+    const addG=(g,ml)=>{byG[g]=(byG[g]||0)+ml};
+    for(const c of R.elec.cuartos)for(const ci of c.circ){rows.push([ci.room,ci.name,`#${ci.gauge}`,ci.pts,f2s(ci.ruta),f2s(ci.drops),f2s((ci.ruta+ci.drops)*h)]);addG(ci.gauge,(ci.ruta+ci.drops)*h);dr+=ci.drops}
+    ex.push({title:"Circuitos por cuarto (luces y contactos en un tablero; aire acondicionado en su propia caja)",head:["Cuarto","Circuito","Cable","Puntos","Ruta (ml)","Bajadas (ml)",`Cable total (ml, ${h} hilos)`],rows,foot:[]});
+    const rr=R.elec.feeders.map(f=>{addG(f.gauge,f.len*h);return[f.room,"Tablero del cuarto → ramal principal",`#${f.gauge}`,f2s(f.len),f2s(f.len*h)]});
+    if(tr){rr.push(["Ramal principal","→ medidor (calle)",`#${tr.gauge}`,f2s(tr.len),f2s(tr.len*h)]);addG(tr.gauge,tr.len*h)}
+    ex.push({title:"Alimentadores (sin tablero general)",head:["De","A","Cable","Ruta (ml)",`Cable total (ml, ${h} hilos)`],rows:rr,foot:[]});
+    const duct=R.eUsed.size*G+(tr?tr.conduit:0)+dr;
+    ex.push({title:"Resumen de cable y tubo",head:["Concepto","Cantidad","Compra sugerida"],rows:Object.entries(byG).sort((a,b)=>a[0]-b[0]).map(([g,ml])=>[`Cable #${g} cobre`,`${f2s(ml)} ml`,`${Math.ceil(ml*1.1/100)} rollo(s) de 100 m (+10%)`]).concat([["Poliducto (circuitos + alimentación + bajadas)",`${f2s(duct)} ml`,`${Math.ceil(duct*1.1/3)} tramos de 3 m (+10%)`]]),foot:[]});
+    if(tr&&tr.star>0)ex.push({title:"Optimización del ramal",head:["Concepto","Poliducto (ml)"],rows:[["Un ramal compartido (trazo óptimo)",f2s(tr.conduit)],["Cada cuarto directo al medidor",f2s(tr.star)],["Ahorro",`${f2s(Math.max(0,tr.star-tr.conduit))} ml (${tr.star?Math.round(Math.max(0,tr.star-tr.conduit)/tr.star*100):0}%)`]],foot:[]});
+    avisos.push("Referencia de trazo: cada cuarto con su tablero y el aire acondicionado en su propia caja, sin tablero general. Todo en cable #12; el electricista define el detalle final.");
+  }else if(v==="hidraulico"){
+    const f=lenByDiam(R.fria.used,R.fFin),h=lenByDiam(R.caliente.used,R.fFin),gf=graphStats(R.fria.used),gh=graphStats(R.caliente.used);
+    const rows=[];for(const d of[0.5,0.75,1])if(f[d])rows.push(["Agua fría",dLab(d),`${f2s(f[d])} ml`,`${Math.ceil(f[d]*1.1/6)} tubos de 6 m (+10%)`]);
+    for(const d of[0.5,0.75,1])if(h[d])rows.push(["Agua caliente",dLab(d),`${f2s(h[d])} ml`,`${Math.ceil(h[d]*1.1/6)} tubos de 6 m (+10%)`]);
+    rows.push(["Puntos de consumo",`${(S.objs||[]).filter(o=>["regadera","tina","lavabo","fregadero","lavadora","inodoro"].includes(o.kind)).length}`,"",""]);
+    rows.push(["Llaves de paso",`${R.valvulas.length}`,`1 por cada ≤${R.cf.grupo} cuartos`,"Configurable en Reglas de instalación"]);
+    rows.push(["Conexiones aprox.",`${gf.codos+gh.codos} codos · ${gf.tees+gh.tees} tees`,"","Estimado del trazo esquemático"]);
+    ex.push({title:"Instalación hidráulica (esquemática)",head:["Concepto","Diámetro / dato","Cantidad","Nota"],rows,foot:[]});
+    if(R.valvulas.length){const con=R.fria.used.size*G;ex.push({title:"Llaves de paso: sectorización por grupo de cuartos",head:["Llave","Cuartos que controla","Muebles"],rows:R.valvulas.map((v,i)=>[`LP${i+1}`,v.rooms.join(", "),v.n]),
+      foot:[["Total",`${R.valvulas.length} llaves`,""],[`Tubería fría con llaves: ${f2s(con)} ml · sin sectorizar: ${f2s(R.fria0)} ml (${con>=R.fria0?"+":"−"}${f2s(Math.abs(con-R.fria0))} ml)`,"",""]]})}
+    avisos.push("Trazo esquemático óptimo (cada mueble se conecta a la rama más cercana). El recorrido real, los diámetros y la ubicación de las llaves los define tu plomero.");
+  }else if(v==="sanitario"){
+    const d=lenByDiam(R.drena.used,R.dFin),g=graphStats(R.drena.used),pd4=R.cfg.pend,pd2=R.cfg.pend2,pdOf=dd=>dd===2?pd2:pd4,rows=[];
+    for(const dd of[2,4])if(d[dd])rows.push(["Drenaje",`Ø${dd}"`,`${f2s(d[dd])} ml`,`${Math.ceil(d[dd]*1.1/6)} tubos de 6 m (+10%)`]);
+    rows.push(["Pendiente aplicada",`Ø4" ${pd4}% · Ø2" ${pd2}%`,`${f2s(pd4)} y ${f2s(pd2)} cm por metro`,"Configurable en Reglas de instalación"]);
+    rows.push(["Conexiones aprox.",`${g.codos} codos · ${g.tees+g.cruces} tees/yees`,"","Estimado del trazo esquemático"]);
+    rows.push(["Registros",`${(S.objs||[]).filter(o=>o.kind==="registro").length}`,"",""]);
+    ex.push({title:"Instalación sanitaria (esquemática)",head:["Concepto","Diámetro / dato","Cantidad","Nota"],rows,foot:[]});
+    const nvOf=id=>{const r=S.shapes.find(x=>x.id===id);return(r&&r.nivel)||0};
+    const per=R.drena.paths.map(p=>{const L=p.full,rm=S.shapes.find(x=>x.id===p.obj.room),dd=p.obj.kind==="inodoro"?4:2,net=L*pdOf(dd)-(nvOf(p.obj.room)-nvOf(p.reg&&p.reg.room));return{nom:OBJ[p.obj.kind][2],room:rm?rm.name||"s/n":"?",d:dd,L,cm:L*pdOf(dd),net:Math.max(0,net),niv:nvOf(p.obj.room)}}).sort((a,b)=>b.net-a.net);
+    ex.push({title:"Caídas por mueble hasta el registro",head:["Mueble","Cuarto","Diámetro","Recorrido (m)","Caída necesaria (cm)","Nivel del cuarto (cm)","Caída neta (cm)"],rows:per.map(x=>[x.nom,x.room,`Ø${x.d}"`,f2(x.L),f2(x.cm),x.niv,f2(x.net)]),foot:per.length?[["Registro debe quedar al menos",`${f2(per[0].net)} cm`,"más profundo que la salida del mueble más lejano","","","",""]]:[]});
+    if(!R.cfg.calle)avisos.push("No has dicho dónde está la calle (en “Reglas de instalación”): el registro debe quedar del lado de la salida.");
+    avisos.push("Trazo esquemático. Pendientes, ventilación y registros los confirma tu plomero.");
+  }
+  return{ex,avisos};
+}
+let UNDO=[],HIST=[];
+function snapshot(){UNDO.push(JSON.stringify(S));if(UNDO.length>20)UNDO.shift()}
+function ctx(){
+  return{seleccion:cur()?cur().name:null,calle:S.calle||null,reglas:cfg(),verificar:preguntas(6).map(c=>({cuarto:c.sh.name||"s/n",pared:c.i+1,lado:wallGeo(c.sh,c.i).side,largo_plano:r2(baseLen(c.sg)),motivo:motivo(c)})),marcas:marksInfo().map(q=>({id:"M"+q.n,tipo:q.m.tipo,texto:q.m.texto||"",ancho:r2(q.w),largo:r2(q.h),largo_linea:r2(q.L),cae_en:q.cae})),inventario:calcInv().supply.slice(0,40).map(x=>({tipo:x.tipo,ancho:r2(x.ancho),alto:r2(x.alto),estado:x.estadoF,origen:x.origen})),humedos:S.humedos??"baño, wc, sanitario",muros:wallRecs().filter(r=>r.sh.type==="muro").map(r=>({nombre:r.sh.name,largo:r2(r.L),lado_a:r.ra?r.ra.name:"exterior",lado_b:r.rb?r.rb.name:"exterior"})),cuartos:S.shapes.filter(s=>TYPES[s.type].closed).map(sh=>{const bb=bbox(polyOf(sh));
+    return{nombre:sh.name,tipo:sh.type,muros_son:sh.obra||"existente",ancho:r2(bb.x1-bb.x0),largo:r2(bb.y1-bb.y0),
+      paredes:sh.segs.map((s,i)=>{const g=wallGeo(sh,i);return{n:i+1,lado:g.side,largo:r2(g.L)}}),
+      objetos:(S.objs||[]).filter(o=>o.room===sh.id).map(o=>o.kind),
+      aberturas:(S.aberts||[]).filter(a=>a.room===sh.id).map(a=>({tipo:a.kind,pared:wallGeo(sh,a.seg).side,distancia:r2(a.pos),ancho:r2(a.ancho)}))}})};
+}
+function bumpItem(room,kind,d){const key=OBJ[kind]&&OBJ[kind][3];if(!key)return;room.items=room.items||{};room.items[key]=Math.max(0,(room.items[key]||0)+d)}
+function markOpening(a,estado){
+  const{r,err}=roomOrErr(a.cuarto);if(err)return err;const wg=findWall(r,a.pared);if(!wg)return`❓ No encuentro la pared “${a.pared}” del cuarto ${r.name}`;
+  const kind=a.tipo==="ventana"?"ventana":"puerta",given=a.ancho>0;
+  const cands=S.aberts.filter(x=>x.room===r.id&&x.seg===wg.i&&x.kind===kind&&x.estado!=="tapar"&&x.estado!=="retirada");
+  let ex=null;
+  if(a.distancia!=null&&a.distancia!==""){const c=(+a.distancia)+(given?+a.ancho/2:0.45);ex=cands.find(x=>Math.abs(x.pos+x.ancho/2-c)<0.3)||null}
+  else if(cands.length===1)ex=cands[0];
+  const verbo=estado==="tapar"?"Tapar":"Retirar";
+  if(ex){
+    ex.estado=estado;if(a.ancho>0)ex.ancho=+a.ancho;if(a.alto>0)ex.alto=+a.alto;
+    return`${estado==="tapar"?"🧱":"🧰"} ${verbo} ${kind} de ${f2(ex.ancho)} × ${f2(ex.alto)} m en la pared ${wg.side} del cuarto ${r.name}. Entra al inventario`;
+  }
+  if(!given&&estado==="tapar")return"❓ ¿Qué ancho tiene el vano a tapar?";
+  const ancho=given?+a.ancho:(kind==="puerta"?0.9:1.2),alto=a.alto>0?+a.alto:(kind==="puerta"?2.1:1.1),pos=a.distancia!=null&&a.distancia!==""?+a.distancia:(wg.L-ancho)/2;
+  if(pos<0||pos+ancho>wg.L+0.01)return`⚠️ No cabe: la pared ${wg.side} mide ${f2(wg.L)} m`;
+  S.aberts.push({id:uid(),room:r.id,seg:wg.i,kind,pos:r2(pos),ancho,alto,antepecho:0,abre:"adentro",bisagra:"izquierda",estado});
+  return`${estado==="tapar"?"🧱":"🧰"} ${verbo} ${kind} de ${f2(ancho)} × ${f2(alto)} m en la pared ${wg.side} del cuarto ${r.name}. Entra al inventario`;
+}
+function placeBox(r,kind,slot){
+  const dr=S.aberts.find(x=>x.room===r.id&&x.kind==="puerta"&&x.estado!=="tapar"&&x.estado!=="retirada");let wg,pos;
+  if(dr){wg=wallGeo(r,dr.seg);pos=dr.pos+dr.ancho+0.15+slot*0.4;if(pos+0.3>wg.L)pos=dr.pos-0.15-0.3-slot*0.4}else{wg=findWall(r,"arriba")||wallGeo(r,0);pos=0.2+slot*0.4}
+  if(!wg||!wg.L||pos<0)return false;
+  const w=0.3,h=0.12;S.objs.push({id:uid(),kind,room:r.id,cx:r2(wg.o.x+wg.u.x*(pos+w/2)+wg.n.x*h/2),cy:r2(wg.o.y+wg.u.y*(pos+w/2)+wg.n.y*h/2),w,h,u:wg.u,n:wg.n,alt:1.5});return true;
+}
+function roomOrErr(name){const r=findRoom(name);return r?{r}:{err:name?`❓ No encuentro el cuarto “${name}”`:"❓ ¿En qué cuarto? Selecciónalo o dime su nombre"}}
+function act(a){
+  const t=a.herramienta||"actualizar_cuarto";
+  if(t==="crear_cuarto"){
+    const w=+a.ancho,h=+a.largo;if(!(w>0&&h>0))return"❓ Faltan las medidas del cuarto";
+    const tipo=a.tipo==="lamina"?"lamina":"cuarto";let x=0,y=0;const all=S.shapes.flatMap(points);
+    if(a.junto_a){const r=findRoom(a.junto_a);if(!r)return`❓ No encuentro el cuarto “${a.junto_a}” para pegarlo`;const bb=bbox(polyOf(r)),l=a.lado||"derecha";
+      if(l==="derecha"){x=bb.x1;y=bb.y0}else if(l==="izquierda"){x=bb.x0-w;y=bb.y0}else if(l==="arriba"){x=bb.x0;y=bb.y0-h}else{x=bb.x0;y=bb.y1}}
+    else if(a.dentro_de){const r=findRoom(a.dentro_de);if(!r)return`❓ No encuentro el cuarto “${a.dentro_de}”`;const bb=bbox(polyOf(r)),e=a.esquina||"arriba-izquierda";
+      if(w>bb.x1-bb.x0+0.01||h>bb.y1-bb.y0+0.01)return`⚠️ No cabe: ${r.name} mide ${f2(bb.x1-bb.x0)} × ${f2(bb.y1-bb.y0)} m y el cuarto pide ${w} × ${h} m`;
+      x=e.includes("derecha")?bb.x1-w:bb.x0;y=e.includes("abajo")?bb.y1-h:bb.y0}
+    else if(all.length){const bb=bbox(all);x=bb.x1+0.5;y=bb.y0}
+    const n=S.shapes.filter(s=>s.type===tipo).length+1;
+    const sh={id:uid(),type:tipo,name:a.nombre!=null&&a.nombre!==""?String(a.nombre):(tipo==="cuarto"?String(n):""),x:r2(x),y:r2(y),segs:[{len:w,ang:0,conf:true},{len:h,ang:90,conf:true},{len:w,ang:180,conf:true},{len:h,ang:270,conf:true}],items:{},obra:a.existente?"existente":"nuevo"};
+    S.shapes.push(sh);sel=sh.id;fit();
+    return`🏠 ${tipo==="lamina"?"Techo":"Cuarto"} ${sh.name}: ${w} × ${h} m (${f2(w*h)} m²)`;
+  }
+  if(t==="crear_muro"){
+    const{r,err}=roomOrErr(a.cuarto);if(err)return err;const wg=findWall(r,a.pared);if(!wg)return`❓ No encuentro la pared “${a.pared}” del cuarto ${r.name}`;
+    const d=+a.distancia;if(!(d>=0&&d<=wg.L+0.01))return`⚠️ La pared ${a.pared} mide ${f2(wg.L)} m; ${a.distancia} m no cabe`;
+    const s0={x:wg.o.x+wg.u.x*d,y:wg.o.y+wg.u.y*d};let len=+a.largo;
+    if(a.cruzar||!(len>0))len=rayLen(polyOf(r),s0,wg.n);
+    if(!(len>0))return"❓ No pude calcular el largo del muro";
+    const ang=Math.round((((Math.atan2(wg.n.y,wg.n.x)*180/Math.PI)%360)+360)%360*10)/10;
+    const sh={id:uid(),type:"muro",name:"Muro "+(S.shapes.filter(s=>s.type==="muro").length+1),x:r2(s0.x),y:r2(s0.y),segs:[{len:r2(len),ang,conf:true}],items:{}};
+    S.shapes.push(sh);return`🧱 Muro de tabla roca de ${f2(len)} m en el cuarto ${r.name}, a ${f2(d)} m de la esquina`;
+  }
+  if(t==="agregar_abertura"){
+    const{r,err}=roomOrErr(a.cuarto);if(err)return err;const wg=findWall(r,a.pared);if(!wg)return`❓ No encuentro la pared “${a.pared}” del cuarto ${r.name}`;
+    const kind=a.tipo==="ventana"?"ventana":"puerta",ancho=a.ancho>0?+a.ancho:(kind==="puerta"?0.9:1.2),alto=a.alto>0?+a.alto:(kind==="puerta"?2.1:1.1);
+    const pos=a.distancia!=null&&a.distancia!==""?+a.distancia:(wg.L-ancho)/2;
+    if(pos<0||pos+ancho>wg.L+0.01)return`⚠️ No cabe: la pared ${a.pared} mide ${f2(wg.L)} m y la ${kind} ocuparía de ${f2(pos)} a ${f2(pos+ancho)} m`;
+    S.aberts.push({id:uid(),room:r.id,seg:wg.i,kind,pos:r2(pos),ancho,alto,antepecho:a.antepecho>0?+a.antepecho:(kind==="ventana"?1:0),abre:a.abre==="afuera"?"afuera":"adentro",bisagra:a.bisagra==="derecha"?"derecha":"izquierda",estado:a.estado==="existente"?"existente":"nueva"});
+    return`${kind==="puerta"?"🚪":"🪟"} ${kind[0].toUpperCase()+kind.slice(1)} de ${f2(ancho)} × ${f2(alto)} m en la pared ${wg.side} del cuarto ${r.name}, a ${f2(pos)} m de la esquina`;
+  }
+  if(t==="agregar_objeto"){
+    const def=OBJ[a.objeto];if(!def)return`❓ No conozco el objeto “${a.objeto}”`;
+    const{r,err}=roomOrErr(a.cuarto);if(err)return err;
+    const w=a.diametro>0?+a.diametro:(a.ancho>0?+a.ancho:def[0]),h=a.diametro>0?+a.diametro:(a.fondo>0?+a.fondo:def[1]);let cx,cy,u={x:1,y:0},n={x:0,y:1},where;
+    const bb=bbox(polyOf(r));
+    if(a.pared){
+      const wg=findWall(r,a.pared);if(!wg)return`❓ No encuentro la pared “${a.pared}” del cuarto ${r.name}`;
+      let pos=a.centrado||a.distancia==null||a.distancia===""?(wg.L-w)/2:+a.distancia;const sep=+a.separacion||0;
+      if(pos<-0.001||pos+w>wg.L+0.01)return`⚠️ No cabe: la pared ${wg.side} mide ${f2(wg.L)} m y ${def[2].toLowerCase()} ocuparía de ${f2(pos)} a ${f2(pos+w)} m`;
+      u=wg.u;n=wg.n;cx=wg.o.x+u.x*(pos+w/2)+n.x*(sep+h/2);cy=wg.o.y+u.y*(pos+w/2)+n.y*(sep+h/2);where=`pared ${wg.side}, a ${f2(pos)} m de la esquina`;
+    }else if(a.x!=null&&a.y!=null){cx=bb.x0+(+a.x)+w/2;cy=bb.y0+(+a.y)+h/2;where=`a ${f2(+a.x)} m / ${f2(+a.y)} m de la esquina de arriba a la izquierda`}
+    else{const c=centroid(polyOf(r));cx=c.x;cy=c.y;where="centro del cuarto"}
+    S.objs.push({id:uid(),kind:a.objeto,room:r.id,cx:r2(cx),cy:r2(cy),w,h,u,n,alt:a.altura>0?+a.altura:undefined,nota:a.nota,talar:a.objeto==="arbol"&&a.accion==="talar"});bumpItem(r,a.objeto,1);
+    return`${a.objeto==="arbol"?"🌳":"🪑"} ${def[2]}${a.objeto==="arbol"&&a.accion==="talar"?" (a talar)":""} (${f2(w)} × ${f2(h)} m${a.altura>0?`, a ${f2(+a.altura)} m de altura`:""}) en el cuarto ${r.name}: ${where}`;
+  }
+  if(t==="dividir_cuarto"){
+    const r=findRoom(a.cuarto);if(!r)return a.cuarto?`❓ No encuentro el cuarto “${a.cuarto}”`:"❓ ¿Qué cuarto quieres dividir? Selecciónalo o dime su nombre";
+    const P=polyOf(r);if(!(P.length===4&&P.every((q,i)=>{const n=P[(i+1)%4];return Math.abs(q.x-n.x)<0.02||Math.abs(q.y-n.y)<0.02})))return`⚠️ Solo sé dividir cuartos rectangulares y ${r.name} no lo es`;
+    const bb=bbox(P),W=bb.x1-bb.x0,H=bb.y1-bb.y0,orden=["arriba","abajo","izquierda","derecha"].includes(a.orden)?a.orden:"arriba",vert=orden==="arriba"||orden==="abajo",total=vert?H:W,across=vert?W:H;
+    const parts=(Array.isArray(a.partes)?a.partes:[]).slice(0,12);if(!parts.length)return"❓ ¿En cuántas partes lo divido y cómo se llaman?";
+    const fixed=parts.reduce((t,q)=>t+(q.tamano>0?+q.tamano:0),0),free=parts.filter(q=>!(q.tamano>0)).length;
+    if(fixed>total+0.01)return`⚠️ No cabe: ${r.name} mide ${f2(total)} m en ese sentido y las partes suman ${f2(fixed)} m`;
+    const share=free?(total-fixed)/free:0,sizes=parts.map(q=>q.tamano>0?+q.tamano:share),sobra=total-sizes.reduce((x,y)=>x+y,0),fwd=orden==="arriba"||orden==="izquierda";
+    let pos=fwd?(vert?bb.y0:bb.x0):(vert?bb.y1:bb.x1);const made=[],mkRect=(name,size,obra)=>{
+      const x0=vert?bb.x0:(fwd?pos:pos-size),y0=vert?(fwd?pos:pos-size):bb.y0,w=vert?across:size,h=vert?size:across;pos+=fwd?size:-size;
+      return{id:uid(),type:"cuarto",name,x:r2(x0),y:r2(y0),segs:[{len:r2(w),ang:0,conf:true},{len:r2(h),ang:90,conf:true},{len:r2(w),ang:180,conf:true},{len:r2(h),ang:270,conf:true}],items:{},obra};
+    };
+    let n0=S.shapes.filter(s=>s.type==="cuarto").length;
+    parts.forEach((q,i)=>made.push(mkRect(q.nombre!=null&&q.nombre!==""?String(q.nombre):String(++n0),sizes[i],a.existentes?"existente":"nuevo")));
+    if(sobra>0.02)made.push(mkRect(r.name,sobra,r.obra));
+    const idx=S.shapes.indexOf(r);S.shapes.splice(idx,1,...made);
+    let moved=0;for(const o of S.objs){if(o.room===r.id){const q=roomAt({x:o.cx,y:o.cy});if(q){o.room=q.id;moved++}}}
+    const lost=S.aberts.filter(x=>x.room===r.id).length;S.aberts=S.aberts.filter(x=>x.room!==r.id);S.objs=S.objs.filter(o=>o.room!==r.id);
+    sel=made[0].id;fit();
+    return`🏠 Dividí ${r.name} (${f2(W)} × ${f2(H)} m) en: ${made.map(m=>{const b=bbox(polyOf(m));return`${m.name} ${f2(b.x1-b.x0)} × ${f2(b.y1-b.y0)} m`}).join(" · ")}${lost?`. ⚠️ Se quitaron ${lost} puerta(s)/ventana(s) que tenía ${r.name}; vuelve a ponerlas`:""}${moved?`. ${moved} objeto(s) se reubicaron`:""}`;
+  }
+  if(t==="configurar_instalacion"){
+    const ch=[],mp=[["cuartos_por_llave","grupo","cuartos por llave de paso"],["pendiente","pend","% de pendiente en tubos de 4 pulgadas"],["pendiente_2","pend2","% de pendiente en tubos de 2 pulgadas"],["calibre_contactos","cC","calibre de uso general (luces, contactos y AC)"],["calibre_ramal","cR","calibre tablero→ramal"],["metros_calibre6","umbral","m con #6 antes de pasar a #4"]];
+    for(const[k,f,l]of mp)if(a[k]!=null&&+a[k]>0){S[f]=+a[k];ch.push(`${l}: ${a[k]}`)}
+    return ch.length?`⚙️ ${ch.join(" · ")}`:"❓ ¿Qué regla de instalación quieres cambiar?";
+  }
+  if(t==="cambiar_nivel"){
+    const{r,err}=roomOrErr(a.cuarto);if(err)return err;let n=r.nivel||0;
+    if(a.nivel_cm!=null&&a.nivel_cm!=="")n=+a.nivel_cm;else if(a.cambio_cm!=null&&a.cambio_cm!=="")n+=+a.cambio_cm;else return"❓ ¿Cuántos centímetros cambia el nivel del piso?";
+    r.nivel=Math.round(n*10)/10;const vol=area(r)*Math.abs(r.nivel)/100;
+    return`⬆️ Cuarto ${r.name}: nivel de piso ${r.nivel>0?"+":""}${r.nivel} cm (${r.nivel>0?"relleno":"excavación"} ≈ ${f2(vol)} m³)`;
+  }
+  if(t==="definir_calle"){
+    if(!["abajo","arriba","izquierda","derecha"].includes(a.lado))return"❓ ¿De qué lado del plano está la calle? (abajo, arriba, izquierda o derecha)";
+    S.calle=a.lado;fit();return`🛣️ La calle queda ${a.lado==="izquierda"||a.lado==="derecha"?"a la "+a.lado:a.lado+" del plano"}`;
+  }
+  if(t==="colocar_cajas_breakers"){
+    const kLC=["foco","ventilador","apagador","contacto","tv"],hasLC=r=>S.objs.some(o=>o.room===r.id&&kLC.includes(o.kind)),hasAC=r=>S.objs.some(o=>o.room===r.id&&o.kind==="minisplit");
+    const rooms=a.cuarto?[findRoom(a.cuarto)].filter(Boolean):S.shapes.filter(x=>x.type==="cuarto"&&(hasLC(x)||hasAC(x)));
+    if(!rooms.length)return a.cuarto?`❓ No encuentro el cuarto “${a.cuarto}”`:"❓ Primero pon focos o contactos en los cuartos";
+    const done=[];
+    for(const r of rooms){
+      let slot=0;const has=k=>S.objs.some(o=>o.room===r.id&&o.kind===k);
+      if(hasLC(r)&&!has("caja_breakers")){if(placeBox(r,"caja_breakers",slot))done.push(`${r.name||"s/n"} (tablero)`);slot++}else if(has("caja_breakers"))slot++;
+      if(hasAC(r)&&!has("caja_ac")&&placeBox(r,"caja_ac",slot))done.push(`${r.name||"s/n"} (caja del aire acond.)`);
+    }
+    return done.length?`🔌 Cajas colocadas junto a la puerta, a 1.5 m de altura: ${done.join(", ")}`:"Todos los cuartos ya tienen sus cajas";
+  }
+  if(t==="convertir_marca"){
+    const info=marksInfo(),id=String(a.marca||"").toUpperCase().replace(/^M/,""),x=info.find(q=>String(q.n)===id)||info.find(q=>q.m.texto&&norm(q.m.texto)===norm(a.marca));
+    if(!x)return`❓ No encuentro la marca “${a.marca}”. Marcas disponibles: ${info.map(q=>"M"+q.n+(q.m.texto?" ("+q.m.texto+")":"")).join(", ")||"ninguna"}`;
+    const m=x.m,P=m.pts,bb=bbox(P);
+    if(m.tipo==="cuarto"||m.tipo==="techo"){
+      const w=a.ancho>0?+a.ancho:r2(sn(bb.x1-bb.x0)),h=a.largo>0?+a.largo:r2(sn(bb.y1-bb.y0));if(!(w>0&&h>0))return"❓ La marca es muy pequeña; dime sus medidas";
+      const tipo=m.tipo==="techo"?"lamina":"cuarto",n=S.shapes.filter(s=>s.type===tipo).length+1;
+      const sh={id:uid(),type:tipo,name:a.nombre!=null&&a.nombre!==""?String(a.nombre):(m.texto&&tipo==="cuarto"?m.texto:(tipo==="cuarto"?String(n):"")),x:r2(sn(bb.x0)),y:r2(sn(bb.y0)),segs:[{len:w,ang:0,conf:true},{len:h,ang:90,conf:true},{len:w,ang:180,conf:true},{len:h,ang:270,conf:true}],items:{},obra:a.existente?"existente":"nuevo"};
+      S.shapes.push(sh);S.marcas=S.marcas.filter(q=>q!==m);sel=sh.id;fit();
+      return`🏠 Convertí la marca M${x.n} en ${tipo==="lamina"?"techo de lámina":"cuarto"} ${sh.name}: ${f2(w)} × ${f2(h)} m (${f2(w*h)} m²)`;
+    }
+    if(m.tipo==="pared"){
+      const L=a.largo>0?+a.largo:r2(x.L),ang=Math.round((((Math.atan2(P[1].y-P[0].y,P[1].x-P[0].x)*180/Math.PI)%360)+360)%360*10)/10;
+      S.shapes.push({id:uid(),type:"muro",name:"Muro "+(S.shapes.filter(s=>s.type==="muro").length+1),x:r2(sn(P[0].x)),y:r2(sn(P[0].y)),segs:[{len:L,ang,conf:true}],items:{}});
+      S.marcas=S.marcas.filter(q=>q!==m);return`🧱 Convertí la marca M${x.n} en un muro de tabla roca de ${f2(L)} m`;
+    }
+    return`❓ La marca M${x.n} es solo un dibujo (${m.tipo}); no se convierte en elemento`;
+  }
+  if(t==="confirmar_medida"){
+    const{r,err}=roomOrErr(a.cuarto);if(err)return err;const wg=findWall(r,a.pared);if(!wg)return`❓ No encuentro la pared “${a.pared}” del cuarto ${r.name}`;
+    const v=+a.medida;if(!(v>0.2&&v<60))return"❓ ¿Cuánto mide? (en metros)";
+    const before=r.segs[wg.i].len;confirmWall(r,wg.i,v);const rc=recalcular();
+    return`📏 Cuarto ${r.name}, pared ${wg.side}: ${f2(before)} → ${f2(v)} m (${v>=before?"+":""}${Math.round((v-before)*100)} cm). ${rc.resumen}`;
+  }
+  if(t==="demoler_muro"){
+    const{r,err}=roomOrErr(a.cuarto);if(err)return err;const wg=findWall(r,a.pared);if(!wg)return`❓ No encuentro la pared “${a.pared}” del cuarto ${r.name}`;
+    const d=a.distancia>0?+a.distancia:0,len=a.largo>0?+a.largo:wg.L-d;
+    if(!(len>0)||d+len>wg.L+0.01)return`⚠️ No cabe: la pared ${wg.side} mide ${f2(wg.L)} m`;
+    const ang=Math.round((((Math.atan2(wg.u.y,wg.u.x)*180/Math.PI)%360)+360)%360*10)/10;
+    S.shapes.push({id:uid(),type:"demo",name:"Demolición "+(S.shapes.filter(s=>s.type==="demo").length+1),x:r2(wg.o.x+wg.u.x*d),y:r2(wg.o.y+wg.u.y*d),segs:[{len:r2(len),ang,conf:true}],items:{}});
+    return`🔨 Demolición de ${f2(len)} m en la pared ${wg.side} del cuarto ${r.name}`;
+  }
+  if(t==="tapar_vano")return markOpening(a,"tapar");
+  if(t==="retirar_abertura")return markOpening(a,"retirada");
+  if(t==="ajustar_claros_a_piezas"){const n=ajustarClaros();return n?`🪟 Dejé ${n} claro(s) nuevo(s) a la medida de las piezas del inventario`:"No hay claros nuevos que ajustar a piezas del inventario"}
+  if(t==="registrar_inventario"){
+    const tipo=a.tipo==="puerta"?"puerta":"ventana",ancho=+a.ancho,alto=+a.alto,cant=Math.max(1,Math.min(200,parseInt(a.cantidad)||1));
+    if(!(ancho>0&&alto>0))return"❓ ¿Qué medidas tiene la pieza? (ancho y alto)";
+    const est=["buena","regular","mala"].includes(a.estado_fisico)?a.estado_fisico:"buena";
+    const ya=S.inv.find(x=>x.tipo===tipo&&Math.abs(x.ancho-ancho)<0.005&&Math.abs(x.alto-alto)<0.005&&x.estadoF===est&&(x.origen||"")===(a.origen||"")&&(x.detalle||"")===(a.detalle||""));
+    if(ya)ya.cantidad+=cant;else S.inv.push({id:uid(),tipo,ancho,alto,cantidad:cant,detalle:a.detalle||"",estadoF:est,origen:a.origen||""});
+    return`🪟 Inventario: +${cant} ${tipo}${cant>1?"s":""} de ${f2(ancho)} × ${f2(alto)} m (${est})${a.origen?" de "+a.origen:""}`;
+  }
+  if(t==="asignar_material"){
+    const mat=["duroc","tablaroca","ninguno","existente"].includes(a.material)?a.material:null;if(!mat)return`❓ Material no válido: “${a.material}”`;
+    const nm=norm(a.cuarto),mu=a.cuarto?S.shapes.find(s=>s.type==="muro"&&norm(s.name)===nm):null;
+    if(mu){
+      const s0=mu.segs[0],rr=wallRecs().find(x=>x.sh===mu);s0.mat=s0.mat||{};let sides=["a","b"];
+      if(a.hacia&&rr){const h=norm(a.hacia);sides=[];if(norm(rr.ra&&rr.ra.name)===h||(h==="exterior"&&!rr.ra))sides.push("a");if(norm(rr.rb&&rr.rb.name)===h||(h==="exterior"&&!rr.rb))sides.push("b");if(!sides.length)return`❓ El ${mu.name} no da hacia “${a.hacia}”`}
+      for(const sd of sides)s0.mat[sd]=mat;
+      return`🧱 ${mu.name}: ${sides.length===2?"ambas caras":"cara hacia "+a.hacia} → ${MATL[mat]}`;
+    }
+    const{r,err}=roomOrErr(a.cuarto);if(err)return err;const cara=a.cara==="exterior"||a.cara==="ambas"?a.cara:"interior";
+    let idx=r.segs.map((_,i)=>i);if(a.pared){const wg=findWall(r,a.pared);if(!wg)return`❓ No encuentro la pared “${a.pared}” del cuarto ${r.name}`;idx=[wg.i]}
+    const p=points(r);
+    for(const i of idx){const s=r.segs[i],A=p[i],B=p[i+1],L=Math.hypot(B.x-A.x,B.y-A.y);if(L<0.01)continue;const nr={x:-(B.y-A.y)/L,y:(B.x-A.x)/L},m={x:(A.x+B.x)/2,y:(A.y+B.y)/2};
+      const inA=roomAt({x:m.x+nr.x*.15,y:m.y+nr.y*.15})===r,inSide=inA?"a":"b",outSide=inA?"b":"a";s.mat=s.mat||{};
+      if(cara!=="exterior")s.mat[inSide]=mat;if(cara!=="interior")s.mat[outSide]=mat}
+    if(r.obra!=="nuevo"&&(mat==="duroc"||mat==="tablaroca"))return`🧱 ${MATL[mat]} (${cara}) en ${a.pared?"la pared "+a.pared:"todas las paredes"} del cuarto ${r.name}. Ojo: sus muros están marcados como existentes; cambia “Muros de este cuarto” a Nuevos si también llevan estructura.`;
+    return`🧱 ${MATL[mat]} (cara ${cara}) en ${a.pared?"la pared "+a.pared:"todas las paredes"} del cuarto ${r.name}`;
+  }
+  if(t==="quitar_objeto"){
+    const{r,err}=roomOrErr(a.cuarto);if(err)return err;let n=Math.max(1,parseInt(a.cantidad)||1),q=0;
+    for(let i=S.objs.length-1;i>=0&&q<n;i--){if(S.objs[i].room===r.id&&S.objs[i].kind===a.objeto){S.objs.splice(i,1);bumpItem(r,a.objeto,-1);q++}}
+    return q?`🗑️ Quité ${q} ${(OBJ[a.objeto]||[0,0,a.objeto])[2].toLowerCase()} del cuarto ${r.name}`:`❓ No hay ${a.objeto} en el cuarto ${r.name}`;
+  }
+  if(t==="actualizar_cuarto"){
+    const{r,err}=roomOrErr(a.cuarto);if(err)return err;r.items=r.items||{};const ch=[];
+    for(const[k,l]of ITEMS){if(typeof a[k]==="number"){r.items[k]=a.modo==="sumar"?(r.items[k]||0)+a[k]:a[k];ch.push(`${l}: ${r.items[k]}`)}}
+    return`✅ Cuarto ${r.name} → ${ch.join(", ")||"sin cambios"}`;
+  }
+  return`❓ No sé hacer “${t}”`;
+}
+async function runAgent(t,imagen){
+  const body={texto:t,contexto:ctx(),historial:HIST};if(imagen)body.imagen=imagen;
+  const r=await sb("/functions/v1/agente",{method:"POST",body});
+  const acc=r.acciones||[],log=[];
+  if(acc.length)snapshot();
+  for(const a of acc){try{log.push(act(a))}catch(e){log.push("⚠️ "+e.message)}}
+  if(r.mensaje)log.push("💬 "+r.mensaje);
+  HIST.push({role:"user",content:imagen?t+" (con una foto de la cámara)":t},{role:"assistant",content:log.join("\n")||"Sin cambios"});HIST=HIST.slice(-6);
+  if(acc.length)render();
+  return{acc,log,msg:r.mensaje||""};
+}
+$("bAg").onclick=async()=>{
+  const t=$("agText").value.trim();if(!t)return;const out=$("agOut");out.className="status";out.textContent="⏳ Pensando…";
+  try{const r=await runAgent(t);out.className="status";out.innerHTML=r.log.map(esc).join("<br>")||"Sin cambios";if(r.acc.length)$("agText").value=""}
+  catch(err){out.className="status bad";out.textContent="⚠️ "+err.message}
+};
+$("bUndo").onclick=()=>{const t=UNDO.pop(),out=$("agOut");if(!t){out.className="status";out.textContent="No hay nada que deshacer";return}S=JSON.parse(t);if(!S.shapes.some(s=>s.id===sel))sel=null;render();out.className="status ok";out.textContent="↩️ Deshecho. Quedan "+UNDO.length+" pasos atrás."};
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,recBtn=null;
+function dictar(ta,btn,out,onEnd){
+  if(!SR){out.className="status bad";out.textContent="Este navegador no trae dictado. Toca el micrófono 🎤 del teclado del iPhone para dictar.";return}
+  if(rec){rec.stop();return}
+  const base=ta.value;rec=new SR();recBtn=btn;rec.lang="es-MX";rec.interimResults=true;rec.continuous=true;
+  rec.onresult=e=>{let s="";for(let i=0;i<e.results.length;i++)s+=e.results[i][0].transcript;ta.value=(base?base+" ":"")+s};
+  rec.onerror=ev=>{out.className="status bad";out.textContent=ev.error==="not-allowed"?"Permite el micrófono en Safari para dictar (o usa el micrófono del teclado).":"Dictado: "+ev.error};
+  rec.onend=()=>{rec=null;btn.textContent="🎤 Hablar";if(onEnd)onEnd()};
+  try{rec.start();btn.textContent="⏹️ Detener";out.className="status";out.textContent="🎙️ Te escucho…"}catch(e){rec=null}
+}
+$("bMic").onclick=()=>dictar($("agText"),$("bMic"),$("agOut"),null);
+
+/* ---------- cámara en vivo por turnos + bitácora ---------- */
+let camStream=null,camFacing="environment";
+const camMsg=(t,bad)=>{const o=$("camOut");o.className="status"+(bad?" bad":"");o.innerHTML=t};
+async function camStart(){
+  try{
+    if(camStream)camStop();
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:camFacing},width:{ideal:1280},height:{ideal:720}},audio:false});
+    const v=$("camVid");v.srcObject=camStream;v.style.display="block";await v.play().catch(()=>{});
+    $("camOpen").textContent="⏹️ Cerrar cámara";$("camFlip").hidden=false;camMsg("📷 Cámara lista. Habla o escribe y toca “Mirar y enviar”.");
+  }catch(e){camStream=null;camMsg("No pude abrir la cámara: "+esc(e&&e.name==="NotAllowedError"?"da permiso de cámara a Safari (Ajustes → Safari → Cámara).":(e&&e.message||String(e))),true)}
+}
+function camStop(){if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}const v=$("camVid");v.srcObject=null;v.style.display="none";$("camOpen").textContent="📷 Abrir cámara";$("camFlip").hidden=true}
+$("camOpen").onclick=()=>camStream?camStop():camStart();
+$("camFlip").onclick=()=>{camFacing=camFacing==="environment"?"user":"environment";camStart()};
+function grabFrame(max,q){const v=$("camVid");if(!camStream||!v.videoWidth)return null;const k=Math.min(1,max/Math.max(v.videoWidth,v.videoHeight)),c=document.createElement("canvas");c.width=Math.round(v.videoWidth*k);c.height=Math.round(v.videoHeight*k);c.getContext("2d").drawImage(v,0,0,c.width,c.height);return c.toDataURL("image/jpeg",q)}
+function hablar(txt){if(!$("camVoz").checked||!window.speechSynthesis||!txt)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang="es-MX";speechSynthesis.speak(u)}catch(e){}}
+async function camSend(){
+  const t=$("camTxt").value.trim();if(!t){camMsg("Escribe o dicta algo primero.",true);return}
+  try{if(window.speechSynthesis&&$("camVoz").checked)speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+  const full=grabFrame(1024,.7),thumb=grabFrame(320,.55);
+  camMsg(full?"⏳ Mirando y pensando…":"⏳ Pensando… (la cámara está cerrada, va solo el texto)");
+  try{
+    const r=await runAgent(t,full?{media_type:"image/jpeg",data:full.split(",")[1]}:null);
+    camMsg(r.log.map(esc).join("<br>")||"Sin cambios");
+    if($("camBit").checked&&thumb){S.bitacora.unshift({id:uid(),ts:Date.now(),texto:t,resumen:r.log.join(" · ").slice(0,600),foto:thumb});S.bitacora=S.bitacora.slice(0,30);render()}
+    hablar(r.msg||(r.acc.length?"Listo, ya lo dibujé.":"No hice cambios."));
+    $("camTxt").value="";
+  }catch(err){camMsg("⚠️ "+esc(err.message),true)}
+}
+$("camSend").onclick=camSend;
+$("camMic").onclick=()=>dictar($("camTxt"),$("camMic"),$("camOut"),()=>{if($("camAuto").checked&&$("camTxt").value.trim())camSend()});
+function renderBit(){
+  const el=$("bitList");
+  el.innerHTML=(S.bitacora||[]).length?`<h2 style="margin-top:12px">📒 Bitácora de obra</h2>`+S.bitacora.map(b=>`<div class="row" style="align-items:flex-start;border-top:1px solid var(--bd);padding-top:6px"><img src="${b.foto}" alt="Foto de la bitácora" style="width:96px;border-radius:8px;flex:none"><div style="flex:1;font-size:13px"><b>${new Date(b.ts).toLocaleString("es-MX",{dateStyle:"short",timeStyle:"short"})}</b><div>${esc(b.texto)}</div><div style="color:var(--mut)">${esc(b.resumen)}</div></div><button class="sec" data-bdel="${b.id}" aria-label="Quitar">✕</button></div>`).join(""):"";
+}
+$("bitList").onclick=e=>{const b=e.target.closest("button[data-bdel]");if(b){S.bitacora=S.bitacora.filter(x=>x.id!==b.dataset.bdel);render()}};
+
+/* ---------- calco del escaneo + método híbrido ---------- */
+const BGKEY="planos-fondo-v1";
+try{const t=localStorage.getItem(BGKEY);if(t)BG=JSON.parse(t)}catch(e){}
+const bgMsg=t=>{$("bgMsg").textContent=t};
+function saveBG(){try{BG?localStorage.setItem(BGKEY,JSON.stringify(BG)):localStorage.removeItem(BGKEY)}catch(e){bgMsg("⚠️ La imagen pesa mucho para guardarse; funciona hasta cerrar la página")}}
+function setMode(m){mode=m;cv.style.cursor=m==="pan"?"":"crosshair";draw()}
+function segNote(s){
+  if(s.orig===undefined&&!s.conf)return"";
+  if(s.conf&&s.orig!==undefined){const d=Math.round((s.len-s.orig)*100);return`<div class="sub ok">✅ Láser · escaneo ${f2(s.orig)} m (${d>0?"+":""}${d} cm)</div>`}
+  if(s.conf)return'<div class="sub ok">✅ Medida de láser</div>';
+  return`<div class="sub">📷 Escaneo ${f2(s.orig)} m · sin confirmar con láser</div>`;
+}
+$("bgFile").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;const im=new Image(),u=URL.createObjectURL(f);
+  im.onload=()=>{const k=Math.min(1,1600/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+    BG={url:c.toDataURL("image/jpeg",.75),w:c.width,h:c.height,mpp:10/c.width,x:0,y:0,op:.6};URL.revokeObjectURL(u);saveBG();fit();render();bgMsg("✅ Imagen cargada. Ahora toca “1. Calibrar escala”.")};
+  im.onerror=()=>bgMsg("⚠️ No pude leer esa imagen");im.src=u;e.target.value="";
+};
+$("bgOp").oninput=e=>{if(BG){BG.op=e.target.value/100;draw()}};
+$("bBgDel").onclick=()=>{BG=null;saveBG();setMode("pan");fit();render();bgMsg("Fondo quitado")};
+$("bCal").onclick=()=>{if(!BG)return bgMsg("Primero carga la imagen");calPts=[];traceId=null;setMode("calib");bgMsg("Toca el punto A y luego el punto B de una pared cuya medida real conozcas con el láser.")};
+$("bTrace").onclick=()=>{
+  if(!BG)return bgMsg("Primero carga la imagen");
+  const t=$("addType").value,sh={id:uid(),type:t,name:t==="cuarto"?String(S.shapes.filter(s=>s.type==="cuarto").length+1):"",x:0,y:0,segs:[],items:{}};
+  S.shapes.push(sh);sel=sh.id;traceId=sh.id;tracePts=[];setMode("trace");render();
+  bgMsg(TYPES[t].closed?"Toca las esquinas en orden. Para cerrar toca la primera esquina otra vez.":"Toca los puntos del muro en orden y luego “Terminar traza”.");
+};
+$("bEnd").onclick=()=>{
+  const sh=S.shapes.find(s=>s.id===traceId);
+  if(sh&&TYPES[sh.type].closed&&sh.segs.length>=2&&closure(sh).e>0.01){const p=points(sh),a=p[p.length-1],b=p[0];sh.segs.push(segOf(a,b))}
+  if(sh&&sh.segs.length===0)S.shapes=S.shapes.filter(s=>s!==sh);
+  traceId=null;tracePts=[];setMode("pan");render();bgMsg("Traza terminada. Ahora corrige cada pared con la medida del láser.");
+};
+function segOf(a,b){const len=Math.round(Math.hypot(b.x-a.x,b.y-a.y)*1000)/1000,ang=Math.round((((Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI)%360)+360)%360*10)/10;return{len,ang,orig:len}}
+function snapPt(p,prev){
+  const tol=Math.max(0.1,view.w/50);
+  for(const sh of S.shapes)for(const v of points(sh))if(Math.hypot(v.x-p.x,v.y-p.y)<tol)return{x:v.x,y:v.y};
+  const q={x:Math.round(p.x*20)/20,y:Math.round(p.y*20)/20};
+  if(prev){const dx=q.x-prev.x,dy=q.y-prev.y,a=Math.atan2(dy,dx)*180/Math.PI,r=Math.hypot(dx,dy);for(const t of[0,90,180,-90,-180])if(Math.abs(a-t)<6){const R=t*Math.PI/180;return{x:prev.x+r*Math.cos(R),y:prev.y+r*Math.sin(R)}}}
+  return q;
+}
+function tap(w){
+  if(mode==="calib"){
+    calPts.push({x:w.x,y:w.y});draw();
+    if(calPts.length===2){
+      const d=Math.hypot(calPts[1].x-calPts[0].x,calPts[1].y-calPts[0].y),real=parseFloat(String(prompt("Medida real entre A y B en metros (la del láser). Ej: 5.30","")||"").replace(",","."));
+      if(real>0&&d>0){const f=real/d;BG.x*=f;BG.y*=f;BG.mpp*=f;saveBG();setMode("pan");fit();render();bgMsg(`✅ Escala lista. Ahora toca “2. Trazar”.`)}
+      else{calPts=[];draw();bgMsg("Medida no válida. Toca A y B otra vez.")}
+    }else bgMsg("Ahora toca el punto B.");
+    return;
+  }
+  if(mode==="trace"){
+    const sh=S.shapes.find(s=>s.id===traceId);if(!sh)return;
+    const p=snapPt(w,tracePts[tracePts.length-1]);
+    if(tracePts.length>2&&TYPES[sh.type].closed&&Math.hypot(p.x-tracePts[0].x,p.y-tracePts[0].y)<0.001){tracePts.push(p);rebuildTrace(sh);traceId=null;tracePts=[];setMode("pan");render();bgMsg("✅ Cuarto cerrado. Corrige cada pared con el láser en “Editar”.");return}
+    if(tracePts.length&&Math.hypot(p.x-tracePts[tracePts.length-1].x,p.y-tracePts[tracePts.length-1].y)<0.01)return;
+    tracePts.push(p);rebuildTrace(sh);render();bgMsg(`${tracePts.length} puntos`);
+  }
+}
+function rebuildTrace(sh){sh.x=tracePts[0].x;sh.y=tracePts[0].y;sh.segs=[];for(let i=1;i<tracePts.length;i++)sh.segs.push(segOf(tracePts[i-1],tracePts[i]))}
+$("bAdj").onclick=()=>{
+  const sh=cur();if(!sh)return;const c=closure(sh),un=sh.segs.filter(s=>!s.conf);
+  if(!un.length){$("close").className="status bad";$("close").textContent="⚠️ Todas las paredes ya tienen medida de láser. Revisa cuál está mal medida.";return}
+  const u=un.map(s=>[Math.cos(s.ang*Math.PI/180),Math.sin(s.ang*Math.PI/180)]);
+  let m00=0,m01=0,m11=0;for(const[x,y]of u){m00+=x*x;m01+=x*y;m11+=y*y}
+  const det=m00*m11-m01*m01,ex=-c.dx,ey=-c.dy;let d;
+  if(Math.abs(det)>1e-6){const lx=(m11*ex-m01*ey)/det,ly=(-m01*ex+m00*ey)/det;d=u.map(([x,y])=>lx*x+ly*y)}
+  else{const[ux,uy]=u[0],k=u.reduce((t,[x,y])=>t+(x*ux+y*uy)**2,0),l=(ex*ux+ey*uy)/k;d=u.map(([x,y])=>l*(x*ux+y*uy))}
+  un.forEach((s,i)=>{s.len=Math.max(0.01,Math.round((s.len+d[i])*1000)/1000)});
+  render();
+};
+cloudRefresh();
+fit();render();
+</script>
+</body>
+</html>
