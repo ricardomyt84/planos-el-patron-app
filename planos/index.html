@@ -1461,6 +1461,41 @@ function act(a){
     for(let i=S.objs.length-1;i>=0&&q<n;i--){if(S.objs[i].room===r.id&&S.objs[i].kind===a.objeto){S.objs.splice(i,1);bumpItem(r,a.objeto,-1);q++}}
     return q?`🗑️ Quité ${q} ${(OBJ[a.objeto]||[0,0,a.objeto])[2].toLowerCase()} del cuarto ${r.name}`:`❓ No hay ${a.objeto} en el cuarto ${r.name}`;
   }
+  if(t==="borrar_elemento"){
+    let list=[];const nm=a.nombre!==undefined&&String(a.nombre).trim()!==""?norm(a.nombre):null;
+    if(a.tipo&&a.numero>0){const x=S.shapes.filter(s=>s.type===a.tipo)[Math.round(a.numero)-1];if(x)list=[x]}
+    else if(nm){list=S.shapes.filter(s=>norm(s.name)===nm||norm(TYPES[s.type].l+" "+s.name)===nm);if(a.tipo)list=list.filter(s=>s.type===a.tipo)}
+    else{const c=cur();if(c)list=[c]}
+    if(!list.length)return`❓ No encuentro “${a.nombre||"el elemento"}” para borrarlo`;
+    if(list.length>1&&!a.todos)return`❓ Hay ${list.length} elementos llamados “${a.nombre}” (${list.map(x=>TYPES[x.type].l).join(", ")}). Dime cuál: cuarto, muro, techo o demolición`;
+    const ids=new Set(list.map(x=>x.id));
+    S.shapes=S.shapes.filter(x=>!ids.has(x.id));S.objs=(S.objs||[]).filter(o=>!ids.has(o.room));S.aberts=(S.aberts||[]).filter(x=>!ids.has(x.room));
+    if(ids.has(sel))sel=null;if(S.shapes.length)fit();
+    return`🗑️ Borré ${list.map(x=>TYPES[x.type].l.toLowerCase()+(x.name?" "+x.name:"")).join(", ")} con todo lo que tenía dentro`;
+  }
+  if(t==="borrar_abertura"){
+    const{r,err}=roomOrErr(a.cuarto);if(err)return err;const wg=a.pared?findWall(r,a.pared):null;
+    let l=(S.aberts||[]).filter(x=>x.room===r.id&&(!a.tipo||x.kind===a.tipo)&&(!wg||x.seg===wg.i));
+    if(!l.length)return`❓ No hay ${a.tipo||"puertas ni ventanas"}${a.pared?" en la pared "+a.pared:""} del cuarto ${r.name}`;
+    if(a.distancia!==undefined&&a.distancia!==null&&l.length>1){l=l.slice().sort((p,q)=>Math.abs(p.pos-a.distancia)-Math.abs(q.pos-a.distancia)).slice(0,1)}
+    if(l.length>1&&!a.todas)return`❓ Hay ${l.length} aberturas ahí (${l.map(x=>x.kind+" a "+f2(x.pos)+" m").join(", ")}). Dime cuál por su distancia o di “todas”`;
+    const ids=new Set(l.map(x=>x.id));S.aberts=S.aberts.filter(x=>!ids.has(x.id));
+    return`🗑️ Quité ${l.length} ${a.tipo||"abertura"}${l.length>1?"s":""} del cuarto ${r.name}`;
+  }
+  if(t==="limpiar_plano"){
+    if(!a.confirmado)return"❓ Esto borra TODO el plano. Dime “sí, borra todo” para confirmarlo (después puedes deshacer)";
+    S.shapes=[];S.objs=[];S.aberts=[];S.marcas=[];sel=null;fit();return"🧹 Dejé el plano vacío (puedes deshacer)";
+  }
+  if(t==="renombrar_cuarto"){
+    const{r,err}=roomOrErr(a.cuarto);if(err)return err;const old=r.name;r.name=String(a.nombre??"").trim();return`✏️ El cuarto ${old} ahora se llama ${r.name}`;
+  }
+  if(t==="cambiar_medidas"){
+    const{r,err}=roomOrErr(a.cuarto);if(err)return err;
+    if(r.segs.length!==4||!r.segs.every((g,i)=>+g.ang===i*90))return`❓ El cuarto ${r.name} no es rectangular; edita sus paredes a mano o bórralo y créalo de nuevo`;
+    const w=+a.ancho>0?+a.ancho:r.segs[0].len,h=+a.largo>0?+a.largo:r.segs[1].len;
+    r.segs[0].len=r.segs[2].len=w;r.segs[1].len=r.segs[3].len=h;for(const g of r.segs){g.conf=true;delete g.auto}fit();
+    return`📐 Cuarto ${r.name} ahora mide ${w} × ${h} m (${f2(w*h)} m²)`;
+  }
   if(t==="actualizar_cuarto"){
     const{r,err}=roomOrErr(a.cuarto);if(err)return err;r.items=r.items||{};const ch=[];
     for(const[k,l]of ITEMS){if(typeof a[k]==="number"){r.items[k]=a.modo==="sumar"?(r.items[k]||0)+a[k]:a[k];ch.push(`${l}: ${r.items[k]}`)}}
