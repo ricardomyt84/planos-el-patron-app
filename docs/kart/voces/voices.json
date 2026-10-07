@@ -1,20 +1,64 @@
 {
- "hit":["¡Ay, mi ladrillo!","¡Esa pared no estaba ahí!","¡Cuidado con el andamio!"],
- "rent_hit":["¡No tengo para la renta!"],
- "cement":["¡Cemento fresco!"],
- "coin5":["¡Cha-ching! ¡Renta cobrada!"],
- "first":["¡Aquí manda el Patrón!"],
- "up":["¡Subiendo como el precio de la renta!"],
- "back":["¡La obra va atrasada!"],
- "lastlap":["¡Última vuelta! ¡A poner el techo!"],
- "go":["¡Arranca la obra!"],
- "taco":["¡Tacos del albañil!"],
- "star":["¡Inquilino invencible!"],
- "win":["¡Hoy cobras renta doble!"],
- "lose":["Te atrasaste como la obra del vecino"],
- "slab":["¡Cuidado, cae la loza!"],
- "rain":["¡Aguas! ¡Se viene la lluvia!"],
- "barrow":["¡Ahí va la carretilla!"],
- "trophy":["¡Patrón de patrones!"],
- "nar":["¡Esto está más reñido que la renta del primero!","El plomero dice que todo es una fuga","La arquitecta revisa el plano y se pasa la curva","El albañil promete llegar mañana","¡Qué carrera, señoras y señores!"]
+ "hit": [
+  "¡Ay, mi ladrillo!",
+  "¡Esa pared no estaba ahí!",
+  "¡Cuidado con el andamio!"
+ ],
+ "rent_hit": [
+  "¡No tengo para la renta!"
+ ],
+ "cement": [
+  "¡Cemento fresco!"
+ ],
+ "coin5": [
+  "¡Cha-chíng! ¡Renta cobrada!",
+  "¡Dinero, dinero, dinerito!",
+  "¡Se cobró la renta, mi patrón!"
+ ],
+ "first": [
+  "¡Aquí manda el Patrón!"
+ ],
+ "up": [
+  "¡Subiendo como el precio de la renta!"
+ ],
+ "back": [
+  "¡La obra va atrasada!"
+ ],
+ "lastlap": [
+  "¡Última vuelta! ¡A poner el techo!"
+ ],
+ "go": [
+  "¡Arranca la obra!"
+ ],
+ "taco": [
+  "¡Tacos del albañil!"
+ ],
+ "star": [
+  "¡Inquilino invencible!"
+ ],
+ "win": [
+  "¡Hoy cobras renta doble!"
+ ],
+ "lose": [
+  "Te atrasaste como la obra del vecino"
+ ],
+ "slab": [
+  "¡Cuidado, cae la loza!"
+ ],
+ "rain": [
+  "¡Aguas! ¡Se viene la lluvia!"
+ ],
+ "barrow": [
+  "¡Ahí va la carretilla!"
+ ],
+ "trophy": [
+  "¡Patrón de patrones!"
+ ],
+ "nar": [
+  "¡Esto está más reñido que la renta del primero!",
+  "El plomero dice que todo es una fuga",
+  "La arquitecta revisa el plano y se pasa la curva",
+  "El albañil promete llegar mañana",
+  "¡Qué carrera, señoras y señores!"
+ ]
 }
