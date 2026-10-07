@@ -306,6 +306,7 @@ body.pres .stage #cv{height:calc(100dvh - 110px)}
     <div class="status" style="margin-top:10px"><b>🎧 Voz de la conversación</b></div>
     <label class="status">Tipo de voz<select id="vnSel"><option value="mujer">🎙️ Natural (Google): mujer</option><option value="hombre">🎙️ Natural (Google): hombre</option><option value="off">📱 La voz del teléfono</option></select></label>
     <div class="status" id="vnInfo" style="color:var(--mut)"></div>
+    <label class="status"><input type="checkbox" id="vnConv" style="width:auto"> 🧪 Usar la voz natural también en la conversación por voz (experimental: en iPhone puede dejar de oír el micrófono)</label>
     <label class="status">Voz<select id="vSel"></select></label>
     <label class="status">Velocidad <span id="vRateT"></span><input type="range" id="vRate" min="0.7" max="1.2" step="0.05" value="0.95"></label>
     <label class="status"><input type="checkbox" id="vAud" style="width:auto"> 🗣️ Puedo interrumpirla hablando (mejor con audífonos)</label>
@@ -584,6 +585,7 @@ $("bMic2").onclick=()=>{if(rec){rec.stop();return}try{speechSynthesis.cancel()}c
 $("bUndo2").onclick=()=>{$("bUndo").click();$("agOut2").textContent=$("agOut").textContent};
 /* ---------- conversación continua (manos libres) ---------- */
 const CV={on:false,busy:false,rec:null,idle:null,wl:null,carry:"",cancel:null};
+function convNat(){try{return localStorage.getItem("planos-vn-conv")==="1"}catch(e){return false}}
 const VK="planos-voz-uri";
 const NB=/paulina|juan|ang[eé]lica|diego|jorge|m[oó]nica|marisol|carlos|francisca|esperanza|sabina|dalia|alvaro|elvira/i;
 const VCAL=["Básica","Estándar","Mejorada","Premium"];
@@ -616,7 +618,7 @@ $("vRate").oninput=()=>{$("vRateT").textContent=$("vRate").value+"×";try{localS
 $("vAud").onchange=()=>{try{localStorage.setItem("planos-aud",$("vAud").checked?"1":"0")}catch(e){}};
 $("vSil").onchange=()=>{try{localStorage.setItem("planos-sil",$("vSil").value)}catch(e){}};
 function vnPaint(){const el=$("vnInfo");if(!el||!window.VN)return;el.textContent=VN.diagnostico();el.style.color=/✅/.test(el.textContent)?"#4ade80":"#ffd978"}
-if(window.VN){$("vnSel").value=VN.pref?VN.voz:"off";vnPaint()}
+if(window.VN){$("vnSel").value=VN.pref?VN.voz:"off";vnPaint();$("vnConv").checked=convNat();$("vnConv").onchange=()=>{try{localStorage.setItem("planos-vn-conv",$("vnConv").checked?"1":"0")}catch(e){}}}
 $("vnSel").onchange=()=>{const v=$("vnSel").value;if(v==="off")VN.pref=false;else{VN.pref=true;VN.voz=v;VN.disabled=false}vnPaint()};
 $("vTest").onclick=async()=>{try{speechSynthesis.cancel()}catch(e){};if(window.VN){VN.stop();VN.unlock()}
   if(window.VN&&VN.pref){const r=await VN.probar();vnPaint();if(r.ok)return}
@@ -630,7 +632,7 @@ async function startConv(){
   closeSheets();go("plano");CV.on=true;CV.busy=false;document.body.classList.add("cv");$("fabAg").classList.add("live");$("convBar").hidden=false;
   try{if(navigator.wakeLock)CV.wl=await navigator.wakeLock.request("screen")}catch(e){}
   try{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
-  if(window.VN)VN.unlock();
+  if(window.VN&&convNat())VN.unlock();
   cvIdle();cvState("hab","");
   await cvSay(sel&&S.shapes.find(x=>x.id===sel)?"Te escucho. Dime qué hacemos con este cuarto.":"Te escucho. Dime qué dibujamos.");
   if(CV.on)cvListen();
@@ -704,7 +706,7 @@ function cvSay(txt,solo){
     const dice=()=>{
       if(fin)return;if(i>=partes.length){cierra();return}
       const txt=partes[i++];
-      if(window.VN&&VN.pref&&!VN.disabled){
+      if(window.VN&&VN.pref&&!VN.disabled&&convNat()){
         if(partes[i])VN.prefetch(partes[i],rate+0.05);
         VN.say(txt,rate+0.05).then(ok=>{if(fin)return;if(ok)dice();else dispositivo(txt)})
       }else dispositivo(txt)};
