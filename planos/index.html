@@ -116,6 +116,23 @@ body.pres .convbar,body.pres .fab2{display:none!important}
 #resumen .rs b{display:block;font-size:20px;color:var(--pri2)}#resumen .rs span{font-size:11px;color:var(--mut)}
 #resumen .row{margin:0}
 body.pres #resumen{display:none!important}
+#home{position:fixed;inset:0;z-index:100;background:#000;overflow-y:auto;display:flex;justify-content:center;padding:calc(16px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))}
+#home .hglow{position:fixed;left:50%;top:26%;width:min(120vw,720px);height:min(120vw,720px);transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(232,205,133,.28) 0%,rgba(184,146,58,.12) 35%,transparent 68%);animation:glow 4s ease-in-out infinite alternate;pointer-events:none}
+@keyframes glow{from{opacity:.55;transform:translate(-50%,-50%) scale(.94)}to{opacity:1;transform:translate(-50%,-50%) scale(1.06)}}
+#home .hwrap{position:relative;width:100%;max-width:440px;margin:auto;display:flex;flex-direction:column;align-items:center;text-align:center;animation:hin .9s ease both}
+@keyframes hin{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
+#home .hlogo{width:min(86vw,400px);mix-blend-mode:lighten;animation:flota 5s ease-in-out infinite alternate;filter:drop-shadow(0 10px 30px rgba(184,146,58,.35))}
+@keyframes flota{from{transform:translateY(0)}to{transform:translateY(-8px)}}
+#home .htit{font-family:Georgia,"Times New Roman",serif;font-size:clamp(15px,4.6vw,26px);letter-spacing:.14em;white-space:nowrap;font-weight:700;margin-top:4px;background:linear-gradient(90deg,#b8923a,#f6e3a8,#b8923a);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:brilla 3.5s linear infinite}
+@keyframes brilla{to{background-position:-200% 0}}
+#home .hsub{color:var(--mut);margin:8px 0 18px;font-size:15px}
+#home .hbtns{width:100%;display:flex;flex-direction:column;gap:10px}
+#home button.big{min-height:58px;font-size:18px;border-radius:16px;box-shadow:0 8px 26px rgba(184,146,58,.4)}
+#home .hbtns>button.sec{min-height:50px}
+#home .hgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#home .hgrid button{min-height:50px;font-size:14px}
+#home .hfoot{margin-top:18px;font-size:11px;letter-spacing:.12em;color:#6f6550;text-transform:uppercase}
+.brand{cursor:pointer}
 .sheet{position:fixed;left:10px;right:10px;bottom:calc(var(--nav) + 22px + env(safe-area-inset-bottom));z-index:40;background:var(--card);border:1px solid var(--bd);border-radius:22px;box-shadow:0 -10px 40px rgba(0,0,0,.3);padding:14px;max-height:64dvh;overflow:auto}
 .sheet h3{margin:0 0 10px;font-size:16px}
 #tabs.sheet{display:flex;flex-direction:column;gap:6px}
@@ -305,6 +322,20 @@ body.pres .stage #cv{height:calc(100dvh - 110px)}
 </div>
 </section>
 </main>
+<div id="home" hidden>
+  <div class="hglow"></div>
+  <div class="hwrap">
+    <img class="hlogo" src="personaje.jpg" alt="El Patrón · Departamentos">
+    <div class="htit">PLANOS DE REFERENCIA</div>
+    <div class="hsub">Levanta, dibuja y entrega tus remodelaciones</div>
+    <div class="hbtns">
+      <button id="hCont" class="big"></button>
+      <button id="hVoz" class="sec">🎤 Hablar con el agente</button>
+      <div class="hgrid"><button id="hNew" class="sec">🆕 Nuevo proyecto</button><button id="hCuenta" class="sec">🔐 Mi equipo</button><button id="hCurso" class="sec">🎓 Curso y videos</button><button id="hTour" class="sec">🧭 Ejercicio guiado</button></div>
+    </div>
+    <div class="hfoot">Departamentos El Patrón · plano de referencia</div>
+  </div>
+</div>
 <div id="tour" hidden><div id="tSpot"></div><div id="tBub"><div id="tStep"></div><div id="tTxt"></div><div class="trow"><button class="sec" id="tExit">Salir</button><button class="sec" id="tAuto" hidden>✍️ Hazlo por mí</button><button id="tNext">Siguiente ➡️</button></div></div></div>
 <div id="scrim" hidden></div><div id="toast" hidden></div>
 <nav id="nav" aria-label="Secciones">
@@ -616,6 +647,21 @@ $("fabAg").onclick=()=>{if(CV.on)stopConv();else startConv()};
 $("fabTxt").onclick=()=>openAgent();
 $("cvStop").onclick=stopConv;
 $("cvCfg").onclick=()=>{llenaVoces();openSheet("sheetAg")};
+/* ---------- portada de inicio ---------- */
+function homeShow(){
+  if(TOUR&&TOUR.on)return;
+  const n=S.shapes.filter(x=>x.type==="cuarto").length,nm=(S.name||"Proyecto").trim();
+  $("hCont").textContent=S.shapes.length?`▶️ Continuar: ${nm.length>22?nm.slice(0,21)+"…":nm} · ${n} ${n===1?"cuarto":"cuartos"}`:"🏗️ Empezar un plano";
+  $("home").hidden=false;try{$("home").scrollTop=0}catch(e){}
+}
+function homeHide(){$("home").hidden=true;try{fit();draw()}catch(e){}}
+$("hCont").onclick=()=>{homeHide();go("plano")};
+$("hVoz").onclick=()=>{homeHide();go("plano");setTimeout(()=>startConv(),150)};
+$("hNew").onclick=()=>{if(S.shapes.length&&!confirm("¿Empezar un proyecto nuevo? Guarda antes el JSON o súbelo a la nube si quieres conservar el actual."))return;S=blank();sel=null;fit();render();homeHide();go("plano")};
+$("hCuenta").onclick=()=>{homeHide();go("mas")};
+$("hCurso").onclick=()=>{location.href="curso.html"};
+$("hTour").onclick=()=>{homeHide();go("plano");setTimeout(()=>tourStart(),150)};
+document.querySelector(".brand").onclick=()=>{if(typeof CV!=="undefined"&&CV.on)return;closeSheets();homeShow()};
 /* ---------- ejercicio guiado (globos) ---------- */
 const TOUR={on:false,i:0,timer:null,backup:null,pend:false};
 const TBK="planos-tour-backup";
@@ -692,6 +738,7 @@ window.addEventListener("resize",()=>{if(TOUR.on)tourPlace();clearTimeout(window
   let pend=null;try{pend=localStorage.getItem(TBK)}catch(e){}
   if(pend&&!/tour=1/.test(location.search)){setTimeout(()=>{if(confirm("Quedó un ejercicio guiado a medias. ¿Recupero tu proyecto?")){TOUR.backup=pend;tourRestore();toast("✅ Recuperé tu proyecto")}else{try{localStorage.removeItem(TBK)}catch(e){}}},600)}
   if(/tour=1/.test(location.search)){setTimeout(()=>{try{history.replaceState(null,"",location.pathname)}catch(e){}tourStart()},500)}
+  else if(!pend)homeShow();
 }
 /* tarjetas plegables */
 for(const el of[$("calco"),$("verCard"),$("invCard"),$("reglas"),$("mats").closest(".card")]){el.classList.add("fold","closed");const h=el.querySelector("h2");if(h)h.onclick=()=>el.classList.toggle("closed")}
