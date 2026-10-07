@@ -92,9 +92,14 @@ input[type=text]{font:inherit;width:100%;padding:12px;border-radius:12px;border:
 #vid .vt b{flex:1;font-family:Georgia,serif;color:var(--pri2);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #vCnt{color:var(--mut);font-size:12px}
 #vid .vt button{min-height:34px;padding:4px 10px;font-size:15px}
-#vSeg{display:flex;gap:3px;padding:0 10px 3px}
-#vSeg i{flex:1;height:4px;border-radius:3px;background:#2a2314;cursor:pointer}
-#vSeg i.on{background:var(--pri)}#vSeg i.cur{background:var(--pri2);box-shadow:0 0 8px var(--pri2)}
+#vBar2{position:absolute;left:8px;right:64px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:6;display:flex;align-items:center;gap:8px;background:rgba(18,14,6,.84);border:1px solid #4a3b1c;border-radius:14px;padding:6px 10px;transition:opacity .35s}
+#vBar2.hide{opacity:0;pointer-events:none}
+#vBar2 span{font-size:12px;color:var(--tx);min-width:36px;text-align:center;font-variant-numeric:tabular-nums}
+#vTrack{position:relative;flex:1;height:34px;touch-action:none;cursor:pointer}
+#vTrack::before{content:"";position:absolute;left:0;right:0;top:14px;height:6px;border-radius:3px;background:#2d2615}
+#vFill{position:absolute;left:0;top:14px;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--pri),var(--pri2));width:0}
+#vTicks i{position:absolute;top:11px;width:2px;height:12px;background:#000;opacity:.75}
+#vThumb{position:absolute;top:8px;left:0;width:18px;height:18px;border-radius:50%;background:var(--pri2);transform:translateX(-50%);box-shadow:0 0 10px rgba(232,205,133,.85)}
 #vid .stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;padding:0;container-type:size;cursor:pointer}
 #vid .frame{transition:transform 1.1s cubic-bezier(.4,0,.2,1);transform-origin:50% 50%;will-change:transform;position:relative;width:min(100cqw,calc(100cqh * .4621));height:min(100cqh,calc(100cqw * 2.164));border-radius:12px;overflow:hidden;background:#000}
 #vid .frame>img{width:100%;height:100%;display:block}
@@ -115,7 +120,7 @@ input[type=text]{font:inherit;width:100%;padding:12px;border-radius:12px;border:
 .side.hide{opacity:0;pointer-events:none}
 .side button{width:46px;height:46px;min-height:0;padding:0;font-size:19px;border-radius:14px;background:rgba(18,14,6,.82);color:var(--tx);border:1px solid #4a3b1c;box-shadow:0 2px 10px rgba(0,0,0,.6)}
 .side #vPlay{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#17110a}
-#vCap{position:absolute;left:8px;right:64px;bottom:10px;z-index:4;background:rgba(0,0,0,.78);border-radius:12px;padding:8px 12px;font-size:17px;line-height:1.3;text-align:center;pointer-events:none}
+#vCap{position:absolute;left:8px;right:64px;bottom:64px;z-index:4;background:rgba(0,0,0,.78);border-radius:12px;padding:8px 12px;font-size:17px;line-height:1.3;text-align:center;pointer-events:none}
 #vCap.off{display:none}
 #vOpts{position:absolute;left:8px;right:8px;bottom:8px;z-index:8;background:#100d07;border:1px solid #4a3b1c;border-radius:16px;padding:10px;box-shadow:0 10px 40px rgba(0,0,0,.8)}
 #vOpts .ctl{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:6px}
@@ -133,9 +138,9 @@ input[type=text]{font:inherit;width:100%;padding:12px;border-radius:12px;border:
 <main id="app"></main>
 <div id="vid" hidden>
   <div class="vt"><b id="vTit"></b><span id="vCnt"></span><button class="sec" id="vX" aria-label="Cerrar">✕</button></div>
-  <div id="vSeg"></div>
   <div class="stage" id="vStage"></div>
   <div id="vCap" class="off"></div>
+  <div id="vBar2"><span id="vT0">0:00</span><div id="vTrack"><div id="vFill"></div><div id="vTicks"></div><div id="vThumb"></div></div><span id="vT1">0:00</span></div>
   <div class="side" id="vSide">
     <button class="sec" id="vPrev" aria-label="Escena anterior">⏮</button>
     <button class="sec" id="vRep" aria-label="Repetir escena">↺</button>
@@ -148,7 +153,7 @@ input[type=text]{font:inherit;width:100%;padding:12px;border-radius:12px;border:
   <div id="vOpts" hidden>
     <div class="ctl"><select id="vVoz" aria-label="Voz"></select><select id="vRate"><option value="0.6">Muy lenta</option><option value="0.7">Lenta</option><option value="0.8" selected>Normal</option><option value="0.9">Rápida</option><option value="1.0">Muy rápida</option></select></div>
     <div class="ctl"><button class="sec" id="vTest" style="font-size:14px">▶️ Probar voz</button><button class="sec" id="vOptsX" style="font-size:14px">Listo</button></div>
-    <div class="stp" id="vVozInfo"></div>
+    
   </div>
 </div>
 <div id="vChap" hidden><p><button class="sec" id="vChapX">⬅️ Volver al video</button></p><h1>📑 Escenas</h1><div class="grid" id="vChapL"></div></div>
@@ -620,10 +625,9 @@ try{speechSynthesis.getVoices()}catch(e){}
 function llenaVoz(){const sel=$("vVoz"),vs=vocesES().sort((a,b)=>vScore(b)-vScore(a)),m=mejorVoz();let pref="";try{pref=localStorage.getItem(VK)||""}catch(e){}
   sel.innerHTML='<option value="">Voz: automática (la mejor)</option>'+vs.map(v=>`<option value="${esc(vUri(v))}">${esc(vEtiqueta(v))}</option>`).join("");sel.value=vs.some(v=>vUri(v)===pref)?pref:"";
   const bueno=vs.some(v=>vCalidad(v)>=2);
-  if(!bueno||!vs.length)$("vOpts").hidden=false;
-  $("vVozInfo").innerHTML=vs.length?`🗣️ Hablando con: <b>${esc(m?vEtiqueta(m):"voz por defecto")}</b> · ${vs.length} voces en español`+(bueno?"":"<br>⚠️ No veo voces <b>Mejoradas</b> en tu teléfono. Descárgalas en Ajustes → Accesibilidad → Lectura y voz → Contenido hablado → Voces → Español (México); luego cierra Safari por completo y vuelve a entrar."):"⚠️ El teléfono no mostró voces en español. Cierra Safari por completo y vuelve a entrar.";}
+}
 const sceneImg=sc=>sc.img||sc.auto||null;
-function segs(){const el=$("vSeg");if(el.childElementCount!==V.sc.length){el.innerHTML=V.sc.map((_,i)=>`<i data-i="${i}"></i>`).join("")}[...el.children].forEach((c,i)=>{c.className=i<V.i?"on":(i===V.i?"cur":"")})}
+function segs(){}
 function vShow(){
   const sc=V.sc[V.i];if(!sc)return;segs();V.k=0;
   $("vTit").textContent=(sc.mod||V.title)+(sc.tit?" · "+sc.tit:"");$("vCnt").textContent=`${V.i+1}/${V.sc.length}`;
@@ -663,12 +667,12 @@ function vSpeak(){
   if(V.k>=sc.lines.length){
     if(sc.turno){V.wait=true;const tb=$("vTb");if(tb)tb.hidden=false;$("vCap").textContent="Cuando termines, toca “Ya lo hice”.";return}
     const my=++V.tok;setTimeout(()=>{if(my!==V.tok||!V.on)return;vGo(V.i+1)},1300);return}
-  const line=sc.lines[V.k];$("vCap").textContent=line.t;vCue(line);
+  const line=sc.lines[V.k];$("vCap").textContent=line.t;vCue(line);V.t0=performance.now();
   if(!window.speechSynthesis){setTimeout(()=>{V.k++;vSpeak()},Math.max(2500,line.t.length*95));return}
   const my=++V.tok;try{speechSynthesis.cancel()}catch(e){}
   const u=new SpeechSynthesisUtterance(line.t);u.lang="es-MX";const v=mejorVoz();if(v){u.voice=v;u.lang=v.lang}
   u.rate=parseFloat($("vRate").value)||0.8;
-  const next=()=>{if(my!==V.tok)return;setTimeout(()=>{if(my!==V.tok)return;V.k++;vSpeak()},750)};u.onend=next;u.onerror=next;
+  const next=()=>{if(my!==V.tok)return;const real=(performance.now()-V.t0)/1000,est=estLine(line.t)/V.corr;if(real>0.6&&real<40){V.corr=Math.min(2.5,Math.max(0.5,V.corr*0.85+0.15*(real/est)))}setTimeout(()=>{if(my!==V.tok)return;V.k++;vSpeak()},750)};u.onend=next;u.onerror=next;
   try{speechSynthesis.speak(u)}catch(e){next()}
 }
 function vGo(i){
@@ -680,17 +684,16 @@ async function vStart(scenes,title){
   await Promise.all([vocesListas(),cargaRects()]);llenaVoz();
   V.sc=scenes;V.title=title||"";V.paused=false;V.on=true;V.wait=false;V.i=0;$("vid").hidden=false;document.body.style.overflow="hidden";$("vChap").hidden=true;
   try{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
-  $("vPlay").textContent="⏸";vShow();vSpeak();vSideShow();
+  $("vPlay").textContent="⏸";vBuild();vShow();vSpeak();vSideShow();
 }
 function vStop(){V.on=false;V.tok++;try{speechSynthesis.cancel()}catch(e){}$("vid").hidden=true;document.body.style.overflow=""}
 function vEnd(){V.on=false;V.tok++;$("vStage").innerHTML=`<div class="chap"><div class="ci">🎬</div><h2>Fin del video</h2><p>Ahora haz tu práctica y el examen.</p><div class="tbt"><button id="vEx">🏁 Hacer el examen</button><button class="sec" id="vAg">↺ Ver de nuevo</button></div></div>`;$("vCap").textContent="Gracias por tu atención. ¡Mucho éxito!";$("vPlay").textContent="↺";
-  segs();[...$("vSeg").children].forEach(c=>c.className="on")}
+  vClock(true)}
 document.addEventListener("click",e=>{
   if(e.target.closest("#vOk")){V.wait=false;vGo(V.i+1);return}
   if(e.target.closest("#vRe")){V.wait=false;V.k=0;vSpeak();return}
   if(e.target.closest("#vEx")){const ex=V.sc.some(s=>s.mod&&EXPRESS.some(m=>m.t===s.mod));vStop();go(ex?"examx":"exam");return}
   if(e.target.closest("#vAg")){vGo(0);return}
-  const sg=e.target.closest("#vSeg i");if(sg){vGo(+sg.dataset.i);return}
   const ch=e.target.closest("#vChap [data-go]");if(ch){$("vChap").hidden=true;vGo(+ch.dataset.go);return}
   if(e.target.closest("#vStage")&&!e.target.closest("button,a")&&V.sc.length){vSideToggle()}
 });
@@ -702,12 +705,12 @@ let SUB=false;try{SUB=localStorage.getItem("curso-sub")==="1"}catch(e){}
 function aplicaSub(){$("vCap").classList.toggle("off",!SUB)}aplicaSub();
 $("vSub").onclick=()=>{SUB=!SUB;try{localStorage.setItem("curso-sub",SUB?"1":"0")}catch(e){}aplicaSub();vSideShow()};
 let sideT=null;
-function vSideShow(){const sd=$("vSide");sd.classList.remove("hide");clearTimeout(sideT);sideT=setTimeout(()=>{if(!V.paused&&$("vOpts").hidden)sd.classList.add("hide")},4500)}
-function vSideToggle(){const sd=$("vSide");if(sd.classList.contains("hide"))vSideShow();else{clearTimeout(sideT);sd.classList.add("hide")}}
+function vSideShow(){const sd=$("vSide"),b2=$("vBar2");sd.classList.remove("hide");b2.classList.remove("hide");clearTimeout(sideT);sideT=setTimeout(()=>{if(!V.paused&&$("vOpts").hidden&&!V.drag){sd.classList.add("hide");b2.classList.add("hide")}},4500)}
+function vSideToggle(){const sd=$("vSide");if(sd.classList.contains("hide"))vSideShow();else{clearTimeout(sideT);sd.classList.add("hide");$("vBar2").classList.add("hide")}}
 $("vCapB").onclick=()=>{const L=V.sc.map((s,i)=>`<button class="mod ${i===V.i?"done":""}" data-go="${i}"><div class="top"><span class="ico">${s.chapter?s.chapter.ico:s.turno?"✋":"🎞️"}</span><div><b>${esc(s.chapter?s.chapter.t:s.turno?"Tu turno":(s.tit||"Escena "+(i+1)))}</b><small>Escena ${i+1}</small></div></div></button>`).join("");$("vChapL").innerHTML=L;$("vChap").hidden=!$("vChap").hidden};
 $("vChapX").onclick=()=>$("vChap").hidden=true;
 $("vVoz").onchange=()=>{try{localStorage.setItem(VK,$("vVoz").value)}catch(e){}llenaVoz();if(V.on&&!V.paused&&!V.wait){V.tok++;vSpeak()}};
-$("vRate").onchange=()=>{try{localStorage.setItem("curso-rate",$("vRate").value)}catch(e){}if(V.on&&!V.paused&&!V.wait){V.tok++;vSpeak()}};
+$("vRate").onchange=()=>{try{localStorage.setItem("curso-rate",$("vRate").value)}catch(e){}vBuild();if(V.on&&!V.paused&&!V.wait){V.tok++;vSpeak()}};
 try{const r=localStorage.getItem("curso-rate");if(r&&[...$("vRate").options].some(o=>o.value===r))$("vRate").value=r}catch(e){}
 $("vPlay").onclick=()=>{vSideShow();
   if(!V.on&&V.i>=V.sc.length-1&&$("vPlay").textContent==="↺"){vGo(0);return}
@@ -715,6 +718,27 @@ $("vPlay").onclick=()=>{vSideShow();
 $("vNext").onclick=()=>{vGo(V.i+1);vSideShow()};
 $("vPrev").onclick=()=>{vGo(V.i-1);vSideShow()};
 $("vRep").onclick=()=>{V.paused=false;$("vPlay").textContent="⏸";vGo(V.i);vSideShow()};
+/* ---- reloj y barra de tiempo ---- */
+V.flat=[];V.total=0;V.corr=1;V.t0=0;V.drag=false;V.turnoS=10;
+const fmt=t=>{t=Math.max(0,Math.round(t));return Math.floor(t/60)+":"+String(t%60).padStart(2,"0")};
+function estLine(t){const rate=parseFloat($("vRate").value)||0.8;return(t.length/(13.5*rate/0.8)+0.75)*V.corr}
+function vBuild(){let acc=0;V.flat=[];V.starts=[];
+  V.sc.forEach((sc,i)=>{V.starts.push(acc);sc.lines.forEach((l,k)=>{const d=estLine(l.t);V.flat.push({i,k,s:acc,d});acc+=d});acc+=1.3;if(sc.turno)acc+=V.turnoS});
+  V.total=acc;
+  $("vTicks").innerHTML=V.starts.map(t=>`<i style="left:${(100*t/Math.max(1,V.total)).toFixed(2)}%"></i>`).join("");vClock(true)}
+function vNow(){const f=V.flat.find(x=>x.i===V.i&&x.k===Math.min(V.k,(V.sc[V.i]?.lines.length||1)-1));if(!f)return 0;const el=V.on&&!V.paused&&!V.wait?(performance.now()-V.t0)/1000:0;return f.s+Math.min(f.d,el)}
+function vClock(force){if(V.drag&&!force)return;const t=V.on||force?vNow():V.total,p=Math.min(1,t/Math.max(1,V.total));
+  $("vFill").style.width=(p*100)+"%";$("vThumb").style.left=(p*100)+"%";$("vT0").textContent=fmt(t);$("vT1").textContent=fmt(V.total)}
+setInterval(()=>{if(!$("vid").hidden)vClock()},250);
+function vJumpTo(t){let f=V.flat[0];for(const x of V.flat){if(x.s<=t)f=x;else break}if(!f)return;
+  V.tok++;try{speechSynthesis.cancel()}catch(e){}V.wait=false;V.on=true;V.i=f.i;vShow();V.k=f.k;V.t0=performance.now();if(!V.paused)vSpeak();vClock(true)}
+(function(){const tr=$("vTrack");
+  const frac=e=>{const r=tr.getBoundingClientRect();return Math.min(1,Math.max(0,(e.clientX-r.left)/r.width))};
+  const move=e=>{const f=frac(e);$("vFill").style.width=(f*100)+"%";$("vThumb").style.left=(f*100)+"%";$("vT0").textContent=fmt(f*V.total)};
+  tr.addEventListener("pointerdown",e=>{V.drag=true;try{tr.setPointerCapture(e.pointerId)}catch(_){}move(e);vSideShow()});
+  tr.addEventListener("pointermove",e=>{if(V.drag)move(e)});
+  const fin=e=>{if(!V.drag)return;V.drag=false;vJumpTo(frac(e)*V.total)};
+  tr.addEventListener("pointerup",fin);tr.addEventListener("pointercancel",()=>{V.drag=false;vClock(true)})})();
 document.addEventListener("click",e=>{const b=e.target.closest("[data-video]");if(!b)return;const id=b.dataset.video;
   if(id==="all-e")vStart(EXPRESS.flatMap(escenasDe),"Curso express");
   else if(id==="all-f")vStart(MODS.flatMap(escenasDe),"Curso completo");
