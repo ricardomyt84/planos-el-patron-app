@@ -38,6 +38,7 @@ const THEMESIDX=t=>TRACKS.filter(x=>!x.custom).findIndex(x=>x.grass[0]===t.grass
 const trackDesc=t=>t.custom?{id:t.id,n:t.n,theme:Math.max(0,THEMESIDX(t)),seed:t.cseed,p:t.cpts||null}:{id:t.id};
 function resolveTrack(d){let t=TRACKS.find(x=>x.id===d.id);if(t)return t;if(window.V4&&V4.mkCustom&&(d.seed!=null||Array.isArray(d.p))){const c={id:String(d.id).slice(0,24),n:clean(d.n)||'Pista',theme:num(d.theme),seed:num(d.seed)};if(Array.isArray(d.p))c.pts=d.p.slice(0,24).map(q=>[num(q[0]),num(q[1])]);t=V4.mkCustom(c);TRACKS.push(t);return t}return TRACKS[0]}
 const tracksFor=(mode,long)=>mode==='race'?[N.lob.tracks[0]||trackDesc(TRACKS[0])]:TRACKS.filter(t=>!t.custom&&(long||!t.extra)).map(trackDesc);
+const EMOS=new Set(['😂','🤑','😱','👑','🔥','🐀','🏠','🧱','🌮','📄','😎','🥲','🥇','🐶','👴','🧟','🧑‍🌾','🔧','😴','⚔️']);
 const teamOf=id=>N.lob.teams?Math.max(0,order.indexOf(id))%2:-1;
 function hello(){send({t:'hi',n:N.me.name,c:N.me.ci,pc:N.me.pc,pl:N.me.pl,h:N.host?1:0})}
 function sendLobby(){if(!N.host)return;const L=N.lob;send({t:'lobby',mode:L.mode,tr:L.tracks,ti:L.ti,pts:L.pts,tp:L.tp,teams:L.teams?1:0,long:L.long?1:0,out:L.out,st:racing?'racing':'lobby'})}
@@ -74,6 +75,7 @@ function onMsg(m){
     case'fin':{const k=kartById(id);if(k){k.fin=true;k.finT=num(m.ft);if(firstFinRaceT<0)firstFinRaceT=raceT}break}
     case'stat':{const key=id+':'+num(m.r);if(statSeen[key])break;statSeen[key]=1;const S=STAT[id]||(STAT[id]={c:0,m:0,h:0});S.c+=num(m.c);S.m+=num(m.m);S.h+=num(m.h);renderStats();break}
     case'res':{onRes(m);break}
+    case'emo':{const e=String(m.e||'');const k=kartById(id);if(k&&(EMOS.has(e)||CHARS.some(c=>c.e===e)))k.emo={e,until:performance.now()+2600};break}
     case'bye':{N.peers.delete(id);const k=kartById(id);if(k){const i=karts.indexOf(k);if(i>=0)karts.splice(i,1)}renderLobbyIfOpen();break}
   }}
 function resetTournament(){const L=N.lob;L.pts={};L.tp={0:0,1:0};L.out=[];L.ti=0;STAT={};statSeen={};N.spectator=false}
@@ -158,9 +160,20 @@ N.results=function(X){const me=N.me.id,R=lastRes;
   else if(R.mode==='elim'&&R.elim===me)title='🧟 Quedaste eliminado';
   else title=pos===1?'🏆 ¡Ganaste la carrera en línea!':pos?'🏁 Terminaste '+pos+'° en línea':'🏁 Carrera terminada';
   X.title=title;
+  if(R.last&&R.mode!=='race'&&!N.spectator&&!R._sub){R._sub=1;let won=false;if(R.teams){const t0=R.tp[0]||0,t1=R.tp[1]||0;won=t0!==t1&&(t0>t1?0:1)===myTeam}else if(R.mode==='elim'){const al=R.rank.filter(r=>r.id!==R.elim);won=((al.length===1?al[0]:al.sort((a,b)=>(R.pts[b.id]||0)-(R.pts[a.id]||0))[0]||{}).id)===me}else won=Object.keys(R.pts).sort((a,b)=>R.pts[b]-R.pts[a])[0]===me;
+    if(won&&R.rank.length>=2)champSubmit(R.mode,R.rank.length,!!R.teams)}
   const more=!(R.last||R.mode==='race');
   X.body.push(N.host?`<div class="hint" style="margin:2px">${more?'Toca "Siguiente pista" para continuar':'Toca "Volver a la sala" para jugar otra'}</div>`:'<div class="hint" style="margin:2px">⏳ Esperando al anfitrión…</div>');
   const ag=$('bAgain');ag.style.display=N.host?'':'none';ag.textContent=more?'➡️ Siguiente pista':'🏠 Volver a la sala'};
+function champSubmit(mode,players,teams){try{fetch(SBURL+'/rest/v1/rpc/kart_champ_submit',{method:'POST',headers:{apikey:SBKEY,'Content-Type':'application/json'},body:JSON.stringify({p_device:devId(),p_name:N.me.name,p_mode:mode,p_players:Math.max(2,Math.min(8,players)),p_teams:!!teams})}).catch(()=>{})}catch(e){}}
+async function showChamps(){showScreen('champs');const b=$('champsBody');b.textContent='Cargando… ⏳';try{const r=await fetch(SBURL+'/rest/v1/rpc/kart_champ_top',{method:'POST',headers:{apikey:SBKEY,'Content-Type':'application/json'},body:'{}'});const rows=await r.json();if(!Array.isArray(rows)||!rows.length){b.innerHTML='Aún no hay campeones 😴<br>¡Gana un torneo en línea y sal aquí! 🏆';return}
+  b.innerHTML='<table>'+rows.slice(0,15).map((x,i)=>`<tr><td>${['🥇','🥈','🥉'][i]||(i+1)+'°'}</td><td>${esc(x.name)}</td><td>${x.wins} 🏆</td></tr>`).join('')+'</table>'}catch(e){b.textContent='No pude cargar 😕 Revisa tu internet'}}
+$('onChamps').onclick=showChamps;$('champsBack').onclick=()=>showScreen('online');
+/* ---- emotes ---- */
+(function(){const tray=$('emoTray'),bt=$('bEmo');if(!tray||!bt)return;
+  function build(){tray.innerHTML='';const own=(CHARS[N.me.ci]||{}).e;const list=[own,'😂','🤑','😱','👑','🔥','🐀'].filter(Boolean);list.forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=ev=>{ev.stopPropagation();tray.classList.remove('on');if(player)player.emo={e,until:performance.now()+2600};send({t:'emo',e});if(!EMOS.has(e))EMOS.add(e)};tray.appendChild(b)})}
+  bt.onclick=ev=>{ev.stopPropagation();if(tray.classList.contains('on')){tray.classList.remove('on');return}build();tray.classList.add('on')};
+  setInterval(()=>{const show=N.on&&racing&&!N.spectator&&state==='race';bt.classList.toggle('on',show);if(!show)tray.classList.remove('on')},400)})();
 function hostNext(){if(!N.host||!lastRes)return;const L=N.lob;
   if(!lastRes.last&&lastRes.mode!=='race'){const ti=L.ti+1,d=L.tracks[ti]||trackDesc(TRACKS[Math.min(ti,3)]);L.ti=ti;
     const ids=order.filter(id=>id===N.me.id||alive().some(p=>p.id===id)).filter(id=>!L.out.includes(id));

@@ -138,3 +138,8 @@ NEWCH.chino=(g,s)=>{const R=s*.34;
   g.restore()};
 NEWCH.has=id=>!!NEWCH[id]&&typeof NEWCH[id]==='function';
 })();
+/* 👑 EL PATRÓN DORADO (personaje secreto): la cara del Patrón bañada en oro y con corona */
+NEWCH.dorado=(g,s)=>{const w=s*1.5,im=(typeof IMG!=='undefined')?IMG.head:null;
+  if(im){const h=w*im.height/im.width,t=document.createElement('canvas');t.width=Math.ceil(w);t.height=Math.ceil(h);const tg=t.getContext('2d');tg.drawImage(im,0,0,w,h);tg.globalCompositeOperation='source-atop';const gr=tg.createLinearGradient(0,0,w,h);gr.addColorStop(0,'rgba(255,236,120,.62)');gr.addColorStop(.5,'rgba(255,190,0,.5)');gr.addColorStop(1,'rgba(214,150,0,.6)');tg.fillStyle=gr;tg.fillRect(0,0,w,h);g.drawImage(t,-w/2,-h*0.62,w,h)}
+  const R=s*.34;g.fillStyle='#ffd43b';g.strokeStyle='#8a5a00';g.lineWidth=R*.05;g.beginPath();g.moveTo(-R*.8,-R*1.34);g.lineTo(-R*.8,-R*1.9);g.lineTo(-R*.4,-R*1.55);g.lineTo(0,-R*2.0);g.lineTo(R*.4,-R*1.55);g.lineTo(R*.8,-R*1.9);g.lineTo(R*.8,-R*1.34);g.closePath();g.fill();g.stroke();
+  g.fillStyle='#e03131';for(const x of[-.8,0,.8]){g.beginPath();g.arc(R*x,-R*1.78,R*.09,0,Math.PI*2);g.fill()}g.fillStyle='rgba(255,255,255,.8)';for(const[x,y]of[[-.5,-.9],[.55,-.7],[.1,-.3]]){g.beginPath();g.arc(R*x,R*y,R*.06,0,Math.PI*2);g.fill()}};

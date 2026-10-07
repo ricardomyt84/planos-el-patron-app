@@ -73,6 +73,9 @@ button.sec{background:#1b1608;color:var(--gold);box-shadow:0 5px 0 #000,0 0 0 2p
 #tiltBar{position:fixed;left:50%;bottom:calc(10px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(40vw,240px);height:8px;background:rgba(0,0,0,.5);border:2px solid rgba(232,205,133,.7);border-radius:6px;z-index:14;display:none}
 #tiltBar.on{display:block}#tiltBar i{position:absolute;top:-4px;width:6px;height:14px;left:50%;margin-left:-3px;background:var(--gold);border-radius:3px}
 #pad.tilt #bL,#pad.tilt #bR{display:none}
+#bEmo{display:none;left:calc(14px + env(safe-area-inset-left));top:34%;width:54px;height:54px;border-radius:50%;font-size:26px}#bEmo.on{display:flex}
+#emoTray{position:absolute;left:calc(76px + env(safe-area-inset-left));top:28%;display:none;gap:6px;flex-wrap:wrap;width:230px;pointer-events:auto}#emoTray.on{display:flex}#emoTray button{padding:6px 10px;font-size:26px;border-radius:14px;box-shadow:0 3px 0 #000}
+.ch.lock{opacity:.7}
 #res{background:rgba(10,8,4,.9);justify-content:flex-start;overflow-y:auto;padding-top:6px}
 #res .title,#champ .title{font-size:clamp(17px,4.4vw,32px)!important;line-height:1.1}
 #res table{margin:2px auto}#res .row{margin-top:6px}
@@ -132,6 +135,7 @@ button.sec{background:#1b1608;color:var(--gold);box-shadow:0 5px 0 #000,0 0 0 2p
 
 <div id="tracks" class="scr glass">
   <div class="title" style="font-size:clamp(22px,6vw,40px)">ELIGE LA PISTA</div>
+  <div id="tkTabs" class="seg" style="margin:4px 0"></div>
   <div id="tkRow"></div>
   <div class="row"><button class="sec" id="bBack2">⬅️ Atrás</button></div>
 </div>
@@ -151,7 +155,7 @@ button.sec{background:#1b1608;color:var(--gold);box-shadow:0 5px 0 #000,0 0 0 2p
   <div class="row"><button id="onCreate">🏁 Crear sala</button></div>
   <div class="row" style="margin-top:8px"><input id="onCode" maxlength="4" placeholder="CÓDIGO" style="font:900 22px system-ui;letter-spacing:.2em;padding:10px;border-radius:12px;border:2px solid #b8923a;background:#15110a;color:#fff;width:150px;text-align:center;text-transform:uppercase;-webkit-user-select:text;user-select:text"><button class="sec" id="onJoin">➡️ Unirme</button></div>
   <div id="onMsg" class="hint" style="min-height:1.4em;color:#ffd9a0"></div>
-  <div class="row"><button class="sec" id="onBack">⬅️ Atrás</button></div>
+  <div class="row"><button class="sec" id="onChamps">🏆 Campeones</button><button class="sec" id="onBack">⬅️ Atrás</button></div>
 </div>
 
 <div id="lobby" class="scr glass">
@@ -183,6 +187,12 @@ button.sec{background:#1b1608;color:var(--gold);box-shadow:0 5px 0 #000,0 0 0 2p
   <div class="row"><button class="sec" id="penDice">🎲 Otra forma</button><button class="sec" id="penCancel">Cancelar</button><button id="penOk">✅ Crear pista</button></div>
 </div>
 
+<div id="champs" class="scr glass">
+  <div class="title" style="font-size:clamp(20px,5vw,34px)">🏆 CAMPEONES DE TORNEOS</div>
+  <div id="champsBody" class="hint" style="font-size:clamp(13px,3.4vw,18px);color:#fff">Cargando…</div>
+  <div class="row"><button class="sec" id="champsBack">⬅️ Atrás</button></div>
+</div>
+
 <div id="drawt" class="scr glass">
   <div class="title" style="font-size:clamp(20px,5vw,34px)">✏️ DIBUJA TU PISTA</div>
   <div class="hint" style="margin:2px">Con el dedo, dibuja un circuito cerrado: sin cruzarte y con curvas abiertas.</div>
@@ -204,12 +214,13 @@ button.sec{background:#1b1608;color:var(--gold);box-shadow:0 5px 0 #000,0 0 0 2p
   <input type="range" id="faceZ" min="100" max="400" value="100">
   <div class="row"><button class="sec" id="faceCancel">Cancelar</button><button id="faceOk">✅ Usar esta cara</button></div>
 </div>
+<input type="file" id="bphFile" accept="image/*" style="display:none">
 <input type="file" id="faceFile" accept="image/*" style="display:none">
 
 <div id="res" class="scr glass">
   <div class="title" id="resT" style="font-size:clamp(24px,7vw,48px)">¡CARRERA TERMINADA!</div>
   <div id="resBody"></div>
-  <div class="row"><button id="bAgain">🔁 Otra carrera</button><button class="sec" id="bMenu">🏠 Menú</button></div>
+  <div class="row"><button id="bAgain">🔁 Otra carrera</button><button class="sec" id="bShare">📣 Compartir</button><button class="sec" id="bMenu">🏠 Menú</button></div>
 </div>
 
 <div id="how" class="scr glass">
@@ -227,7 +238,7 @@ button.sec{background:#1b1608;color:var(--gold);box-shadow:0 5px 0 #000,0 0 0 2p
 
 <div id="pad">
   <button class="pb" id="bL">◀</button><button class="pb" id="bR">▶</button>
-  <button class="pb" id="bI">🧱</button><button class="pb" id="b2L">◀</button><button class="pb" id="b2R">▶</button><button class="pb" id="b2I">🧱</button><button class="pb" id="bD">DERRAPE</button><button class="pb" id="bG">⛽<br>GAS</button>
+  <button class="pb" id="bI">🧱</button><button class="pb" id="b2L">◀</button><button class="pb" id="b2R">▶</button><button class="pb" id="b2I">🧱</button><button class="pb" id="bEmo">💬</button><div id="emoTray"></div><button class="pb" id="bD">DERRAPE</button><button class="pb" id="bG">⛽<br>GAS</button>
 </div>
 <div id="tiltBar"><i></i></div>
 <div id="top"><button class="sec" id="bMute">🔊</button><button class="sec" id="bPause">⏸</button></div>
@@ -270,7 +281,8 @@ const CHARS=[
  {id:'socanibal',n:'Socaníbal',col:'#82c91e',col2:'#e9fac8',spd:0.80,hand:1.00,q:'«¡Yo mejor me quedo en la salida!»',e:'😱'},
  {id:'agricultor',n:'El Agricultor',col:'#a0632a',col2:'#f3dfc1',spd:0.95,hand:0.66,q:'«¡Lo que se siembra, se cosecha!»',e:'🌾'},
  {id:'vida',n:'Vida',col:'#15aabf',col2:'#c5f6fa',spd:0.78,hand:0.72,q:'«¿Esto se aprieta o se afloja?»',e:'🔧'},
- {id:'chino',n:'El Chino',col:'#5f3dc4',col2:'#e5dbff',spd:0.87,hand:0.82,q:'«¡Ya chilló la rata!»',e:'🐀'}
+ {id:'chino',n:'El Chino',col:'#5f3dc4',col2:'#e5dbff',spd:0.87,hand:0.82,q:'«¡Ya chilló la rata!»',e:'🐀'},
+ {id:'dorado',n:'El Patrón Dorado',col:'#e0a800',col2:'#fff3bf',spd:0.97,hand:0.90,q:'«¡Todo lo que toco se hace renta!»',e:'👑',secret:10}
 ];
 const BASE=CHARS.length,FACE_COL=['#0ca678','#e8590c','#7048e8','#c2255c','#1098ad','#5c940d'];
 const IMG={};
@@ -566,7 +578,7 @@ function newKart(ci,slot,isPlayer){
   const off=col?-34:34;return{ci,ch:CHARS[ci],x:w.x+w.nx*off,y:w.y+w.ny*off,a:w.a,spd:0,steer:0,lean:0,drift:0,driftT:0,boost:0,spin:0,spinA:0,star:0,item:null,itemT:rnd(1.5,4),lap:0,wpi:(WPN-3-row*3+WPN)%WPN,prog:0,fin:false,finT:0,ai:!isPlayer,skill:rnd(0.93,1.0),lane:rnd(-45,45),isPlayer,human:isPlayer,slot,surf:1,bump:0,mud:0,roll:0,coins:0};
 }
 function startRace(){
-  const pool=CHARS.map((_,i)=>i).filter(i=>i!==picked&&!(P2&&i===picked2));
+  const pool=CHARS.map((_,i)=>i).filter(i=>i!==picked&&!(P2&&i===picked2)&&!(CHARS[i].secret&&window.V4&&V4.achCount()<CHARS[i].secret));
   let others=MODE==='tt'?[]:(MODE==='champ'&&CH&&CH.others)?CH.others:pool.sort(()=>Math.random()-.5).slice(0,P2?3:4);
   if(MODE==='champ'&&CH&&!CH.others)CH.others=others;
   if(MODE==='online'&&window.NETG&&NETG.on){karts=NETG.makeKarts()}
@@ -822,6 +834,7 @@ function drawSprites(){
     if(o.kart){const k=o.kart;y+=Math.sin(t*26+k.slot*2)*Math.min(1,k.spd/260)*0.8*Math.min(2.2,p.sc*.3);
       if(o.spin){ctx.save();ctx.translate(p.sx,y+h/2);ctx.rotate(o.spin);ctx.drawImage(o.img,-w/2,-h/2,w,h);ctx.restore()}
       else ctx.drawImage(o.img,x,y,w,h);
+      if(k.emo&&performance.now()<k.emo.until){const rem=(k.emo.until-performance.now())/2600,sz=Math.max(18,Math.min(44,w*.3)),yy=y-sz*.9-(1-rem)*sz*.6;ctx.save();ctx.globalAlpha=Math.min(1,rem*4);ctx.fillStyle='rgba(255,255,255,.92)';ctx.strokeStyle='#e8cd85';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.sx,yy,sz*.68,0,TAU);ctx.fill();ctx.stroke();ctx.font=sz+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#000';ctx.fillText(k.emo.e,p.sx,yy+sz*.04);ctx.restore()}
       {const nm=k.name||(k.isPlayer?'':(k.ch&&k.ch.n)||'');if(nm&&state!=='menu'&&w>13&&!(P2&&k.human)){const fs=Math.max(8,Math.min(15,w*.1));ctx.font=`bold ${fs}px Arial`;ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.lineWidth=3;ctx.lineJoin='round';ctx.strokeStyle='rgba(0,0,0,.85)';const tg=(k.team>=0?(k.team?'🧱 ':'🏠 '):'')+nm,ty=y+h+fs*.75;ctx.strokeText(tg,p.sx,ty);ctx.fillStyle=k.team===0?'#74c0fc':k.team===1?'#ffa94d':'#fff';ctx.fillText(tg,p.sx,ty);
         const q=(!k.remote&&k.ch&&k.ch.q)?k.ch.q.replace(/[«»]/g,''):'';if(q&&w>78){const f2=Math.max(7,fs*.78);ctx.font=`italic bold ${f2}px Arial`;ctx.lineWidth=2.5;ctx.strokeStyle='rgba(0,0,0,.8)';ctx.strokeText(q,p.sx,ty+f2*1.2);ctx.fillStyle='#ffd9a0';ctx.fillText(q,p.sx,ty+f2*1.2)}}}
       if(o.star){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.4+.3*Math.sin(t*30);ctx.drawImage(o.img,x,y,w,h);ctx.restore();GLOWS.push([p.sx,y+h*.5,w*.34,`hsl(${(t*400)%360},100%,60%)`,.3])}
@@ -916,9 +929,10 @@ $('faceCancel').onclick=()=>showScreen('select');
 $('faceOk').onclick=()=>{const n=((prompt('¿Cómo se llama este piloto?','Piloto')||'').trim().slice(0,14))||'Piloto';const o=document.createElement('canvas');o.width=o.height=160;o.getContext('2d').drawImage($('faceCv'),0,0,160,160);const d=o.toDataURL('image/jpeg',.82);const nc=CHARS.filter(c=>c.custom).length;if(nc>=6){alert('Máximo 6 caras. Borra una con la ✖');return}
   const img=new Image();img.onload=()=>{const i=nc;CHARS.push({id:'c'+i,n,col:FACE_COL[i%FACE_COL.length],col2:'#fff',spd:0.84,hand:0.86,face:img,custom:true,d});saveCustoms();picked=CHARS.length-1;buildSelect();showScreen('select')};img.src=d};
 function delCustom(i){if(!confirm('¿Borrar a '+CHARS[i].n+'?'))return;CHARS.splice(i,1);for(const k in KS)delete KS[k];saveCustoms();picked=0;buildSelect()}
-function buildSelect(){const wrap=$('chars');wrap.innerHTML='';CHARS.forEach((c,i)=>{const d=document.createElement('div');d.className='ch'+(i===picked?' sel':'');const cn=document.createElement('canvas');cn.width=cn.height=120;const g=cn.getContext('2d');g.fillStyle='#0b0905';g.fillRect(0,0,120,120);g.fillStyle=(i===picked&&PAINT.c)?PAINT.c:c.col;g.beginPath();g.arc(60,64,46,0,TAU);g.fill();g.fillStyle='rgba(255,255,255,.12)';g.beginPath();g.arc(60,64,46,Math.PI,0);g.fill();drawHead(g,c,60,62,58);
+function buildSelect(){const wrap=$('chars');wrap.innerHTML='';CHARS.forEach((c,i)=>{const lk=!!(c.secret&&window.V4&&V4.achCount()<c.secret);const d=document.createElement('div');d.className='ch'+(i===picked?' sel':'')+(lk?' lock':'');const cn=document.createElement('canvas');cn.width=cn.height=120;const g=cn.getContext('2d');g.fillStyle='#0b0905';g.fillRect(0,0,120,120);g.fillStyle=(i===picked&&PAINT.c)?PAINT.c:c.col;g.beginPath();g.arc(60,64,46,0,TAU);g.fill();g.fillStyle='rgba(255,255,255,.12)';g.beginPath();g.arc(60,64,46,Math.PI,0);g.fill();drawHead(g,c,60,62,58);
   d.appendChild(cn);d.insertAdjacentHTML('beforeend',`<b>${esc(c.n)}</b><small class="qt">${esc((c.q||'').replace(/[«»]/g,''))}</small><div class="bar"><i style="width:${c.spd*100}%"></i></div><div class="bar h"><i style="width:${c.hand*100}%"></i></div>`);
   if(c.custom){const x=document.createElement('span');x.className='x';x.textContent='✖';x.onclick=e=>{e.stopPropagation();delCustom(i)};d.appendChild(x)}
+  if(lk){d.querySelector('b').textContent='🔒 Secreto';const qq=d.querySelector('.qt');if(qq)qq.textContent='Consigue '+c.secret+' logros';cn.style.filter='grayscale(1) brightness(.35)';d.onclick=()=>{audioUnlock();beep(200,.12);alert('🔒 Este personaje es secreto. Se desbloquea con '+c.secret+' logros 🎖️')};wrap.appendChild(d);return}
   d.onclick=()=>{picked=i;audioUnlock();beep(660,.08);if(c.id==='chino'&&window.V4)V4.speak('rata',true);buildSelect()};wrap.appendChild(d)});
   $('chTag').textContent=(CHARS[picked].q||'«¡El nuevo inquilino del año!»');
   if(CHARS.length-BASE<6){const a=document.createElement('div');a.className='ch add';a.innerHTML='<div class="plus">📸</div><b>Tu cara</b>';a.onclick=()=>{audioUnlock();$('faceFile').click()};wrap.appendChild(a)}}
