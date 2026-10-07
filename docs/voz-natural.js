@@ -45,7 +45,7 @@ VN.say=async function(texto,vel){
 /* Prueba de conexión para mostrar el estado. */
 VN.probar=async function(){VN.disabled=false;VN.estado="";const ok=await VN.say("Hola. Esta es la voz natural de Google.",1);return{ok,estado:VN.estado,detalle:VN.ultimoError}};
 VN.sesionOk=()=>{const s=sesion();return !!(s&&s.access_token)};
-VN.diagnostico=function(){if(!VN.pref)return"📱 Usando la voz del teléfono";if(!VN.sesionOk())return"🔐 No has iniciado sesión en esta dirección. Entra en ⚙️ Más de la app y vuelve";return VN.estado?VN.mensaje(VN.estado):"🎙️ Sesión iniciada. Toca ▶️ Probar voz para comprobar la voz natural"};
+VN.diagnostico=function(){if(!VN.pref)return"📱 Usando la voz del teléfono";if(!VN.sesionOk())return"🔐 No has iniciado sesión en esta dirección. Entra en ⚙️ Más de la app y vuelve";return(VN.estado&&VN.estado!=="sin_sesion")?VN.mensaje(VN.estado):"🎙️ Sesión iniciada. Toca ▶️ Probar voz para comprobar la voz natural"};
 VN.mensaje=e=>({ok:"✅ Voz natural activa",sin_clave:"⏳ Falta pegar la clave de Google en Supabase",sin_sesion:"🔐 Entra en ⚙️ Más para usar la voz natural",sin_red:"📶 Sin internet: uso la voz del teléfono",clave_sin_permiso:"🔑 La clave de Google no tiene permiso para Text-to-Speech",voz_invalida:"🗣️ El nombre de la voz no es válido"})[e]||("⚠️ "+(e||"Sin respuesta"));
 window.VN=VN;
 })();
