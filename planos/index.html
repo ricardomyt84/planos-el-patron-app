@@ -8,6 +8,7 @@
 <meta name="color-scheme" content="dark">
 <link rel="icon" type="image/png" href="logo-icon-96.png">
 <link rel="manifest" href="manifest.webmanifest">
+<script src="voz-natural.js"></script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="El Patrón">
@@ -303,6 +304,8 @@ body.pres .stage #cv{height:calc(100dvh - 110px)}
     <div class="row"><button class="sec" id="bMic2">🎤 Hablar</button><button id="bAg2">Enviar</button><button class="sec" id="bUndo2">↩️</button></div>
     <label class="status"><input type="checkbox" id="agVoz" checked style="width:auto"> 🔊 Que me conteste con voz (al escribir)</label>
     <div class="status" style="margin-top:10px"><b>🎧 Voz de la conversación</b></div>
+    <label class="status">Tipo de voz<select id="vnSel"><option value="mujer">🎙️ Natural (Google): mujer</option><option value="hombre">🎙️ Natural (Google): hombre</option><option value="off">📱 La voz del teléfono</option></select></label>
+    <div class="status" id="vnInfo" style="color:var(--mut)"></div>
     <label class="status">Voz<select id="vSel"></select></label>
     <label class="status">Velocidad <span id="vRateT"></span><input type="range" id="vRate" min="0.7" max="1.2" step="0.05" value="0.95"></label>
     <label class="status"><input type="checkbox" id="vAud" style="width:auto"> 🎧 Uso audífonos (puedo interrumpirlo hablando)</label>
@@ -562,9 +565,12 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(
 try{$("agVoz").checked=localStorage.getItem("planos-voz")!=="0";$("agConv").checked=localStorage.getItem("planos-conv")==="1"}catch(e){}
 $("agVoz").onchange=()=>{try{localStorage.setItem("planos-voz",$("agVoz").checked?"1":"0")}catch(e){}if(!$("agVoz").checked){try{speechSynthesis.cancel()}catch(e){}}};
 $("agConv").onchange=()=>{try{localStorage.setItem("planos-conv",$("agConv").checked?"1":"0")}catch(e){}if($("agConv").checked)$("agVoz").checked=true};
-function decir(txt,then){const ok=$("agVoz").checked&&window.speechSynthesis&&txt;if(!ok){if(then)then();return}
+function decir(txt,then){
+  if($("agVoz").checked&&txt&&window.VN&&VN.pref&&!VN.disabled){VN.say(txt,1.0).then(ok=>{if(ok){if(then)then()}else decirDisp(txt,then)});return}
+  decirDisp(txt,then)}
+function decirDisp(txt,then){const ok=$("agVoz").checked&&window.speechSynthesis&&txt;if(!ok){if(then)then();return}
   try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang="es-MX";u.onend=()=>{if(then)then()};u.onerror=()=>{if(then)then()};speechSynthesis.speak(u)}catch(e){if(then)then()}}
-function primeVoz(){try{if(window.speechSynthesis&&$("agVoz").checked){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(""))}}catch(e){}}
+function primeVoz(){if(window.VN)VN.unlock();try{if(window.speechSynthesis&&$("agVoz").checked){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(""))}}catch(e){}}
 function escuchar(){primeVoz();dictar($("agText2"),$("bMic2"),$("agOut2"),()=>{if($("agText2").value.trim())agEnviar()},false)}
 async function agEnviar(){const t=$("agText2").value.trim();if(!t)return;const out=$("agOut2");primeVoz();$("agText2").value="";out.className="status";out.textContent="⏳ Pensando…";
   try{const r=await runAgent(t);out.className="status ok";out.innerHTML=r.log.map(esc).join("<br>")||"Sin cambios";
@@ -607,7 +613,12 @@ $("vRateT").textContent=$("vRate").value+"×";
 $("vSel").onchange=()=>{try{localStorage.setItem(VK,$("vSel").value)}catch(e){}};
 $("vRate").oninput=()=>{$("vRateT").textContent=$("vRate").value+"×";try{localStorage.setItem("planos-voz-rate",$("vRate").value)}catch(e){}};
 $("vAud").onchange=()=>{try{localStorage.setItem("planos-aud",$("vAud").checked?"1":"0")}catch(e){}};
-$("vTest").onclick=()=>{try{speechSynthesis.cancel()}catch(e){};cvSay("Hola, soy el agente de El Patrón. ¿Qué dibujamos hoy?",true)};
+function vnPaint(){const el=$("vnInfo");if(!el||!window.VN)return;el.textContent=!VN.pref?"📱 Usando la voz del teléfono":(VN.estado?VN.mensaje(VN.estado):"🎙️ Voz natural lista; se confirma al probarla")}
+if(window.VN){$("vnSel").value=VN.pref?VN.voz:"off";vnPaint()}
+$("vnSel").onchange=()=>{const v=$("vnSel").value;if(v==="off")VN.pref=false;else{VN.pref=true;VN.voz=v;VN.disabled=false}vnPaint()};
+$("vTest").onclick=async()=>{try{speechSynthesis.cancel()}catch(e){};if(window.VN){VN.stop();VN.unlock()}
+  if(window.VN&&VN.pref){const r=await VN.probar();vnPaint();if(r.ok)return}
+  cvSay("Hola, soy el agente de El Patrón. ¿Qué dibujamos hoy?",true)};
 function cvState(st,txt){const m={esc:"Te escucho…",pen:"Pensando…",hab:"Hablando…"};$("cvSt").textContent=m[st]||st;if(txt!==undefined)$("cvTxt").textContent=txt;$("convBar").dataset.st=st}
 function cvIdle(){clearTimeout(CV.idle);CV.idle=setTimeout(()=>{if(CV.on){toast("🎧 Conversación en pausa por inactividad");stopConv()}},180000)}
 async function startConv(){
@@ -617,6 +628,7 @@ async function startConv(){
   closeSheets();go("plano");CV.on=true;CV.busy=false;document.body.classList.add("cv");$("fabAg").classList.add("live");$("convBar").hidden=false;
   try{if(navigator.wakeLock)CV.wl=await navigator.wakeLock.request("screen")}catch(e){}
   try{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+  if(window.VN)VN.unlock();
   cvIdle();cvState("hab","");
   await cvSay(sel&&S.shapes.find(x=>x.id===sel)?"Te escucho. Dime qué hacemos con este cuarto.":"Te escucho. Dime qué dibujamos.");
   if(CV.on)cvListen();
@@ -658,16 +670,21 @@ function cvSay(txt,solo){
     const partes=(String(txt).replace(/[*_#`]/g,"").match(/[^.!?\n]+[.!?]*/g)||[String(txt)]).map(x=>x.trim()).filter(Boolean);
     let i=0,fin=false,barge=null;
     const cierra=()=>{if(fin)return;fin=true;try{if(barge){barge.onend=null;barge.abort()}}catch(e){}CV.cancel=null;res()};
-    CV.cancel=()=>{try{speechSynthesis.cancel()}catch(e){}cierra()};
+    CV.cancel=()=>{try{speechSynthesis.cancel()}catch(e){}if(window.VN)VN.stop();cierra()};
     if(!solo&&$("vAud").checked&&CV.on&&SR){ // con audífonos: se puede interrumpir hablando
       try{barge=new SR();barge.lang="es-MX";barge.interimResults=true;barge.continuous=false;let t="";
         barge.onresult=e=>{t="";for(let k=0;k<e.results.length;k++)t+=e.results[k][0].transcript;if(t.trim().length>=3&&!fin){try{speechSynthesis.cancel()}catch(x){}CV.carry="";CV.barging=true;cierra()}};
         barge.onend=()=>{if(CV.barging){CV.barging=false}};barge.start()}catch(e){barge=null}}
+    const rate=parseFloat($("vRate").value)||0.95;
+    const dispositivo=txt=>{const u=new SpeechSynthesisUtterance(txt);u.lang="es-MX";const v=mejorVoz();if(v){u.voice=v;u.lang=v.lang}
+      u.rate=rate;u.pitch=1;u.onend=dice;u.onerror=dice;try{speechSynthesis.speak(u)}catch(e){cierra()}};
     const dice=()=>{
       if(fin)return;if(i>=partes.length){cierra();return}
-      const u=new SpeechSynthesisUtterance(partes[i++]);u.lang="es-MX";const v=mejorVoz();if(v){u.voice=v;u.lang=v.lang}
-      u.rate=parseFloat($("vRate").value)||0.95;u.pitch=1;u.onend=dice;u.onerror=dice;
-      try{speechSynthesis.speak(u)}catch(e){cierra()}};
+      const txt=partes[i++];
+      if(window.VN&&VN.pref&&!VN.disabled){
+        if(partes[i])VN.prefetch(partes[i],rate+0.05);
+        VN.say(txt,rate+0.05).then(ok=>{if(fin)return;if(ok)dice();else dispositivo(txt)})
+      }else dispositivo(txt)};
     dice();
   });
 }
