@@ -23,3 +23,6 @@ Esta sesión arranca en **Sonnet** (`"model": "sonnet"` en `.claude/settings.jso
 - 🟢 **Lo sencillo → subagente Haiku** (`Agent` con `model: "haiku"`): buscar/leer archivos, git status/log, correr pruebas y resumirlas, typos, notas, commits/push de cambios ya hechos.
 - 🟠 **Código, bugs, diseño → lo haces tú (Sonnet).**
 - 🔴 **Delicado → subagente Opus** (`Agent` con `model: "opus"`; si existe, el agente `tareas-delicadas`): migraciones, seguridad, dinero, revisar PRs antes de fusionar. Solo cuando lo amerite y avisando a Ricardo del costo. La calidad no se negocia: ante la duda, sube de modelo.
+
+## 🗜️ Compactación automática (Ricardo, 8 nov 2026 — ahorro de plan)
+Se compacta sola antes de llenarse (`CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=60` en `.claude/settings.json`). **Al compactar conserva:** restricciones y decisiones vigentes de Ricardo, PRs/links abiertos y su estado, pendientes, archivos tocados y por qué, y el formato de respuesta. **Descarta:** salidas largas de comandos, exploración de archivos y intentos fallidos.
