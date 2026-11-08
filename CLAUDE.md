@@ -17,3 +17,9 @@ cuentan **10×** (1 min = 10). En nov-2026 se gastaron **3,575 min en 3 días**.
   siempre `paths:`, `concurrency` con `cancel-in-progress: true` y `timeout-minutes`;
   Linux (`ubuntu-*`) salvo que de verdad se necesite Mac. Antes de agregar un trigger,
   calcula los minutos/mes y díselo a Ricardo.
+
+## 💸 REGLA DE DELEGACIÓN POR MODELO (Ricardo, 8 nov 2026 — ahorro de plan, todas las sesiones)
+Esta sesión arranca en **Sonnet** (`"model": "sonnet"` en `.claude/settings.json`). El jefe DELEGA con la herramienta Agent:
+- 🟢 **Lo sencillo → subagente Haiku** (`Agent` con `model: "haiku"`): buscar/leer archivos, git status/log, correr pruebas y resumirlas, typos, notas, commits/push de cambios ya hechos.
+- 🟠 **Código, bugs, diseño → lo haces tú (Sonnet).**
+- 🔴 **Delicado → subagente Opus** (`Agent` con `model: "opus"`; si existe, el agente `tareas-delicadas`): migraciones, seguridad, dinero, revisar PRs antes de fusionar. Solo cuando lo amerite y avisando a Ricardo del costo. La calidad no se negocia: ante la duda, sube de modelo.
